@@ -14,6 +14,11 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     *
+     * @param nickname
+     * @return 없는 nickname 이면 true, 존재하면 false
+     */
     public boolean isNicknameAvailable(String nickname) {
         Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
         return optionalMember.isEmpty();
@@ -52,6 +57,12 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    /**
+     *
+     * @param memberId
+     * @param password
+     * @return 비밀번호가 맞으면 true, 틀리면 false
+     */
     public boolean isCorrectPassword(Long memberId, String password){
         Member member = memberRepository.findMemberById(memberId).orElseThrow();
         return passwordEncoder.matches(password, member.getPassword());

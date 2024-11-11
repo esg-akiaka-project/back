@@ -51,6 +51,12 @@ public class AuthService {
         levelRepository.save(level);
     }
 
+    /**
+     *
+     * @param loginReqDTO email, password
+     * @return 일치하는 member를 찾아 jwt를 생성해 member와 jwt를 반환
+     * @throws Exception 가입되지 않은 경우, 비밀번호가 틀릴 경우
+     */
     public JwtMemberDTO login(LoginReqDTO loginReqDTO) throws Exception {
         Optional<Member> memberOptional = memberRepository.findMemberByEmail(loginReqDTO.getEmail());
         if(memberOptional.isEmpty()){
@@ -70,6 +76,11 @@ public class AuthService {
                 .build();
     }
 
+    /**
+     * 
+     * @param jwtReqDTO refresh token 만 사용
+     * @return rtk 로 유저를 찾고, access, refresh 모두 새로 발급해 JwtMemberDTO반환
+     */
     public JwtMemberDTO reissue(JwtReqDTO jwtReqDTO) {
         // 검증
         if(jwtProvider.validateToken(jwtReqDTO.getRefreshToken())){
