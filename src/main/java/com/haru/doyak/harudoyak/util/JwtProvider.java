@@ -4,7 +4,9 @@ import com.haru.doyak.harudoyak.dto.auth.jwt.JwtRecord;
 import com.haru.doyak.harudoyak.entity.Member;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -12,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class JwtProvider {
@@ -47,7 +50,7 @@ public class JwtProvider {
                 .add("typ", "rtk")
                 .and()
                 .issuedAt(Date.from(ZonedDateTime.now().toInstant()))
-                .expiration(Date.from(ZonedDateTime.now().plusHours(atkExpirationHour).toInstant()))
+                .expiration(Date.from(ZonedDateTime.now().plusHours(rtkExpirationHour).toInstant()))
                 .signWith(key)
                 .compact();
     }
@@ -94,5 +97,11 @@ public class JwtProvider {
         return claims;
     }
 
+    public String parseBearerToken(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
+                .filter(token -> token.length() > 7 && token.startsWith("Bearer "))
+                .map(token -> token.substring(7))
+                .orElse(null);
+    }
 
 }

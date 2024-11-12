@@ -1,5 +1,6 @@
 package com.haru.doyak.harudoyak.domain.auth;
 
+import com.haru.doyak.harudoyak.annotation.CheckOwner;
 import com.haru.doyak.harudoyak.domain.auth.oauth.OAuthService;
 import com.haru.doyak.harudoyak.dto.auth.*;
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtMemberDTO;
@@ -65,6 +66,12 @@ public class AuthController {
     public ResponseEntity validate(){
         Object object = RequestContextHolder.getRequestAttributes().getAttribute("authenticated", RequestAttributes.SCOPE_REQUEST);
         return ResponseEntity.ok().body(object.toString());
+    }
+
+    @CheckOwner
+    @PostMapping("validate/{memberId}")
+    public ResponseEntity validateMemberId(@PathVariable("memberId") Long memberId){
+        return ResponseEntity.ok().body(memberId+"성공");
     }
 
     @PostMapping("reissue")
