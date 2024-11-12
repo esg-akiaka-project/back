@@ -11,7 +11,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,8 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LogCustomRepositoryImpl implements LogCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
-
-    // private final QLog log = QLog.log;
 
     @Override
     public List<ResLogDTO> findLogAllByMemberId(Long memberId) {
@@ -37,28 +34,29 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
 
 
     @Override
-    public List<Tuple> findLogLetterMemberWhereArrivedDateBetweenDatetime(LocalDateTime startDate, LocalDateTime endDate) {
-         return jpaQueryFactory.select(log, letter, member)
+    public List<Tuple> findLetterMemberWhereBetweenLogCreationDateTime(LocalDateTime startDate, LocalDateTime endDate) {
+         return jpaQueryFactory.select(letter.content, member.memberId, member.aiNickname)
                 .from(log)
                 .leftJoin(member)
                 .on(member.memberId.eq(log.member.memberId))
-                .leftJoin(letter)
+                .rightJoin(letter)
                 .on(letter.log.logId.eq(log.logId))
                 .where(
-                        letter.arrivedDate.between(startDate, endDate)
+                        log.creationDate.between(startDate, endDate)
                 )
                 .fetch();
     }
 
-    public List<Tuple> findLogMemberWhereCreationDateBetweenDatetime(LocalDateTime startDate, LocalDateTime endDate) {
-        return jpaQueryFactory.select(member, member.count())
+    @Override
+    public List<Tuple> findLogMemberWhereBetweenLogCreationDatetime(LocalDateTime startDate, LocalDateTime endDate) {
+        return jpaQueryFactory.select(log.member.memberId, log.member.memberId.count())
                 .from(log)
                 .leftJoin(member)
                 .on(member.memberId.eq(log.member.memberId))
                 .where(
                         log.creationDate.between(startDate, endDate)
                 )
-                .groupBy(member.memberId)
+                .groupBy(log.member.memberId)
                 .fetch();
     }
 

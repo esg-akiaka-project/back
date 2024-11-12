@@ -3,6 +3,7 @@ package com.haru.doyak.harudoyak.repository.querydsl;
 import com.haru.doyak.harudoyak.dto.log.ResLogDTO;
 import com.querydsl.core.Tuple;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,7 +14,7 @@ public interface LogCustomRepository {
      * */
     List<ResLogDTO> findLogAllByMemberId(Long memberId);
 
-    List<Tuple> findLogLetterMemberWhereArrivedDateBetweenDatetime(LocalDateTime startDate, LocalDateTime endDate);
+    List<Tuple> findLetterMemberWhereBetweenLogCreationDateTime(LocalDateTime startDate, LocalDateTime endDate);
 
-    List<Tuple> findLogMemberWhereCreationDateBetweenDatetime(LocalDateTime startDate, LocalDateTime endDate);
+    List<Tuple> findLogMemberWhereBetweenLogCreationDatetime(LocalDateTime startDate, LocalDateTime endDate);
 }
