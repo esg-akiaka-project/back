@@ -1,3 +1,4 @@
+/*
 package com.haru.doyak.harudoyak.config;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +10,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 @Configuration
-    public class WebConfig /*implements WebMvcConfigurer*/ {
+    public class WebConfig */
+/*implements WebMvcConfigurer*//*
+ {
 
         @Value("${serverbBaseUrl}")
         private String serverUrl;
@@ -19,7 +22,9 @@ import org.springframework.web.filter.CorsFilter;
             CorsConfiguration config = new CorsConfiguration();
 //            config.setAllowCredentials(true); // 쿠키 및 인증 정보 허용
             config.addAllowedOrigin("*");// 허용할 출처
-            /*config.addAllowedHeader("*");*/ // 모든 헤더 허용  // 모든 HTTP 메서드 허용 (GET, POST, PUT, PATCH, DELETE, OPTIONS 등)
+            */
+/*config.addAllowedHeader("*");*//*
+ // 모든 헤더 허용  // 모든 HTTP 메서드 허용 (GET, POST, PUT, PATCH, DELETE, OPTIONS 등)
             config.addAllowedMethod("*");
 //            config.addExposedHeader("*"); //
             config.setMaxAge(3600L); // preflight 요청의 캐시 시간 설정 (초 단위)
@@ -34,7 +39,8 @@ import org.springframework.web.filter.CorsFilter;
         }
 
     // 리액트 CORS설정
-    /*@Override
+    */
+/*@Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOriginPatterns("http://*:3000")
@@ -43,9 +49,11 @@ import org.springframework.web.filter.CorsFilter;
                 .allowCredentials(true)
                 .maxAge(3600);
 
-    }*/
+    }*//*
+
 
     // CORS 필터 등록
+*/
 /*    @Bean
     public FilterRegistrationBean<CorsFilter> corsFilterRegistrationBean() {
 
@@ -66,6 +74,7 @@ import org.springframework.web.filter.CorsFilter;
         corsFilterBean.setOrder(0); // 가장 먼저 실행되도록 설정
 
         return corsFilterBean;
-    }*/
+    }*//*
 
-}
+
+}*/
