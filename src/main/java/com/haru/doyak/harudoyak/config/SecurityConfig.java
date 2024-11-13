@@ -12,6 +12,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
+
 
 @Configuration
 @EnableWebSecurity
@@ -46,14 +48,17 @@ public class SecurityConfig {
     }
 
     /*
-    * cors관련 설정 커스텀
-    * */
+     * cors관련 설정 커스텀
+     * */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*");
-        configuration.addAllowedMethod("*");
-        configuration.setMaxAge(3600L);
+        configuration.setAllowedOriginPatterns(Arrays.asList("*")); // 모든 도메인 및 포트 허용
+        configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
+        configuration.addAllowedHeader("*"); // 모든 헤더 허용
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setAllowCredentials(false); // 자격 증명 포함 필요 시 true로 설정
+        configuration.setMaxAge(3600L); // 캐싱 시간 설정 (단위: 초)
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
