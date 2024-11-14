@@ -19,6 +19,7 @@ public class MemberController {
         return ResponseEntity.badRequest().body(nickname+"가 중복입니다.");
     }
 
+//TODO: 데이터 변경시 바뀐걸로 로드할 수 있게 객체 response로 반환해주기
     @PutMapping("{memberId}/nickname")
     public ResponseEntity chageNickname(@PathVariable("memberId") Long memberId,
                                         @RequestBody ChangeMemberInfoReqDTO dto){

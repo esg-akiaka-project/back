@@ -31,6 +31,11 @@ public class MemberService {
         return optionalMember.isEmpty();
     }
 
+    public boolean isEmailAvailable(String email) {
+        Optional<Member> optionalMember = memberRepository.findMemberByEmail(email);
+        return optionalMember.isEmpty();
+    }
+
     public void changeNickname(Long memberId, String newNickname) {
         Optional<Member> optionalMember = memberRepository.findMemberById(memberId);
         if(optionalMember.isEmpty()) return;

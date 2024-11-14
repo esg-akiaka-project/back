@@ -104,4 +104,12 @@ public class AuthService {
                 .file(tuple.get(file))
                 .build();
     }
+
+    public boolean logout(Long memberId, String refreshToken) {
+        Member member = memberRepository.findMemberByRefreshToken(refreshToken).orElseThrow();
+        if(member.getMemberId()!=memberId) return false;
+        member.updateRefreshToken(null);
+        memberRepository.save(member);
+        return true;
+    }
 }

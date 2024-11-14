@@ -2,6 +2,7 @@ package com.haru.doyak.harudoyak.domain.auth;
 
 import com.haru.doyak.harudoyak.annotation.Authenticated;
 import com.haru.doyak.harudoyak.domain.auth.oauth.OAuthService;
+import com.haru.doyak.harudoyak.domain.member.MemberService;
 import com.haru.doyak.harudoyak.dto.auth.*;
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtMemberDTO;
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtReqDTO;
@@ -9,6 +10,7 @@ import com.haru.doyak.harudoyak.dto.auth.jwt.JwtResDTO;
 import com.haru.doyak.harudoyak.security.AuthenticatedUser;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,7 @@ public class AuthController {
     private final OAuthService oAuthService;
     private final AuthService authService;
     private final EmailService emailService;
+    private final MemberService memberService;
 
     @PostMapping("login")
     public ResponseEntity<LoginResDTO> login(@RequestBody LoginReqDTO loginReqDTO) throws Exception {
@@ -59,17 +62,14 @@ public class AuthController {
 
     @PostMapping("email/verify")
     public ResponseEntity<String> emailVerify(@RequestBody EmailVerifyReqDTO dto) throws MessagingException {
+        if(memberService.isEmailAvailable(dto.getEmail())){
+            return ResponseEntity.ok().body("이미 가입한 이메일입니다.");
+        }
         emailService.sendAuthLinkEmail(dto.getEmail());
         return ResponseEntity.ok().body("인증 메일이 발송되었습니다.");
     }
 
     @PostMapping("validate")
-    public ResponseEntity validate(){
-        Object object = RequestContextHolder.getRequestAttributes().getAttribute("authenticated", RequestAttributes.SCOPE_REQUEST);
-        return ResponseEntity.ok().body(object.toString());
-    }
-
-    @PostMapping("validate/{memberId}")
     public ResponseEntity validateMemberId(@Authenticated AuthenticatedUser authenticatedUser){
         return ResponseEntity.ok().body(authenticatedUser.toString());
     }
@@ -84,5 +84,17 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, jwtMemberDTO.getJwtRecord().authorizationType()+" "+jwtMemberDTO.getJwtRecord().accessToken())
                 .body(jwtResDTO);
+    }
+
+    @PostMapping("logout/{memberId}")
+    public ResponseEntity logout(@PathVariable("memberId") Long memberId,
+                                 @RequestBody JwtReqDTO jwtReqDTO){
+        if(jwtReqDTO.getRefreshToken()==null){
+            return ResponseEntity.badRequest().body("refresh token is null");
+        }
+        if(authService.logout(memberId, jwtReqDTO.getRefreshToken())){
+            return ResponseEntity.ok().body("로그아웃이 완료되었습니다.");
+        }
+        return ResponseEntity.badRequest().body("member jwt conflict");
     }
 }
