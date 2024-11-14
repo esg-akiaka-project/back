@@ -7,7 +7,7 @@ import com.haru.doyak.harudoyak.entity.Member;
 import com.haru.doyak.harudoyak.repository.FileRepository;
 import com.haru.doyak.harudoyak.repository.LevelRepository;
 import com.haru.doyak.harudoyak.repository.MemberRepository;
-import com.haru.doyak.harudoyak.util.JwtProvider;
+import com.haru.doyak.harudoyak.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -82,6 +82,11 @@ public class OAuthService {
                 .block();
     }
 
+    /**
+     *
+     * @param authorizationCode 구글 로그인 성공 후 redirect uri로 받은 인가코드
+     * @return db에 없으면 레벨도 함꼐 생성해 저장 후, jwt를 생성해 member와 jwt를 반환
+     */
     public JwtMemberDTO googleLogin(String authorizationCode){
         GoogleUserResponse userInfo = requestGoogleUserInfo(requestGoogleAccessToken(authorizationCode));
         // provider_id로 가입 했었는지 확인
@@ -118,6 +123,11 @@ public class OAuthService {
                 .build();
     }
 
+    /**
+     *
+     * @param authorizationCode 구글 로그인 성공 후 redirect uri로 받은 인가코드
+     * @return db에 없으면 레벨도 함꼐 생성해 저장 후, jwt를 생성해 member와 jwt를 반환
+     */
     public JwtMemberDTO kakaoLogin(String authorizationCode) {
         KakaoUserResponse userInfo = requestKakaoUserInfo(requestKakaoAccessToken(authorizationCode));
         // provider_id로 가입 했었는지 확인

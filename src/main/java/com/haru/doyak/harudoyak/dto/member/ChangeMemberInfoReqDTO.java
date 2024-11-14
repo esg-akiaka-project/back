@@ -8,4 +8,5 @@ public class ChangeMemberInfoReqDTO {
     private String aiNickname;
     private String goalName;
     private String password;
+    private String photoUrl;
 }

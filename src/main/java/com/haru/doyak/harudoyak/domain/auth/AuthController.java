@@ -1,16 +1,17 @@
 package com.haru.doyak.harudoyak.domain.auth;
 
+import com.haru.doyak.harudoyak.annotation.Authenticated;
 import com.haru.doyak.harudoyak.domain.auth.oauth.OAuthService;
-import com.haru.doyak.harudoyak.dto.auth.EmailVerifyReqDTO;
-import com.haru.doyak.harudoyak.dto.auth.JoinReqDTO;
-import com.haru.doyak.harudoyak.dto.auth.LoginReqDTO;
-import com.haru.doyak.harudoyak.dto.auth.LoginResDTO;
+import com.haru.doyak.harudoyak.domain.member.MemberService;
+import com.haru.doyak.harudoyak.dto.auth.*;
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtMemberDTO;
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtReqDTO;
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtResDTO;
+import com.haru.doyak.harudoyak.security.AuthenticatedUser;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ public class AuthController {
     private final OAuthService oAuthService;
     private final AuthService authService;
     private final EmailService emailService;
+    private final MemberService memberService;
 
     @PostMapping("login")
     public ResponseEntity<LoginResDTO> login(@RequestBody LoginReqDTO loginReqDTO) throws Exception {
@@ -62,28 +64,17 @@ public class AuthController {
 
     @PostMapping("email/verify")
     public ResponseEntity<String> emailVerify(@RequestBody EmailVerifyReqDTO dto) throws MessagingException {
-        try {
-            // 이메일 주소 유효성 검사 후 처리
-            System.out.println(dto.toString());
-            System.out.println(dto.getEmail());
-
-            String trimedEmail = dto.getEmail().trim();
-            InternetAddress emailAddr = new InternetAddress(trimedEmail);
-            emailAddr.validate();
-            System.out.println(emailAddr.getAddress());
-
-            emailService.sendAuthLinkEmail(emailAddr.getAddress());
-            return ResponseEntity.status(HttpStatus.OK).body("인증 메일이 발송되었습니다.");
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(memberService.isEmailAvailable(dto.getEmail())){
+            return ResponseEntity.ok().body("이미 가입한 이메일입니다.");
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 요청");
+        emailService.sendAuthLinkEmail(dto.getEmail());
+        return ResponseEntity.ok().body("인증 메일이 발송되었습니다.");
+
     }
 
     @PostMapping("validate")
-    public ResponseEntity validate(){
-        Object object = RequestContextHolder.getRequestAttributes().getAttribute("authenticated", RequestAttributes.SCOPE_REQUEST);
-        return ResponseEntity.ok().body(object.toString());
+    public ResponseEntity validateMemberId(@Authenticated AuthenticatedUser authenticatedUser){
+        return ResponseEntity.ok().body(authenticatedUser.toString());
     }
 
     @PostMapping("reissue")
@@ -96,5 +87,17 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, jwtMemberDTO.getJwtRecord().authorizationType()+" "+jwtMemberDTO.getJwtRecord().accessToken())
                 .body(jwtResDTO);
+    }
+
+    @PostMapping("logout/{memberId}")
+    public ResponseEntity logout(@PathVariable("memberId") Long memberId,
+                                 @RequestBody JwtReqDTO jwtReqDTO){
+        if(jwtReqDTO.getRefreshToken()==null){
+            return ResponseEntity.badRequest().body("refresh token is null");
+        }
+        if(authService.logout(memberId, jwtReqDTO.getRefreshToken())){
+            return ResponseEntity.ok().body("로그아웃이 완료되었습니다.");
+        }
+        return ResponseEntity.badRequest().body("member jwt conflict");
     }
 }
