@@ -1,11 +1,9 @@
 package com.haru.doyak.harudoyak.domain.sharedoyak;
 
-import com.haru.doyak.harudoyak.dto.sharedoyak.ReqCommentDTO;
-import com.haru.doyak.harudoyak.dto.sharedoyak.ReqShareDoyakDTO;
-import com.haru.doyak.harudoyak.dto.sharedoyak.ResReplyCommentDTO;
-import com.haru.doyak.harudoyak.dto.sharedoyak.ResShareDoyakDTO;
+import com.haru.doyak.harudoyak.dto.sharedoyak.*;
 import com.haru.doyak.harudoyak.entity.*;
 import com.haru.doyak.harudoyak.repository.FileRepository;
+import com.haru.doyak.harudoyak.repository.LevelRepository;
 import com.haru.doyak.harudoyak.repository.MemberRepository;
 import com.haru.doyak.harudoyak.repository.ShareDoyakRepository;
 import com.haru.doyak.harudoyak.repository.querydsl.DoyakCustomRepository;
@@ -26,6 +24,106 @@ public class ShareDoyakService {
     private final MemberRepository memberRepository;
     private final FileRepository fileRepository;
     private final DoyakCustomRepository doyakCustomRepository;
+    private final LevelRepository levelRepository;
+
+    /*
+     * 회원의 댓글 모아보기
+     * @param : membaerId(Long)
+     * */
+    public List<ResCommentDTO> getMemberCommentList(Long memberId){
+        List<ResCommentDTO> resCommentDTOS = shareDoyakRepository.findMemberCommentAll(memberId);
+         return resCommentDTOS;
+    }
+
+    /*
+     * 회원의 서로도약 글 모아보기
+     * @param : membaerId(Long)
+     * */
+    public List<ResShareDoyakDTO> getMemberShareDoyakList(Long memberId){
+        List<ResShareDoyakDTO> resShareDoyakDTOS = shareDoyakRepository.findMemberShareDoyakAll(memberId);
+        return resShareDoyakDTOS;
+    }
+    /*
+     * 댓글 삭제
+     * @param : memberId(Long), commentId(Long)
+     * */
+    @Transactional
+    public long setCommentDelete(Long memberId, Long commentId){
+
+        // 댓글의 작성자가 맞는지
+        long commentAuthorId = 0;
+        try{
+            Comment selectComment = shareDoyakRepository.findCommentByMemberId(memberId, commentId);
+            commentAuthorId = selectComment.getMember().getMemberId();
+        } catch (NullPointerException nullPointerException) {
+            throw new NullPointerException("해당 댓글의 작성자가 아닙니다.");
+        }
+
+        // 댓글의 작성자가 맞다면
+        long commentDeleteResult = 0;
+        if(commentAuthorId == memberId){
+            commentDeleteResult = shareDoyakRepository.commentDelete(commentId);
+            return commentDeleteResult;
+        }
+
+        // 아니라면
+        return 0;
+
+    }
+
+    /*
+     * 서로도약 삭제
+     * @param : memberId(Long), shareDoyakId(Long)
+     * */
+    @Transactional
+    public long setShareDoyakDelete(Long memberId, Long shareDoyakId) {
+
+        // 서로도약 작성자가 맞는지
+        long shareDoyakAuthorId = 0;
+        try{
+
+            ShareDoyak selectShareDoyak = shareDoyakRepository.findShaereDoyakByMemeberId(memberId, shareDoyakId);
+            shareDoyakAuthorId = selectShareDoyak.getMember().getMemberId();
+        }catch (NullPointerException nullPointerException){
+            throw new NullPointerException("해당 글의 작성자가 아닙니다.");
+        }
+
+        // 해당 서로도약 글의 작성자가 맞다면
+        long shareDoyakDeleteResult = 0;
+        if(shareDoyakAuthorId == memberId) {
+            shareDoyakDeleteResult = shareDoyakRepository.shareDoyakDelete(shareDoyakId);
+            return shareDoyakDeleteResult;
+        }
+        // 아니라면
+        return 0;
+    }
+
+    /*
+     * 댓글 수정
+     * @param : memberId(Long), commentId(Long)
+     * */
+    @Transactional
+    public long setCommentUpdate(Long memberId, Long commentId, ReqCommentDTO reqCommentDTO) {
+
+        // 댓글의 작성자가 맞는지
+        long commentAuthorId = 0;
+        try{
+            Comment selectComment = shareDoyakRepository.findCommentByMemberId(memberId, commentId);
+            commentAuthorId = selectComment.getMember().getMemberId();
+        } catch (NullPointerException nullPointerException) {
+            throw new NullPointerException("해당 댓글의 작성자가 아닙니다.");
+        }
+
+        // 댓글의 작성자가 맞다면
+        long commentUpdateResult = 0;
+        if(commentAuthorId == memberId){
+            commentUpdateResult = shareDoyakRepository.commentContentUpdate(commentId, reqCommentDTO);
+            return commentUpdateResult;
+        }
+        
+        // 아니라면
+        return 0;
+    }
 
     /*
      * 서로도약 수정
@@ -33,9 +131,8 @@ public class ShareDoyakService {
      * @return :
      * */
     @Transactional
-    public long setShareDoyakUpdate(Long memberId, Long shareDoyakId, String shareContent){
-        ReqShareDoyakDTO reqShareDoyakDTO = new ReqShareDoyakDTO();
-        reqShareDoyakDTO.setShareContent(shareContent);
+    public long setShareDoyakUpdate(Long memberId, Long shareDoyakId, ReqShareDoyakDTO reqShareDoyakDTO){
+
         long shareDoyakAuthor = 0;
         try {
             ShareDoyak selectShareDoyak = shareDoyakRepository.findShaereDoyakByMemeberId(memberId, shareDoyakId);
@@ -46,7 +143,7 @@ public class ShareDoyakService {
         // 서로도약 작성자가 해당 회원이 맞다면
         long shareDoyakUpdateResult = 0;
         if(shareDoyakAuthor == memberId){
-            shareDoyakUpdateResult = shareDoyakRepository.ShareContentUpdate(shareDoyakId, reqShareDoyakDTO);
+            shareDoyakUpdateResult = shareDoyakRepository.shareContentUpdate(shareDoyakId, reqShareDoyakDTO);
             return shareDoyakUpdateResult;
         }
         // 아니라면
@@ -197,6 +294,10 @@ public class ShareDoyakService {
                     .build();
             entityManager.persist(shareDoyak);
 
+            // 레벨 update
+            Level level = levelRepository.findLevelByMemberId(memberId).orElseThrow();
+            level.updateWhenPostShareDoyak();
+            levelRepository.save(level);
         }
 
 

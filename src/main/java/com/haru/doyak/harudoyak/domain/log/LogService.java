@@ -3,9 +3,11 @@ package com.haru.doyak.harudoyak.domain.log;
 import com.haru.doyak.harudoyak.dto.letter.ReqLetterDTO;
 import com.haru.doyak.harudoyak.dto.log.ReqLogDTO;
 import com.haru.doyak.harudoyak.dto.log.ResLogDTO;
+import com.haru.doyak.harudoyak.dto.log.ResDailyLogDTO;
 import com.haru.doyak.harudoyak.dto.log.TagDTO;
 import com.haru.doyak.harudoyak.entity.*;
 import com.haru.doyak.harudoyak.repository.FileRepository;
+import com.haru.doyak.harudoyak.repository.LevelRepository;
 import com.haru.doyak.harudoyak.repository.LogRepository;
 import com.haru.doyak.harudoyak.repository.MemberRepository;
 import jakarta.persistence.EntityManager;
@@ -24,6 +26,18 @@ public class LogService {
     private final EntityManager entityManager;
     private final MemberRepository memberRepository;
     private final FileRepository fileRepository;
+    private final LevelRepository levelRepository;
+
+    /*
+     * 일간 도약기록 조회
+     * @param : memberId(Long), logId(Long)
+     * */
+    public List<ResDailyLogDTO> getDailyLogDetail(Long memberId, Long logId) {
+
+        List<ResDailyLogDTO> resDailyLogDTOS = logRepository.findLogByLogIdAndMemberId(memberId, logId);
+
+        return resDailyLogDTOS;
+    }
 
     /*
      * 도약이 편지 작성
@@ -59,11 +73,6 @@ public class LogService {
 
         List<ResLogDTO> resLogDTOS = logRepository.findLogAllByMemberId(memberId);
 
-        for (ResLogDTO resLogDTO : resLogDTOS) {
-            log.info("resLogDTO: {}", resLogDTO.getCreationDate());
-            log.info("resLogDTO: {}", resLogDTO.getLogId());
-        }
-
         return resLogDTOS;
     }
 
@@ -73,11 +82,12 @@ public class LogService {
      * res : 200 ok 400 등
      * */
     @Transactional
-    public void setLogAdd(ReqLogDTO reqLogDTO, Long memberId) {
+    public ResLogDTO setLogAdd(ReqLogDTO reqLogDTO, Long memberId) {
 
         // 도약기록 insert 전 회원 존재하는지 isExists 확인
          boolean isExistsMember = memberRepository.existsByMemberId(memberId);
 
+         ResLogDTO resLogDTO = new ResLogDTO();
          // 회원이 존재한다면
          if (isExistsMember){
 
@@ -108,11 +118,18 @@ public class LogService {
                  setLogTag(log, tag);
              }
 
+             // 레벨 update
+             Level level = levelRepository.findLevelByMemberId(memberId).orElseThrow();
+             level.updateWhenPostLog();
+             levelRepository.save(level);
 
+             resLogDTO.setLogId(log.getLogId());
+             resLogDTO.setMemberId(selectByMember.getMemberId());
+             resLogDTO.setLogContent("기록도약 게시글 작성을 완료했습니다.");
          }
 
          // 회원이 존재하지 않다면
-
+        return resLogDTO;
     }
 
     /*

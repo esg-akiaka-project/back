@@ -9,7 +9,7 @@ group = 'com.haru.doyak'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	sourceCompatibility = '17'
+	/*sourceCompatibility = '17'*/
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(17)
 	}
@@ -39,6 +39,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.batch:spring-batch-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
 	// 데이터 유효성 검사
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
@@ -58,6 +59,7 @@ dependencies {
 
 	// bcrypt 암호화
 	implementation 'org.springframework.security:spring-security-crypto'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 }
 
 configurations {
