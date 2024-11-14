@@ -38,7 +38,6 @@ public class LogController {
     * */
     @GetMapping("daily")
     public ResponseEntity<List<ResDailyLogDTO>> getDailyLogDetail(@RequestBody ReqLogDTO reqLogDTO) {
-        log.info("memberId ------> {}", reqLogDTO.getMemberId());
         log.info("logCreationDate ------> {}", reqLogDTO.getLogId());
         List<ResDailyLogDTO> resDailyLogDTOS = logService.getDailyLogDetail(reqLogDTO);
         return ResponseEntity.ok(resDailyLogDTOS);
