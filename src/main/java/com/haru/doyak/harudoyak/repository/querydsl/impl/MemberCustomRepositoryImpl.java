@@ -1,6 +1,5 @@
 package com.haru.doyak.harudoyak.repository.querydsl.impl;
 
-import com.haru.doyak.harudoyak.dto.auth.LoginResDTO;
 import com.haru.doyak.harudoyak.entity.Member;
 
 import static com.haru.doyak.harudoyak.entity.QMember.member;
@@ -10,8 +9,11 @@ import static com.haru.doyak.harudoyak.entity.QFile.file;
 import com.haru.doyak.harudoyak.repository.querydsl.MemberCustomRepository;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -67,5 +69,15 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 .leftJoin(file).on(member.fileId.eq(file.fileId))
                 .where(member.memberId.eq(memberId))
                 .fetchOne();
+    }
+
+    @Override
+    public Optional<Tuple> findMemberFileByMemberId(Long memberId) {
+        Tuple tuple = jpaQueryFactory.select(member, file)
+                .from(member)
+                .leftJoin(file).on(member.fileId.eq(file.fileId))
+                .where(member.memberId.eq(memberId))
+                .fetchOne();
+        return Optional.ofNullable(tuple);
     }
 }

@@ -72,4 +72,14 @@ public class MemberController {
         return ResponseEntity.badRequest().body("비밀번호가 불일치 합니다");
     }
 
+    @PutMapping("{memberId}/profile")
+    public ResponseEntity changeProfile(@PathVariable("memberId") Long memberId,
+                                        @RequestBody ChangeMemberInfoReqDTO dto){
+        if(dto.getPhotoUrl()==null){
+            return ResponseEntity.badRequest().body("photo url이 없습니다.");
+        }
+        memberService.changeProfilePhoto(memberId, dto.getPhotoUrl());
+        return ResponseEntity.ok().body("프로필이 변경되었습니다.");
+    }
+
 }

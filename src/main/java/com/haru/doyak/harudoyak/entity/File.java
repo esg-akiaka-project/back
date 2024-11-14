@@ -31,4 +31,8 @@ public class File {
         this.originalName = originalName;
     }
 
+    public void updateFilePathName(String newFileUrl) {
+        this.filePathName = newFileUrl;
+    }
+
 }

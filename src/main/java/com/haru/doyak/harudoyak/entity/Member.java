@@ -83,5 +83,8 @@ public class Member {
     public void updateLocalProviderId(){
         this.providerId = this.provider+"_"+this.memberId;
     }
+    public void updateFileId(Long fileId){
+        this.fileId = fileId;
+    }
 
 }
