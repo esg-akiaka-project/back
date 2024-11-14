@@ -6,6 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(value = RetentionPolicy.RUNTIME)
-@Target(value = ElementType.METHOD)
-public @interface CheckOwner {
+@Target(value = ElementType.PARAMETER)
+public @interface Authenticated {
 }

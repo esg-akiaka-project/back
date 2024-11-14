@@ -1,4 +1,4 @@
-package com.haru.doyak.harudoyak.util;
+package com.haru.doyak.harudoyak.security;
 
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtRecord;
 import com.haru.doyak.harudoyak.entity.Member;
@@ -25,6 +25,10 @@ public class JwtProvider {
     private int atkExpirationHour;
     @Value("${jwt.rtk.expiration-hour}")
     private int rtkExpirationHour;
+    @Value("${jwt.atk.typ}")
+    private String atkTyp;
+    @Value("${jwt.rtk.typ}")
+    private String rtkType;
 
     public JwtProvider(@Value("${jwt.jwt-key}") String keyValue) {
         byte[] keyBytes = keyValue.getBytes(StandardCharsets.UTF_8);
@@ -34,7 +38,7 @@ public class JwtProvider {
     public String generateAccessToken(Map<String, Object> valueMap) {
         return Jwts.builder()
                 .header()
-                    .add("typ", "atk")
+                    .add("typ", atkTyp)
                 .and()
                 .subject((String)valueMap.get("role"))
                 .claims(valueMap)
@@ -47,7 +51,9 @@ public class JwtProvider {
     public String generateRefreshToken() {
         return Jwts.builder()
                 .header()
-                .add("typ", "rtk")
+                .add("typ", rtkType)
+                .and()
+                .claims().add("site", "harudoyak")
                 .and()
                 .issuedAt(Date.from(ZonedDateTime.now().toInstant()))
                 .expiration(Date.from(ZonedDateTime.now().plusHours(rtkExpirationHour).toInstant()))
@@ -62,15 +68,27 @@ public class JwtProvider {
                 member.getMemberId());
     }
 
-    public boolean validateToken(String token){
+    /**
+     *
+     * @param token
+     * @param typ application-secret.yaml 에 지정된 토큰 타입(typ) 값 [access, refresh]
+     * @return
+     */
+    public Map<String, Object> validateAndExtractClaims(String token, String typ){
         token = token;
         Map<String, Object> claims = null;
 
         try{
-            claims = Jwts.parser()
+            Jws<Claims> jwsClaims = Jwts.parser()
                     .verifyWith(key)
                     .build()
-                    .parseSignedClaims(token)
+                    .parseSignedClaims(token);
+
+            String jwtType = jwsClaims.getHeader().getType();
+
+            if(!jwtType.equals(typ)) throw new JwtException("토큰 타입이 일치하지 않음");
+
+            claims = jwsClaims
                     .getPayload();
 
         } catch  (MalformedJwtException malformedJwtException) {
@@ -85,7 +103,7 @@ public class JwtProvider {
             throw new RuntimeException(e.getMessage());
         }
 
-        return true;
+        return claims;
     }
 
     public Map<String, Object> extractClaimsFromJwt(String token) {

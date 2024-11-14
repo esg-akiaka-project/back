@@ -7,7 +7,7 @@ import com.haru.doyak.harudoyak.entity.Member;
 import com.haru.doyak.harudoyak.repository.FileRepository;
 import com.haru.doyak.harudoyak.repository.LevelRepository;
 import com.haru.doyak.harudoyak.repository.MemberRepository;
-import com.haru.doyak.harudoyak.util.JwtProvider;
+import com.haru.doyak.harudoyak.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;

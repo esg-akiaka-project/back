@@ -13,7 +13,7 @@ import com.haru.doyak.harudoyak.entity.Member;
 import com.haru.doyak.harudoyak.repository.FileRepository;
 import com.haru.doyak.harudoyak.repository.LevelRepository;
 import com.haru.doyak.harudoyak.repository.MemberRepository;
-import com.haru.doyak.harudoyak.util.JwtProvider;
+import com.haru.doyak.harudoyak.security.JwtProvider;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -83,7 +83,7 @@ public class AuthService {
      */
     public JwtMemberDTO reissue(JwtReqDTO jwtReqDTO) {
         // 검증
-        if(jwtProvider.validateToken(jwtReqDTO.getRefreshToken())){
+        if(jwtProvider.validateAndExtractClaims(jwtReqDTO.getRefreshToken(), "refresh")!=null){
             // rtk로 유저 찾기
             Member savedMember = memberRepository.findMemberByRefreshToken(jwtReqDTO.getRefreshToken()).orElseThrow();
             // 재발급

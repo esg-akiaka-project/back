@@ -61,6 +61,7 @@ public class Member {
         map.put("role", "ROLE_USER");
         map.put("email", this.email);
         map.put("memberId", this.memberId);
+        map.put("aiNickname", this.aiNickname);
         return map;
     }
 
