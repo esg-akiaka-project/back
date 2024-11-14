@@ -53,10 +53,11 @@ jobs:
          chmod 600 ~/key.pem
         env:
            EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-      - name: Deploy Docker container on EC2
+      - name: Deploy Docker container on EC2, Remove image:<none>
         run: |
          ssh -o StrictHostKeyChecking=no -i ~/key.pem ubuntu@${{ secrets.EC2_IP }} "docker pull ${{ secrets.DOCKER_USERNAME }}/harudoyak-back:latest &&
          cd harudoyak &&
          docker compose down backend &&
-         docker compose up -d backend"
+         docker compose up -d backend &&
+         docker image prune -f"
 
