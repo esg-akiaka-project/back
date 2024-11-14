@@ -31,15 +31,16 @@ public class LogController {
     public void getWeeklyLogDetail(@PathVariable("memberId") Long memberId, @RequestBody ReqWeeklyLogDTO reqWeeklyLogDTO) {
         log.info("주간 도약기록 조회~~~");
     }
+
     /*
     * 일간 도약기록 조회
     * @param : memberId(Long), logId(Long)
     * */
-    @GetMapping("{memberId}/{logId}")
-    public ResponseEntity<List<ResDailyLogDTO>> getDailyLogDetail(@PathVariable("memberId") Long memberId, @PathVariable("logId") Long logId) {
-        log.info("memberId ------> {}", memberId);
-        log.info("logId ------> {}", logId);
-        List<ResDailyLogDTO> resDailyLogDTOS = logService.getDailyLogDetail(memberId, logId);
+    @GetMapping("daily")
+    public ResponseEntity<List<ResDailyLogDTO>> getDailyLogDetail(@RequestBody ReqLogDTO reqLogDTO) {
+        log.info("memberId ------> {}", reqLogDTO.getMemberId());
+        log.info("logCreationDate ------> {}", reqLogDTO.getLogId());
+        List<ResDailyLogDTO> resDailyLogDTOS = logService.getDailyLogDetail(reqLogDTO);
         return ResponseEntity.ok(resDailyLogDTOS);
     }
 

@@ -12,6 +12,7 @@ import java.util.List;
 public class ReqLogDTO {
     // 도약기록 요청 정보를 받는 DTO
 
+    private Long logId;
     private String logContent;    // 도약기록 내용
     private List<TagDTO> tagNameList; // 태그명 리스트
     private String emotion;    // 오늘의 감정

@@ -32,18 +32,15 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
         List<ResDailyLogDTO> resDailyLogDTOS = jpaQueryFactory
                 .select(Projections.bean(
                         ResDailyLogDTO.class,
-                        log.logId,
-                        log.creationDate.as("logCreationDate"),
                         log.emotion,
                         log.content.as("logContent"),
                         file.filePathName.as("logImageUrl"),
-                        member.aiNickname,
 
                         // 도약이 편지가 null일시 CaseBuilder 사용해서 기본값 설정
                         new CaseBuilder()
                                 .when(letter.content.isNotNull())
                                 .then(letter.content)
-                                .otherwise("도약이 답변 내용이 없습니다.")
+                                .otherwise(letter.content)
                                 .as("letterContent"),
                         new CaseBuilder()
                                 .when(letter.arrivedDate.isNotNull())
