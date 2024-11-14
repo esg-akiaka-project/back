@@ -46,17 +46,17 @@ jobs:
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/harudoyak-back:latest
 
-      # # 7. EC2에서 Docker compose 실행
-      # - name: Create pem key in github runner
-      #   run: |
-      #     echo "$EC2_SSH_KEY" >> ~/key.pem
-      #     chmod 600 ~/key.pem
-      #   env:
-      #     EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-      # - name: Deploy Docker container on EC2
-      #   run: |
-      #     ssh -o StrictHostKeyChecking=no -i ~/key.pem ubuntu@${{ secrets.EC2_IP }} "docker pull ${{ secrets.DOCKER_USERNAME }}/harudoyak-back:latest &&
-      #     docker compose stop backend &&
-      #     docker compose rm backend &&
-      #     docker compose up -d backend"
+       # 7. EC2에서 Docker compose 실행
+      - name: Create pem key in github runner
+        run: |
+         echo "$EC2_SSH_KEY" >> ~/key.pem
+         chmod 600 ~/key.pem
+        env:
+           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+      - name: Deploy Docker container on EC2
+        run: |
+         ssh -o StrictHostKeyChecking=no -i ~/key.pem ubuntu@${{ secrets.EC2_IP }} "docker pull ${{ secrets.DOCKER_USERNAME }}/harudoyak-back:latest &&
+         docker compose stop backend &&
+         docker compose rm backend &&
+         docker compose up -d backend"
 
