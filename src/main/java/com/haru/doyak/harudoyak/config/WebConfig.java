@@ -19,19 +19,9 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
-    // 리액트 CORS설정
+
     private final CheckOwnerInterceptor checkOwnerInterceptor;
     private final AuthenticatedUserArgumentResolver authenticatedUserArgumentResolver;
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOriginPatterns("*")
-                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true)
-                .maxAge(3600);
-    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -42,4 +32,5 @@ public class WebConfig implements WebMvcConfigurer {
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers){
         resolvers.add(authenticatedUserArgumentResolver);
     }
+
 }

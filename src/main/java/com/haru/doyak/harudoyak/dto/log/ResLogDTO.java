@@ -14,5 +14,7 @@ public class ResLogDTO {
 
     private Long logId;        // 도약기록 아이디
     private LocalDateTime creationDate; // 도약기록 작성일
+    private Long memberId;
+    private String logContent;
 
 }

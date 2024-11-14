@@ -9,9 +9,11 @@ import com.haru.doyak.harudoyak.dto.auth.jwt.JwtReqDTO;
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtResDTO;
 import com.haru.doyak.harudoyak.security.AuthenticatedUser;
 import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestAttributes;
@@ -67,6 +69,7 @@ public class AuthController {
         }
         emailService.sendAuthLinkEmail(dto.getEmail());
         return ResponseEntity.ok().body("인증 메일이 발송되었습니다.");
+
     }
 
     @PostMapping("validate")

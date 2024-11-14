@@ -2,7 +2,9 @@ package com.haru.doyak.harudoyak.domain.log;
 
 import com.haru.doyak.harudoyak.dto.letter.ReqLetterDTO;
 import com.haru.doyak.harudoyak.dto.log.ReqLogDTO;
+import com.haru.doyak.harudoyak.dto.log.ReqWeeklyLogDTO;
 import com.haru.doyak.harudoyak.dto.log.ResLogDTO;
+import com.haru.doyak.harudoyak.dto.log.ResDailyLogDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +24,24 @@ public class LogController {
      * */
 
     /*
+     * 주간 도약기록 조회
+     * @param : memberId(Long), logId(Long)
+     * */
+    @GetMapping("weekly/{memberId}")
+    public void getWeeklyLogDetail(@PathVariable("memberId") Long memberId, @RequestBody ReqWeeklyLogDTO reqWeeklyLogDTO) {
+        log.info("주간 도약기록 조회~~~");
+    }
+    /*
     * 일간 도약기록 조회
+    * @param : memberId(Long), logId(Long)
     * */
-    @GetMapping()
+    @GetMapping("{memberId}/{logId}")
+    public ResponseEntity<List<ResDailyLogDTO>> getDailyLogDetail(@PathVariable("memberId") Long memberId, @PathVariable("logId") Long logId) {
+        log.info("memberId ------> {}", memberId);
+        log.info("logId ------> {}", logId);
+        List<ResDailyLogDTO> resDailyLogDTOS = logService.getDailyLogDetail(memberId, logId);
+        return ResponseEntity.ok(resDailyLogDTOS);
+    }
 
     /*
     * 도약이 편지 작성
@@ -55,9 +72,9 @@ public class LogController {
      * res : 200 ok 400 등
      * */
     @PostMapping("{memberId}")
-    public ResponseEntity<String> setLogAdd(@PathVariable("memberId") Long memberId, @RequestBody ReqLogDTO reqLogDTO) {
-        logService.setLogAdd(reqLogDTO, memberId);
-        return ResponseEntity.ok().body("기록도약 게시글 작성을 완료했습니다.");
+    public ResponseEntity<ResLogDTO> setLogAdd(@PathVariable("memberId") Long memberId, @RequestBody ReqLogDTO reqLogDTO) {
+        ResLogDTO resLogDTO = logService.setLogAdd(reqLogDTO, memberId);
+        return ResponseEntity.ok().body(resLogDTO);
     }
 
 }

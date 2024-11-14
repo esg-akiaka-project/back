@@ -1,9 +1,7 @@
 package com.haru.doyak.harudoyak.repository.querydsl.impl;
 
-import com.haru.doyak.harudoyak.dto.sharedoyak.ReqShareDoyakDTO;
-import com.haru.doyak.harudoyak.dto.sharedoyak.ResCommentDTO;
-import com.haru.doyak.harudoyak.dto.sharedoyak.ResReplyCommentDTO;
-import com.haru.doyak.harudoyak.dto.sharedoyak.ResShareDoyakDTO;
+import com.haru.doyak.harudoyak.dto.sharedoyak.*;
+import com.haru.doyak.harudoyak.entity.Comment;
 import com.haru.doyak.harudoyak.entity.ShareDoyak;
 import com.haru.doyak.harudoyak.repository.querydsl.ShareDoyakCustomRepository;
 import com.querydsl.core.types.ExpressionUtils;
@@ -14,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.haru.doyak.harudoyak.entity.QComment.comment;
 import static com.haru.doyak.harudoyak.entity.QDoyak.doyak;
@@ -26,6 +23,92 @@ import static com.haru.doyak.harudoyak.entity.QShareDoyak.shareDoyak;
 @RequiredArgsConstructor
 public class ShareDoyakCustomRepositoryImpl implements ShareDoyakCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
+
+    /*
+    * 회원 댓글 목록 select
+    * */
+    @Override
+    public List<ResCommentDTO> findMemberCommentAll(Long memberId){
+        List<ResCommentDTO> resCommentDTOS = jpaQueryFactory
+                .select(Projections.bean(
+                        ResCommentDTO.class,
+                        comment.shareDoyak.shareDoyakId.as("commentShareDoyakId"),
+                        comment.commentId,
+                        member.memberId.as("commentAuthorId"),
+                        member.nickname.as("commentAuthorNickname")
+                ))
+                .from(comment)
+                .leftJoin(member).on(comment.member.memberId.eq(member.memberId))
+                .where(comment.member.memberId.eq(memberId))
+                .fetch();
+        return resCommentDTOS;
+    }
+
+    /*
+    * 회원 서로도약 목록 select
+    * */
+    @Override
+    public List<ResShareDoyakDTO> findMemberShareDoyakAll(Long memberId){
+        List<ResShareDoyakDTO> resShareDoyakDTOS = jpaQueryFactory
+                .select(Projections.bean(
+                        ResShareDoyakDTO.class,
+                        shareDoyak.shareDoyakId,
+                        member.nickname.as("shareAuthorNickname")
+                ))
+                .from(shareDoyak)
+                .leftJoin(member).on(shareDoyak.member.memberId.eq(member.memberId))
+                .where(shareDoyak.member.memberId.eq(memberId))
+                .fetch();
+        return resShareDoyakDTOS;
+    }
+
+    /*
+    * 댓글 delete
+    * */
+    @Override
+    public long commentDelete(Long commentId) {
+        return jpaQueryFactory
+                .delete(comment)
+                .where(comment.commentId.eq(commentId))
+                .execute();
+    }
+
+    /*
+    * 서로도약 delete
+    * */
+    @Override
+    public long shareDoyakDelete(Long shareDoyakId) {
+        return jpaQueryFactory
+                .delete(shareDoyak)
+                .where(shareDoyak.shareDoyakId.eq(shareDoyakId))
+                .execute();
+    }
+
+    /*
+     * 댓글 내용 update
+     * */
+    @Override
+    public long commentContentUpdate(Long commentId, ReqCommentDTO reqCommentDTO){
+        return jpaQueryFactory
+                .update(comment)
+                .where(comment.commentId.eq(commentId))
+                .set(comment.content, reqCommentDTO.getCommentContent())
+                .execute();
+    }
+
+    /*
+    * 댓글 작성한 회원 select
+    * */
+    @Override
+    public Comment findCommentByMemberId(Long memberId, Long commentId){
+
+        return jpaQueryFactory
+                .select(comment)
+                .from(comment)
+                .leftJoin(member).on(comment.member.memberId.eq(member.memberId))
+                .where(comment.member.memberId.eq(memberId), comment.commentId.eq(commentId))
+                .fetchOne();
+    }
 
     /*
     * 서로도약 작성한 회원 select
@@ -45,7 +128,7 @@ public class ShareDoyakCustomRepositoryImpl implements ShareDoyakCustomRepositor
     * 서로도약 content 수정
     * */
     @Override
-    public long ShareContentUpdate(Long shareDoyakId, ReqShareDoyakDTO reqShareDoyakDTO){
+    public long shareContentUpdate(Long shareDoyakId, ReqShareDoyakDTO reqShareDoyakDTO){
         return jpaQueryFactory
                 .update(shareDoyak)
                 .where(shareDoyak.shareDoyakId.eq(shareDoyakId))
@@ -124,7 +207,7 @@ public class ShareDoyakCustomRepositoryImpl implements ShareDoyakCustomRepositor
                 .fetch();
 
         // 댓글의 데이터 목록을 select
-        List<ResCommentDTO> resCommentDTOS = jpaQueryFactory
+        /*List<ResCommentDTO> resCommentDTOS = jpaQueryFactory
                 .select(Projections.bean(ResCommentDTO.class,
                         comment.shareDoyak.shareDoyakId.as("commentShareDoyakId"),
                         comment.commentId,
@@ -133,15 +216,17 @@ public class ShareDoyakCustomRepositoryImpl implements ShareDoyakCustomRepositor
                 ))
                 .from(comment)
                 .join(member).on(comment.member.memberId.eq(member.memberId))
-                .fetch();
+                .fetch();*/
+
+        return resShareDoyakDTOS;
 
         // 게시글 Id를 기준으로 댓글을 그룹화하여 매핑
-        return resShareDoyakDTOS.stream()
+        /*resShareDoyakDTOS.stream()
                         .peek(resShareDoyakDTO -> resShareDoyakDTO.setResComments(
                                 resCommentDTOS.stream()
                                         .filter(comment -> comment.getCommentShareDoyakId().equals(resShareDoyakDTO.getShareDoyakId()))
                                         .collect(Collectors.toList())
                         ))
-                        .collect(Collectors.toList());
+                        .collect(Collectors.toList());*/
     }
 }

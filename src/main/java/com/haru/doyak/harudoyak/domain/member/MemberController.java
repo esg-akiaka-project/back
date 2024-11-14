@@ -1,15 +1,43 @@
 package com.haru.doyak.harudoyak.domain.member;
 
+import com.haru.doyak.harudoyak.domain.sharedoyak.ShareDoyakService;
 import com.haru.doyak.harudoyak.dto.member.ChangeMemberInfoReqDTO;
+import com.haru.doyak.harudoyak.dto.sharedoyak.ResCommentDTO;
+import com.haru.doyak.harudoyak.dto.sharedoyak.ResShareDoyakDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/members")
+@Slf4j
 public class MemberController {
     private final MemberService memberService;
+    private final ShareDoyakService shareDoyakService;
+
+    /*
+     * 회원의 댓글 모아보기
+     * @param : membaerId(Long)
+     * */
+    @GetMapping("/{memberId}/comments")
+    public ResponseEntity<List<ResCommentDTO>> getMemberCommentList(@PathVariable("memberId") Long memberId){
+        List<ResCommentDTO> resCommentDTOS= shareDoyakService.getMemberCommentList(memberId);
+        return ResponseEntity.ok(resCommentDTOS);
+    }
+
+    /*
+    * 회원의 서로도약 글 모아보기
+    * @param : membaerId(Long)
+    * */
+    @GetMapping("/{memberId}/posts")
+    public ResponseEntity<List<ResShareDoyakDTO>> getMemberShareDoyakList(@PathVariable("memberId") Long memberId){
+        List<ResShareDoyakDTO> resShareDoyakDTOS = shareDoyakService.getMemberShareDoyakList(memberId);
+        return ResponseEntity.ok(resShareDoyakDTOS);
+    }
 
     @GetMapping("check")
     public ResponseEntity check(@RequestParam("nickname")String nickname) {
