@@ -56,7 +56,6 @@ jobs:
       - name: Deploy Docker container on EC2
         run: |
          ssh -o StrictHostKeyChecking=no -i ~/key.pem ubuntu@${{ secrets.EC2_IP }} "docker pull ${{ secrets.DOCKER_USERNAME }}/harudoyak-back:latest &&
-         docker compose stop backend &&
-         docker compose rm backend &&
+         docker compose down backend &&
          docker compose up -d backend"
 
