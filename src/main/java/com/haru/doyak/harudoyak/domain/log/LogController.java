@@ -38,10 +38,11 @@ public class LogController {
     * 일간 도약기록 조회
     * @param : memberId(Long), logId(Long)
     * */
-    @GetMapping("daily")
-    public ResponseEntity<List<ResDailyLogDTO>> getDailyLogDetail(@RequestBody ReqLogDTO reqLogDTO) {
-        log.info("logCreationDate ------> {}", reqLogDTO.getLogId());
-        List<ResDailyLogDTO> resDailyLogDTOS = logService.getDailyLogDetail(reqLogDTO);
+    @GetMapping("daily/{memberId}/{logId}")
+    public ResponseEntity<List<ResDailyLogDTO>> getDailyLogDetail(@PathVariable("memberId") Long memberId, @PathVariable("logId") Long logId) {
+        log.info("memberId ------> {}", memberId);
+        log.info("logId ------> {}", logId);
+        List<ResDailyLogDTO> resDailyLogDTOS = logService.getDailyLogDetail(memberId, logId);
         return ResponseEntity.ok(resDailyLogDTOS);
     }
 
