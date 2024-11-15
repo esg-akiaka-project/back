@@ -1,10 +1,7 @@
 package com.haru.doyak.harudoyak.domain.log;
 
 import com.haru.doyak.harudoyak.dto.letter.ReqLetterDTO;
-import com.haru.doyak.harudoyak.dto.log.ReqLogDTO;
-import com.haru.doyak.harudoyak.dto.log.ResLogDTO;
-import com.haru.doyak.harudoyak.dto.log.ResDailyLogDTO;
-import com.haru.doyak.harudoyak.dto.log.TagDTO;
+import com.haru.doyak.harudoyak.dto.log.*;
 import com.haru.doyak.harudoyak.entity.*;
 import com.haru.doyak.harudoyak.repository.FileRepository;
 import com.haru.doyak.harudoyak.repository.LevelRepository;
@@ -29,12 +26,31 @@ public class LogService {
     private final LevelRepository levelRepository;
 
     /*
+     * 주간 도약기록 조회
+     * @param : memberId(Long)
+     * */
+    @Transactional
+    public ResWeeklyLogDTO getWeeklyLogDetail(ReqWeeklyLogDTO reqWeeklyLogDTO) {
+
+        ResWeeklyLogDTO resWeeklyLogDTO = new ResWeeklyLogDTO();
+        List<LetterWeeklyDTO> letterWeeklyDTOS = logRepository.findLetterByDate(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
+        log.info("로그 서비스 여기에 찍히닝?!");
+//        List<EmotionDTO> emotionDTOS = logRepository.findEmotionByDate(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
+//        List<TagWeeklyDTO> tagWeeklyDTOS = logRepository.findTagsByName(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
+
+//        resWeeklyLogDTO.setTags(tagWeeklyDTOS);
+//        resWeeklyLogDTO.setEmotions(emotionDTOS);
+        resWeeklyLogDTO.setAiFeedbacks(letterWeeklyDTOS);
+        return resWeeklyLogDTO;
+    }
+
+    /*
      * 일간 도약기록 조회
      * @param : memberId(Long), logId(Long)
      * */
-    public List<ResDailyLogDTO> getDailyLogDetail(Long memberId, Long logId) {
+    public List<ResDailyLogDTO> getDailyLogDetail(ReqLogDTO reqLogDTO) {
 
-        List<ResDailyLogDTO> resDailyLogDTOS = logRepository.findLogByLogIdAndMemberId(memberId, logId);
+        List<ResDailyLogDTO> resDailyLogDTOS = logRepository.findLogByLogIdAndMemberId(reqLogDTO.getMemberId(), reqLogDTO.getLogId());
 
         return resDailyLogDTOS;
     }

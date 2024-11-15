@@ -214,17 +214,18 @@ public class ShareDoyakService {
      * res : doyakCount(Long)
      * */
     @Transactional
-    public Long setDoyakAdd(Long memberId, Long shareDoyakId) {
+    public ResDoyakDTO setDoyakAdd(Long memberId, Long shareDoyakId) {
 
         // 도약 테이블에 memberId 존재 여부
         boolean isExistsDoyak = doyakCustomRepository.existsByMemberId(memberId);
-
+        ResDoyakDTO resDoyakDTO = new ResDoyakDTO();
         //
         if (isExistsDoyak) {
             log.info("해당 아이디가 있는 도약이 있니?");
             doyakCustomRepository.deleteDoyakByMemberId(memberId);
             Long doyakCount = doyakCustomRepository.findDoyakAllCount();
-            return doyakCount;
+            resDoyakDTO.setDoyakCount(doyakCount);
+            return resDoyakDTO;
         }
 
         // 회원 존재 여부 확인
@@ -257,8 +258,9 @@ public class ShareDoyakService {
 
         // 해당 게시글의 총 도약수 select
         Long doyakCount = doyakCustomRepository.findDoyakAllCount();
-        log.info("===============해당 게시글의 총 도약수 ");
-        return doyakCount;
+        resDoyakDTO.setDoyakCount(doyakCount);
+        log.info("===============해당 게시글의 총 도약수 {}", resDoyakDTO.getDoyakCount());
+        return resDoyakDTO;
 
     }
 
