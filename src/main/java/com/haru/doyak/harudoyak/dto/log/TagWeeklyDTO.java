@@ -7,11 +7,13 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Data
-@Setter
 @Getter
-public class LetterDTO {
+@Setter
+public class TagWeeklyDTO {
 
-    private LocalDateTime date;
-    private String feedback;
+    private LocalDateTime monday;
+    private LocalDateTime sunday;
+    private String tagName;
+    private Long rn;
 
 }

@@ -1,9 +1,6 @@
 package com.haru.doyak.harudoyak.domain.sharedoyak;
 
-import com.haru.doyak.harudoyak.dto.sharedoyak.ReqCommentDTO;
-import com.haru.doyak.harudoyak.dto.sharedoyak.ReqShareDoyakDTO;
-import com.haru.doyak.harudoyak.dto.sharedoyak.ResReplyCommentDTO;
-import com.haru.doyak.harudoyak.dto.sharedoyak.ResShareDoyakDTO;
+import com.haru.doyak.harudoyak.dto.sharedoyak.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -124,9 +121,9 @@ public class ShareDoyakController {
     * res : doyakCount(Long)
      * */
     @PostMapping("doyak/{memberId}/{shareDoyakId}")
-    public ResponseEntity<Long> setDoyakAdd(@PathVariable("memberId") Long memberId, @PathVariable("shareDoyakId") Long shareDoyakId) {
-        Long doyakCount = shareDoyakService.setDoyakAdd(memberId, shareDoyakId);
-        return ResponseEntity.ok().body(doyakCount);
+    public ResponseEntity<ResDoyakDTO> setDoyakAdd(@PathVariable("memberId") Long memberId, @PathVariable("shareDoyakId") Long shareDoyakId) {
+        ResDoyakDTO resDoyakDTO = shareDoyakService.setDoyakAdd(memberId, shareDoyakId);
+        return ResponseEntity.ok().body(resDoyakDTO);
     }
 
     /*
