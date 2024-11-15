@@ -58,18 +58,20 @@ public class AuthController {
     @PostMapping("join")
     public ResponseEntity<String> join(@RequestBody JoinReqDTO joinReqDto){
         if(!joinReqDto.getIsVerified()) return ResponseEntity.badRequest().body("이메일 인증이 필요합니다.");
-        authService.joinMember(joinReqDto);
-        return ResponseEntity.ok().body("회원가입이 완료되었습니다.");
+        if(authService.joinMember(joinReqDto)){
+            return ResponseEntity.ok().body("회원가입이 완료되었습니다.");
+        }else {
+            return ResponseEntity.badRequest().body("회원가입 실패");
+        }
     }
 
     @PostMapping("email/verify")
     public ResponseEntity<String> emailVerify(@RequestBody EmailVerifyReqDTO dto) throws MessagingException {
         if(memberService.isEmailAvailable(dto.getEmail())){
-            return ResponseEntity.ok().body("이미 가입한 이메일입니다.");
+            emailService.sendAuthLinkEmail(dto.getEmail());
+            return ResponseEntity.ok().body("인증 메일이 발송되었습니다.");
         }
-        emailService.sendAuthLinkEmail(dto.getEmail());
-        return ResponseEntity.ok().body("인증 메일이 발송되었습니다.");
-
+        return ResponseEntity.ok().body("이미 가입한 이메일입니다.");
     }
 
     @PostMapping("validate")
