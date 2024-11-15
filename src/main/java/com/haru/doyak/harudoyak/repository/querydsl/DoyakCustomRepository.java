@@ -2,10 +2,10 @@ package com.haru.doyak.harudoyak.repository.querydsl;
 
 public interface DoyakCustomRepository {
 
-    Long findDoyakAllCount();
+    Long findDoyakAllCount(Long shareDoyakId);
 
-    Long deleteDoyakByMemberId(Long memberId);
+    Long deleteDoyak(Long memberId, Long shareDoyakId);
 
-    boolean existsByMemberId(Long memberId);
+    boolean existsByMemberIdAndShareDoyakId(Long memberId, Long shareDoyakId);
 
 }
