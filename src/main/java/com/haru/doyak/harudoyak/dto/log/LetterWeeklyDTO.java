@@ -9,9 +9,11 @@ import java.time.LocalDateTime;
 @Data
 @Setter
 @Getter
-public class LetterDTO {
+public class LetterWeeklyDTO {
 
-    private LocalDateTime date;
+    private LocalDateTime monday;
+    private LocalDateTime sunday;
+    private LocalDateTime feedBackDate;
     private String feedback;
 
 }

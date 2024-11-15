@@ -1,10 +1,7 @@
 package com.haru.doyak.harudoyak.domain.log;
 
 import com.haru.doyak.harudoyak.dto.letter.ReqLetterDTO;
-import com.haru.doyak.harudoyak.dto.log.ReqLogDTO;
-import com.haru.doyak.harudoyak.dto.log.ReqWeeklyLogDTO;
-import com.haru.doyak.harudoyak.dto.log.ResLogDTO;
-import com.haru.doyak.harudoyak.dto.log.ResDailyLogDTO;
+import com.haru.doyak.harudoyak.dto.log.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -27,19 +24,24 @@ public class LogController {
      * 주간 도약기록 조회
      * @param : memberId(Long), logId(Long)
      * */
-    @GetMapping("weekly/{memberId}")
-    public void getWeeklyLogDetail(@PathVariable("memberId") Long memberId, @RequestBody ReqWeeklyLogDTO reqWeeklyLogDTO) {
-        log.info("주간 도약기록 조회~~~");
+    @GetMapping("weekly")
+    public ResponseEntity<ResWeeklyLogDTO> getWeeklyLogDetail(@RequestBody ReqWeeklyLogDTO reqWeeklyLogDTO) {
+
+        log.info("memberId {}", reqWeeklyLogDTO.getMemberId());
+        log.info("date야 넘어왔니? {}", reqWeeklyLogDTO.getCreationDate());
+        ResWeeklyLogDTO resWeeklyLogDTOS = logService.getWeeklyLogDetail(reqWeeklyLogDTO);
+
+        return ResponseEntity.ok(resWeeklyLogDTOS);
     }
+
     /*
     * 일간 도약기록 조회
     * @param : memberId(Long), logId(Long)
     * */
-    @GetMapping("{memberId}/{logId}")
-    public ResponseEntity<List<ResDailyLogDTO>> getDailyLogDetail(@PathVariable("memberId") Long memberId, @PathVariable("logId") Long logId) {
-        log.info("memberId ------> {}", memberId);
-        log.info("logId ------> {}", logId);
-        List<ResDailyLogDTO> resDailyLogDTOS = logService.getDailyLogDetail(memberId, logId);
+    @GetMapping("daily")
+    public ResponseEntity<List<ResDailyLogDTO>> getDailyLogDetail(@RequestBody ReqLogDTO reqLogDTO) {
+        log.info("logCreationDate ------> {}", reqLogDTO.getLogId());
+        List<ResDailyLogDTO> resDailyLogDTOS = logService.getDailyLogDetail(reqLogDTO);
         return ResponseEntity.ok(resDailyLogDTOS);
     }
 
