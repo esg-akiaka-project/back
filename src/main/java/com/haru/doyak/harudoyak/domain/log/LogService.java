@@ -48,9 +48,9 @@ public class LogService {
      * 일간 도약기록 조회
      * @param : memberId(Long), logId(Long)
      * */
-    public List<ResDailyLogDTO> getDailyLogDetail(ReqLogDTO reqLogDTO) {
+    public List<ResDailyLogDTO> getDailyLogDetail(Long memberId, Long logId) {
 
-        List<ResDailyLogDTO> resDailyLogDTOS = logRepository.findLogByLogIdAndMemberId(reqLogDTO.getMemberId(), reqLogDTO.getLogId());
+        List<ResDailyLogDTO> resDailyLogDTOS = logRepository.findLogByLogIdAndMemberId(memberId, logId);
 
         return resDailyLogDTOS;
     }
