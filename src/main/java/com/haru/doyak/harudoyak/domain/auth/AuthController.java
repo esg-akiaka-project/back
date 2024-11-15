@@ -7,6 +7,8 @@ import com.haru.doyak.harudoyak.dto.auth.*;
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtMemberDTO;
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtReqDTO;
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtResDTO;
+import com.haru.doyak.harudoyak.exception.CustomException;
+import com.haru.doyak.harudoyak.exception.ErrorCode;
 import com.haru.doyak.harudoyak.security.AuthenticatedUser;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
@@ -70,8 +72,7 @@ public class AuthController {
         if(memberService.isEmailAvailable(dto.getEmail())){
             emailService.sendAuthLinkEmail(dto.getEmail());
             return ResponseEntity.ok().body("인증 메일이 발송되었습니다.");
-        }
-        return ResponseEntity.ok().body("이미 가입한 이메일입니다.");
+        }else throw new CustomException(ErrorCode.DUPLICATE_MEMBER);
     }
 
     @PostMapping("validate")

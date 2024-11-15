@@ -2,6 +2,8 @@ package com.haru.doyak.harudoyak.security;
 
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtRecord;
 import com.haru.doyak.harudoyak.entity.Member;
+import com.haru.doyak.harudoyak.exception.CustomException;
+import com.haru.doyak.harudoyak.exception.ErrorCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -91,16 +93,14 @@ public class JwtProvider {
             claims = jwsClaims
                     .getPayload();
 
-        } catch  (MalformedJwtException malformedJwtException) {
-            throw new RuntimeException(malformedJwtException.getMessage());
         } catch (ExpiredJwtException expiredJwtException) {
-            throw new RuntimeException(expiredJwtException.getMessage());
-        } catch (InvalidClaimException invalidClaimException) {
-            throw new RuntimeException(invalidClaimException.getMessage());
-        } catch (JwtException jwtException) {
-            throw new RuntimeException(jwtException.getMessage());
+            throw new CustomException(ErrorCode.EXPIRED_JWT_TOKEN);
+        } catch (MalformedJwtException | InvalidClaimException e) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        } catch (JwtException jwtException){
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new CustomException(ErrorCode.UNKNOWN_ERROR);
         }
 
         return claims;
