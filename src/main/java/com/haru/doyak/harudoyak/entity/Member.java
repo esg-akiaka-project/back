@@ -61,6 +61,7 @@ public class Member {
         map.put("role", "ROLE_USER");
         map.put("email", this.email);
         map.put("memberId", this.memberId);
+        map.put("aiNickname", this.aiNickname);
         return map;
     }
 
@@ -81,6 +82,9 @@ public class Member {
     }
     public void updateLocalProviderId(){
         this.providerId = this.provider+"_"+this.memberId;
+    }
+    public void updateFileId(Long fileId){
+        this.fileId = fileId;
     }
 
 }

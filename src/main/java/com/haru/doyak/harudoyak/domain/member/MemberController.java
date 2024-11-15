@@ -47,6 +47,7 @@ public class MemberController {
         return ResponseEntity.badRequest().body(nickname+"가 중복입니다.");
     }
 
+//TODO: 데이터 변경시 바뀐걸로 로드할 수 있게 객체 response로 반환해주기
     @PutMapping("{memberId}/nickname")
     public ResponseEntity chageNickname(@PathVariable("memberId") Long memberId,
                                         @RequestBody ChangeMemberInfoReqDTO dto){
@@ -98,6 +99,16 @@ public class MemberController {
             return ResponseEntity.ok().body("비밀번호가 일치합니다.");
         }
         return ResponseEntity.badRequest().body("비밀번호가 불일치 합니다");
+    }
+
+    @PutMapping("{memberId}/profile")
+    public ResponseEntity changeProfile(@PathVariable("memberId") Long memberId,
+                                        @RequestBody ChangeMemberInfoReqDTO dto){
+        if(dto.getPhotoUrl()==null){
+            return ResponseEntity.badRequest().body("photo url이 없습니다.");
+        }
+        memberService.changeProfilePhoto(memberId, dto.getPhotoUrl());
+        return ResponseEntity.ok().body("프로필이 변경되었습니다.");
     }
 
 }
