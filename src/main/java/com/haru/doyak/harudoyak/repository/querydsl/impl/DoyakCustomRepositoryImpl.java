@@ -13,10 +13,10 @@ public class DoyakCustomRepositoryImpl implements DoyakCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public boolean existsByMemberId(Long memberId) {
+    public boolean existsByMemberIdAndShareDoyakId(Long memberId, Long shareDoyakId) {
         boolean existsByMemberId = jpaQueryFactory
                 .selectFrom(doyak)
-                .where(doyak.member.memberId.eq(memberId))
+                .where(doyak.member.memberId.eq(memberId), doyak.shareDoyak.shareDoyakId.eq(shareDoyakId))
                 .fetchFirst() != null;
         return existsByMemberId;
     }
@@ -26,23 +26,23 @@ public class DoyakCustomRepositoryImpl implements DoyakCustomRepository {
      * req : memberId(Long)
      * */
     @Override
-    public Long deleteDoyakByMemberId(Long memberId) {
-        Long deleteDoyakByMemberId = jpaQueryFactory
+    public Long deleteDoyak(Long memberId, Long shareDoyakId) {
+        Long deleteDoyak = jpaQueryFactory
                 .delete(doyak)
-                .where(doyak.member.memberId.eq(memberId))
+                .where(doyak.member.memberId.eq(memberId), doyak.shareDoyak.shareDoyakId.eq(shareDoyakId))
                 .execute();
-        return deleteDoyakByMemberId;
+        return deleteDoyak ;
     }
 
     /*
      * 해당 서로도약의 총 도약수
      * */
     @Override
-    public Long findDoyakAllCount() {
+    public Long findDoyakAllCount(Long shareDoyakId) {
         Long doyakCount = jpaQueryFactory
-                .select(doyak.member.count().as("doyakCount"))
+                .select(doyak.shareDoyak.shareDoyakId.count().as("doyakCount"))
                 .from(doyak)
-                .groupBy(doyak.member)
+                .where(doyak.shareDoyak.shareDoyakId.eq(shareDoyakId))
                 .fetchCount();
         return doyakCount;
     }
