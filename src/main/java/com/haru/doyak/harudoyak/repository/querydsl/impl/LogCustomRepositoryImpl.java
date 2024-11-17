@@ -1,7 +1,12 @@
 package com.haru.doyak.harudoyak.repository.querydsl.impl;
 
 import com.haru.doyak.harudoyak.dto.log.*;
+import com.haru.doyak.harudoyak.dto.log.ResLogDTO;
+
+import com.haru.doyak.harudoyak.dto.log.ResDailyLogDTO;
+import com.haru.doyak.harudoyak.dto.log.TagDTO;
 import com.haru.doyak.harudoyak.repository.querydsl.LogCustomRepository;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.DateTemplate;
@@ -13,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.haru.doyak.harudoyak.entity.QFile.file;
@@ -181,4 +187,33 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .fetch();
         return resLogDTOs;
     }
+
+
+    @Override
+    public List<Tuple> findLetterMemberWhereBetweenLogCreationDateTime(LocalDateTime startDate, LocalDateTime endDate) {
+         return jpaQueryFactory.select(letter.content, member.memberId, member.aiNickname)
+                .from(log)
+                .leftJoin(member)
+                .on(member.memberId.eq(log.member.memberId))
+                .rightJoin(letter)
+                .on(letter.log.logId.eq(log.logId))
+                .where(
+                        log.creationDate.between(startDate, endDate)
+                )
+                .fetch();
+    }
+
+    @Override
+    public List<Tuple> findLogMemberWhereBetweenLogCreationDatetime(LocalDateTime startDate, LocalDateTime endDate) {
+        return jpaQueryFactory.select(log.member.memberId, log.member.memberId.count())
+                .from(log)
+                .leftJoin(member)
+                .on(member.memberId.eq(log.member.memberId))
+                .where(
+                        log.creationDate.between(startDate, endDate)
+                )
+                .groupBy(log.member.memberId)
+                .fetch();
+    }
+
 }
