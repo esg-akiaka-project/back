@@ -2,6 +2,8 @@ package com.haru.doyak.harudoyak.domain.sharedoyak;
 
 import com.haru.doyak.harudoyak.dto.sharedoyak.*;
 import com.haru.doyak.harudoyak.entity.*;
+import com.haru.doyak.harudoyak.exception.CustomException;
+import com.haru.doyak.harudoyak.exception.ErrorCode;
 import com.haru.doyak.harudoyak.repository.FileRepository;
 import com.haru.doyak.harudoyak.repository.LevelRepository;
 import com.haru.doyak.harudoyak.repository.MemberRepository;
@@ -112,10 +114,8 @@ public class ShareDoyakService {
         ResDoyakDTO resDoyakDTO = new ResDoyakDTO();
         //
         if (isExistsDoyak) {
-            log.info("해당 아이디가 있는 도약이 있니?");
             doyakCustomRepository.deleteDoyak(memberId, shareDoyakId);
             Long doyakCount = doyakCustomRepository.findDoyakAllCount(shareDoyakId);
-            log.info("여기서 Count는? {}", doyakCount);
             resDoyakDTO.setDoyakCount(doyakCount);
             return resDoyakDTO;
         }
@@ -130,10 +130,6 @@ public class ShareDoyakService {
             Member selectMember = memberRepository.findMemberByMemberId(memberId);
             ShareDoyak selectShareDoyak = shareDoyakRepository.findShareDoyakByShareDoyakId(shareDoyakId);
 
-            log.info("=============================================shareDoyakService");
-            log.info("memberId {}", selectMember.getMemberId());
-            log.info("shareDoyakId {}", selectShareDoyak.getShareDoyakId());
-
             Doyak doyak = Doyak.builder()
                     .doyakId(new DoyakId(
                             selectShareDoyak.getShareDoyakId(),
@@ -146,7 +142,11 @@ public class ShareDoyakService {
             entityManager.persist(doyak);
         }
         // 회원이 존재하지 않다면
-
+        if(!isExistsMember){
+            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
+        }else if(!isExistsShareDoyak){
+            throw new CustomException(ErrorCode.POST_NOT_FOUND);
+        }
 
         // 해당 게시글의 총 도약수 select
         Long doyakCount = doyakCustomRepository.findDoyakAllCount(shareDoyakId);

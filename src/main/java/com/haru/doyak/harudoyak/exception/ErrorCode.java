@@ -17,6 +17,8 @@ public enum ErrorCode {
     EMPTY_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 비어있습니다"),
 
     // 404 Not Found
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "탈퇴한 회원이거나 없는 회원 입니다."),
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "이미 삭제된 게시글이거나 없는 게시글 입니다."),
 
 
     // 405 Method Not Allowed
