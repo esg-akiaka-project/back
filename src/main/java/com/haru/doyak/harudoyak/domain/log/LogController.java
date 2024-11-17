@@ -21,10 +21,10 @@ public class LogController {
      * @param : memberId(Long), creationDate(LocalDateTime)
      * */
     @GetMapping("montly")
-    public ResponseEntity<ResWeeklyLogDTO.ResMontlyLogDTO> getMontlyLogDetail(@RequestBody ReqWeeklyLogDTO reqWeeklyLogDTO) {
+    public ResponseEntity<ResLogDTO.ResMontlyLogDTO> getMontlyLogDetail(@RequestBody ReqWeeklyLogDTO reqWeeklyLogDTO) {
         log.info("월간 도약기록 조회 memberId {}", reqWeeklyLogDTO.getMemberId());
         log.info("월간 도약기록 조회 date야 넘어왔니? {}", reqWeeklyLogDTO.getCreationDate());
-        ResWeeklyLogDTO.ResMontlyLogDTO resMontlyLogDTO = logService.getMontlyLogDetail(reqWeeklyLogDTO);
+        ResLogDTO.ResMontlyLogDTO resMontlyLogDTO = logService.getMontlyLogDetail(reqWeeklyLogDTO);
         return ResponseEntity.ok(resMontlyLogDTO);
     }
 
@@ -33,11 +33,11 @@ public class LogController {
      * @param : memberId(Long), creationDate(LocalDateTime)
      * */
     @GetMapping("weekly")
-    public ResponseEntity<ResWeeklyLogDTO> getWeeklyLogDetail(@RequestBody ReqWeeklyLogDTO reqWeeklyLogDTO) {
+    public ResponseEntity<ResLogDTO.ResWeeklyLogDTO> getWeeklyLogDetail(@RequestBody ReqWeeklyLogDTO reqWeeklyLogDTO) {
 
         log.info("memberId {}", reqWeeklyLogDTO.getMemberId());
         log.info("date야 넘어왔니? {}", reqWeeklyLogDTO.getCreationDate());
-        ResWeeklyLogDTO resWeeklyLogDTOS = logService.getWeeklyLogDetail(reqWeeklyLogDTO);
+        ResLogDTO.ResWeeklyLogDTO resWeeklyLogDTOS = logService.getWeeklyLogDetail(reqWeeklyLogDTO);
 
         return ResponseEntity.ok(resWeeklyLogDTOS);
     }
@@ -47,10 +47,10 @@ public class LogController {
     * @param : memberId(Long), logId(Long)
     * */
     @GetMapping("daily/{memberId}/{logId}")
-    public ResponseEntity<List<ResDailyLogDTO>> getDailyLogDetail(@PathVariable("memberId") Long memberId, @PathVariable("logId") Long logId) {
+    public ResponseEntity<List<ResLogDTO.ResDailyLogDTO>> getDailyLogDetail(@PathVariable("memberId") Long memberId, @PathVariable("logId") Long logId) {
         log.info("memberId ------> {}", memberId);
         log.info("logId ------> {}", logId);
-        List<ResDailyLogDTO> resDailyLogDTOS = logService.getDailyLogDetail(memberId, logId);
+        List<ResLogDTO.ResDailyLogDTO> resDailyLogDTOS = logService.getDailyLogDetail(memberId, logId);
         return ResponseEntity.ok(resDailyLogDTOS);
     }
 

@@ -15,7 +15,7 @@ public class ReqLogDTO {
     private Long logId;
     private Long memberId;
     private String logContent;    // 도약기록 내용
-    private List<TagDTO> tagNameList; // 태그명 리스트
+    private List<ResTagDTO> tagNameList; // 태그명 리스트
     private String emotion;    // 오늘의 감정
     private String logImageUrl; // 이미지파일 S3 url
 
