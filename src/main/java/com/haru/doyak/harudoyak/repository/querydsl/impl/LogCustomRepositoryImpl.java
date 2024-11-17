@@ -1,13 +1,12 @@
 package com.haru.doyak.harudoyak.repository.querydsl.impl;
 
-import com.haru.doyak.harudoyak.dto.log.*;
+import com.haru.doyak.harudoyak.dto.log.EmotionDTO;
+import com.haru.doyak.harudoyak.dto.log.ResLetterDTO;
 import com.haru.doyak.harudoyak.dto.log.ResLogDTO;
-
-import com.haru.doyak.harudoyak.dto.log.ResDailyLogDTO;
-import com.haru.doyak.harudoyak.dto.log.TagDTO;
+import com.haru.doyak.harudoyak.dto.log.ResTagDTO;
 import com.haru.doyak.harudoyak.repository.querydsl.LogCustomRepository;
-import com.querydsl.core.types.ConstantImpl;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.ConstantImpl;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.DateTemplate;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Repository;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.haru.doyak.harudoyak.entity.QFile.file;

@@ -2,7 +2,6 @@ package com.haru.doyak.harudoyak.repository.querydsl;
 
 import com.haru.doyak.harudoyak.dto.log.*;
 import com.haru.doyak.harudoyak.dto.log.ResLogDTO;
-import com.haru.doyak.harudoyak.dto.log.ResDailyLogDTO;
 import com.querydsl.core.Tuple;
 
 import java.time.LocalDateTime;
