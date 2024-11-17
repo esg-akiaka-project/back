@@ -13,21 +13,21 @@ public interface LogCustomRepository {
     /*
     * 월간 도약기록 상세 조회
     * */
-    List<LetterWeeklyDTO.LetterMontlyDTO> findMontlyLetterAll(Long memberId, LocalDateTime creationDate);
+    List<ResLetterDTO.LetterMontlyDTO> findMontlyLetterAll(Long memberId, LocalDateTime creationDate);
     List<EmotionDTO> findMontlyEmotion(Long memberId, LocalDateTime creationDate);
-    List<TagWeeklyDTO.TagMontlyDTO> findMontlyTagAll(Long memberId, LocalDateTime creationDate);
+    List<ResTagDTO.TagMontlyDTO> findMontlyTagAll(Long memberId, LocalDateTime creationDate);
 
     /*
     * 주간 도약기록 상세 조회
     * */
-    List<LetterWeeklyDTO> findLetterByDate(Long memberId, LocalDateTime creationDate);
+    List<ResLetterDTO.LetterWeeklyDTO> findLetterByDate(Long memberId, LocalDateTime creationDate);
     List<EmotionDTO> findEmotionByDate(Long memberId, LocalDateTime creationDate);
-    List<TagWeeklyDTO> findTagsByName(Long memberId, LocalDateTime creationDate);
+    List<ResTagDTO.TagWeeklyDTO> findTagsByName(Long memberId, LocalDateTime creationDate);
 
     /*
      * 일간 도약기록 상세 조회
      * */
-    List<ResDailyLogDTO> findLogByLogIdAndMemberId(Long memberId, Long logId);
+    List<ResLogDTO.ResDailyLogDTO> findLogByLogIdAndMemberId(Long memberId, Long logId);
 
     /*
      * 도약 기록 목록 조회

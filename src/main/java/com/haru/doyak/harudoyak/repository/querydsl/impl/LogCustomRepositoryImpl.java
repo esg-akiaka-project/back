@@ -39,10 +39,10 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
     * */
     // 태그 월간 집계
     @Override
-    public List<TagWeeklyDTO.TagMontlyDTO> findMontlyTagAll(Long memberId, LocalDateTime creationDate){
-        List<TagWeeklyDTO.TagMontlyDTO> tagMontlyDTOS = jpaQueryFactory
+    public List<ResTagDTO.TagMontlyDTO> findMontlyTagAll(Long memberId, LocalDateTime creationDate){
+        List<ResTagDTO.TagMontlyDTO> tagMontlyDTOS = jpaQueryFactory
                 .select(Projections.bean(
-                        TagWeeklyDTO.TagMontlyDTO.class,
+                        ResTagDTO.TagMontlyDTO.class,
                         tag.name.as("tagName"),
                         Expressions.numberTemplate(Long.class, "ROW_NUMBER() OVER (PARTITION BY {0}, DATE_FORMAT({1}, '%Y-%u') ORDER BY COUNT({2}) DESC)", log.member.memberId, creationDate, tag.name).as("rn")
                 ))
@@ -79,7 +79,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
 
     // 도약이편지 Count
     @Override
-    public List<LetterWeeklyDTO.LetterMontlyDTO> findMontlyLetterAll(Long memberId, LocalDateTime creationDate){
+    public List<ResLetterDTO.LetterMontlyDTO> findMontlyLetterAll(Long memberId, LocalDateTime creationDate){
 
         DateTemplate<LocalDateTime> montly = Expressions.dateTemplate(
                 LocalDateTime.class,
@@ -87,9 +87,9 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 creationDate, ConstantImpl.create("%Y-%m")
         );
 
-        List<LetterWeeklyDTO.LetterMontlyDTO> letterMontlyDTOS = jpaQueryFactory
+        List<ResLetterDTO.LetterMontlyDTO> letterMontlyDTOS = jpaQueryFactory
                 .select(Projections.bean(
-                        LetterWeeklyDTO.LetterMontlyDTO.class,
+                        ResLetterDTO.LetterMontlyDTO.class,
                         /*montly.as("montly"),*/
                         letter.letterId.count().as("aiFeedbackCount")
                 ))
@@ -109,7 +109,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
     * */
     // 도약이편지 목록
     @Override
-    public List<LetterWeeklyDTO> findLetterByDate(Long memberId, LocalDateTime creationDate){
+    public List<ResLetterDTO.LetterWeeklyDTO> findLetterByDate(Long memberId, LocalDateTime creationDate){
         // 월요일 날짜 계산
         LocalDateTime mondayDate = creationDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         // 일요일 날짜 계산
@@ -129,9 +129,9 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 "DATE_FORMAT(ADDDATE({0}, - WEEKDAY({0})+6), '%Y-%m-%d')",
                 sundayDate
         );*/
-        List<LetterWeeklyDTO> letterWeeklyDTOS = jpaQueryFactory
+        List<ResLetterDTO.LetterWeeklyDTO> letterWeeklyDTOS = jpaQueryFactory
                 .select(Projections.bean(
-                        LetterWeeklyDTO.class,
+                        ResLetterDTO.LetterWeeklyDTO.class,
                         monday.as("monday"),
                         sunday.as("sunday"),
                         letter.arrivedDate.as("feedBackDate"),
@@ -184,7 +184,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
 
     // 태그 주간 집계
     @Override
-    public List<TagWeeklyDTO> findTagsByName(Long memberId, LocalDateTime creationDate){
+    public List<ResTagDTO.TagWeeklyDTO> findTagsByName(Long memberId, LocalDateTime creationDate){
         // 월요일 날짜 계산
         LocalDateTime mondayDate = creationDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         // 일요일 날짜 계산
@@ -198,9 +198,9 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 LocalDateTime.class, "DATE_FORMAT(ADDDATE({0}, - WEEKDAY({0})+6), '%Y-%m-%d')", creationDate);*/
         DateTemplate<LocalDateTime> sunday = Expressions.dateTemplate(
                 LocalDateTime.class, "{0}", sundayDate);
-        List<TagWeeklyDTO> tagWeeklyDTOS = jpaQueryFactory
+        List<ResTagDTO.TagWeeklyDTO> tagWeeklyDTOS = jpaQueryFactory
                 .select(Projections.bean(
-                        TagWeeklyDTO.class,
+                        ResTagDTO.TagWeeklyDTO.class,
                         tag.name.as("tagName"),
                         tag.name.count().as("tagCount"),
                         monday.as("monday"),
@@ -222,10 +222,10 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
     * 일간 도약기록 상세 조회
     * */
     @Override
-    public List<ResDailyLogDTO> findLogByLogIdAndMemberId(Long memberId, Long logId){
-        List<ResDailyLogDTO> resDailyLogDTOS = jpaQueryFactory
+    public List<ResLogDTO.ResDailyLogDTO> findLogByLogIdAndMemberId(Long memberId, Long logId){
+        List<ResLogDTO.ResDailyLogDTO> resDailyLogDTOS = jpaQueryFactory
                 .select(Projections.bean(
-                        ResDailyLogDTO.class,
+                        ResLogDTO.ResDailyLogDTO.class,
                         log.emotion,
                         log.content.as("logContent"),
                         file.filePathName.as("logImageUrl"),
@@ -250,9 +250,9 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .groupBy(log.logId)
                 .fetch();
 
-        List<TagDTO> tagDTOS = jpaQueryFactory
+        List<ResTagDTO> resTagDTOS = jpaQueryFactory
                 .select(Projections.bean(
-                        TagDTO.class,
+                        ResTagDTO.class,
                         tag.name.as("tagName")
                 ))
                 .from(logTag)
@@ -261,7 +261,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .fetch();
 
         resDailyLogDTOS.forEach(resDailyLogDTO -> {
-            resDailyLogDTO.setTagNameList(tagDTOS);
+            resDailyLogDTO.setTagNameList(resTagDTOS);
         });
 
         return resDailyLogDTOS;

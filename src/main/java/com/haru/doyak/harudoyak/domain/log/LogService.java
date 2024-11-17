@@ -29,12 +29,12 @@ public class LogService {
      * 월간 도약기록 조회
      * @param : memberId(Long), creationDate(LocalDateTime)
      * */
-    public ResWeeklyLogDTO.ResMontlyLogDTO getMontlyLogDetail(ReqWeeklyLogDTO reqWeeklyLogDTO) {
-        List<LetterWeeklyDTO.LetterMontlyDTO> letterMontlyDTOS = logRepository.findMontlyLetterAll(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
+    public ResLogDTO.ResMontlyLogDTO getMontlyLogDetail(ReqWeeklyLogDTO reqWeeklyLogDTO) {
+        List<ResLetterDTO.LetterMontlyDTO> letterMontlyDTOS = logRepository.findMontlyLetterAll(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
         List<EmotionDTO> emotionDTOS = logRepository.findMontlyEmotion(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
-        List<TagWeeklyDTO.TagMontlyDTO> tagMontlyDTOS = logRepository.findMontlyTagAll(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
+        List<ResTagDTO.TagMontlyDTO> tagMontlyDTOS = logRepository.findMontlyTagAll(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
 
-        ResWeeklyLogDTO.ResMontlyLogDTO resMontlyLogDTO = new ResWeeklyLogDTO.ResMontlyLogDTO();
+        ResLogDTO.ResMontlyLogDTO resMontlyLogDTO = new ResLogDTO.ResMontlyLogDTO();
         resMontlyLogDTO.setAiFeedbacks(letterMontlyDTOS);
         resMontlyLogDTO.setEmotions(emotionDTOS);
         resMontlyLogDTO.setTags(tagMontlyDTOS);
@@ -47,13 +47,13 @@ public class LogService {
      * @param : memberId(Long)
      * */
     @Transactional
-    public ResWeeklyLogDTO getWeeklyLogDetail(ReqWeeklyLogDTO reqWeeklyLogDTO) {
+    public ResLogDTO.ResWeeklyLogDTO getWeeklyLogDetail(ReqWeeklyLogDTO reqWeeklyLogDTO) {
 
-        ResWeeklyLogDTO resWeeklyLogDTO = new ResWeeklyLogDTO();
-        List<LetterWeeklyDTO> letterWeeklyDTOS = logRepository.findLetterByDate(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
+        ResLogDTO.ResWeeklyLogDTO resWeeklyLogDTO = new ResLogDTO.ResWeeklyLogDTO();
+        List<ResLetterDTO.LetterWeeklyDTO> letterWeeklyDTOS = logRepository.findLetterByDate(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
         log.info("로그 서비스 여기에 찍히닝?!");
         List<EmotionDTO> emotionDTOS = logRepository.findEmotionByDate(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
-        List<TagWeeklyDTO> tagWeeklyDTOS = logRepository.findTagsByName(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
+        List<ResTagDTO.TagWeeklyDTO> tagWeeklyDTOS = logRepository.findTagsByName(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
 
         resWeeklyLogDTO.setAiFeedbacks(letterWeeklyDTOS);
         resWeeklyLogDTO.setEmotions(emotionDTOS);
@@ -65,9 +65,9 @@ public class LogService {
      * 일간 도약기록 조회
      * @param : memberId(Long), logId(Long)
      * */
-    public List<ResDailyLogDTO> getDailyLogDetail(Long memberId, Long logId) {
+    public List<ResLogDTO.ResDailyLogDTO> getDailyLogDetail(Long memberId, Long logId) {
 
-        List<ResDailyLogDTO> resDailyLogDTOS = logRepository.findLogByLogIdAndMemberId(memberId, logId);
+        List<ResLogDTO.ResDailyLogDTO> resDailyLogDTOS = logRepository.findLogByLogIdAndMemberId(memberId, logId);
 
         return resDailyLogDTOS;
     }
@@ -143,9 +143,9 @@ public class LogService {
              entityManager.persist(log);
 
              // 태그 insert
-             for(TagDTO tagDTO : reqLogDTO.getTagNameList()){
+             for(ResTagDTO resTagDTO : reqLogDTO.getTagNameList()){
                  Tag tag = Tag.builder()
-                         .name(tagDTO.getTagName())
+                         .name(resTagDTO.getTagName())
                          .build();
                  entityManager.persist(tag);
                  setLogTag(log, tag);
