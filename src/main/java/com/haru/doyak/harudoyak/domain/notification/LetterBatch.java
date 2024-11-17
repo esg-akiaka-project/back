@@ -1,14 +1,11 @@
 package com.haru.doyak.harudoyak.domain.notification;
 
-import com.haru.doyak.harudoyak.entity.Member;
 import static com.haru.doyak.harudoyak.entity.QMember.member;
 import static com.haru.doyak.harudoyak.entity.QLog.log;
-import static com.haru.doyak.harudoyak.entity.QLetter.letter;
 import com.haru.doyak.harudoyak.repository.LogRepository;
 import com.haru.doyak.harudoyak.repository.MemberRepository;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -29,9 +26,9 @@ public class LetterBatch {
     // 임시 편지 리스트
     private final Map<Long, List<String>> userLetters = new HashMap<>();
 
-    public void addLetterForUser(Long userId, String letterContent, String message) {
-        userLetters.computeIfAbsent(userId, k -> new ArrayList<>()).add(letterContent);
-        notificationService.customNotify(userId, userLetters.get(userId),message, "letter");
+    public void addLetterForUser(Long memberId, String letterContent, String message) {
+        userLetters.computeIfAbsent(memberId, k -> new ArrayList<>()).add(letterContent);
+        notificationService.customNotify(memberId, userLetters.get(memberId),message, "letter");
     }
 
     // 매일 7am 실행 -> 하루도약작성일 다음 날이면 알림

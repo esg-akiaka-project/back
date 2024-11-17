@@ -1,6 +1,5 @@
 package com.haru.doyak.harudoyak.domain.notification;
 
-import com.haru.doyak.harudoyak.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -15,64 +14,64 @@ public class NotificationService {
 
     private static final Long DEFAULT_TIMEOUT = 600L * 1000 * 60;
 
-    public SseEmitter subscribe(Long userId) {
-        SseEmitter emitter = createEmitter(userId);
+    public SseEmitter subscribe(Long memberId) {
+        SseEmitter emitter = createEmitter(memberId);
 
-        sendToClient(userId, "EventStream Created. [userId="+ userId + "]", "sse 접속 성공");
+        sendToClient(memberId, "EventStream Created. [memberId="+ memberId + "]", "sse 접속 성공");
         return emitter;
     }
 
-    public <T> void customNotify(Long userId, T data, String comment, String type) {
-        sendToClient(userId, data, comment, type);
+    public <T> void customNotify(Long memberId, T data, String comment, String type) {
+        sendToClient(memberId, data, comment, type);
     }
-    public void notify(Long userId, Object data, String comment) {
-        sendToClient(userId, data, comment);
+    public void notify(Long memberId, Object data, String comment) {
+        sendToClient(memberId, data, comment);
     }
 
-    private void sendToClient(Long userId, Object data, String comment) {
-        SseEmitter emitter = emitterRepository.get(userId);
+    private void sendToClient(Long memberId, Object data, String comment) {
+        SseEmitter emitter = emitterRepository.get(memberId);
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
-                        .id(String.valueOf(userId))
+                        .id(String.valueOf(memberId))
                         .name("sse")
                         .data(data)
                         .comment(comment));
             } catch (IOException e) {
-                emitterRepository.deleteById(userId);
+                emitterRepository.deleteById(memberId);
                 emitter.completeWithError(e);
             }
         }
     }
 
 
-    private <T> void sendToClient(Long userId, T data, String comment, String type) {
-        SseEmitter emitter = emitterRepository.get(userId);
+    private <T> void sendToClient(Long memberId, T data, String comment, String type) {
+        SseEmitter emitter = emitterRepository.get(memberId);
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
-                        .id(String.valueOf(userId))
+                        .id(String.valueOf(memberId))
                         .name(type)
                         .data(data)
                         .comment(comment));
             } catch (IOException e) {
-                emitterRepository.deleteById(userId);
+                emitterRepository.deleteById(memberId);
                 emitter.completeWithError(e);
             }
         }
     }
 
-    private SseEmitter createEmitter(Long userId) {
+    private SseEmitter createEmitter(Long memberId) {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
-        emitterRepository.save(userId, emitter);
+        emitterRepository.save(memberId, emitter);
 
-        emitter.onCompletion(() -> emitterRepository.deleteById(userId));
-        emitter.onTimeout(() -> emitterRepository.deleteById(userId));
+        emitter.onCompletion(() -> emitterRepository.deleteById(memberId));
+        emitter.onTimeout(() -> emitterRepository.deleteById(memberId));
 
         return emitter;
     }
 
-//    private User validUser(Long userId) {
-//        return memberRepository.findById(userId).orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND_USER));
+//    private User validUser(Long memberId) {
+//        return memberRepository.findById(memberId).orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND_USER));
 //    }
 }
