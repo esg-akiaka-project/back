@@ -33,7 +33,10 @@ public class AuthService {
     @Value("${spring.oauth2.local.client-name}")
     private String local_client_name;
 
-    public void joinMember(JoinReqDTO joinReqDTO){
+    public boolean joinMember(JoinReqDTO joinReqDTO){
+        if(memberRepository.findMemberByEmail(joinReqDTO.getEmail()).isEmpty()){
+            return false;
+        }
         Member member = Member.builder()
                 .email(joinReqDTO.getEmail())
                 .provider(local_client_name)
@@ -49,6 +52,7 @@ public class AuthService {
                 .point(10L)// 가입시 10포인트
                 .build();
         levelRepository.save(level);
+        return true;
     }
 
     /**
@@ -77,7 +81,7 @@ public class AuthService {
     }
 
     /**
-     * 
+     *
      * @param jwtReqDTO refresh token 만 사용
      * @return rtk 로 유저를 찾고, access, refresh 모두 새로 발급해 JwtMemberDTO반환
      */
