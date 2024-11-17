@@ -196,14 +196,31 @@ public class ShareDoyakService {
             // 서로도약 select
             ShareDoyak selectShareDoyak = shareDoyakRepository.findShareDoyakByShareDoyakId(shareDoyakId);
 
+            if(reqCommentDTO.getParentCommentId() != null){
 
-            // 댓글 insert
-            Comment comment = Comment.builder()
-                    .shareDoyak(selectShareDoyak)
-                    .member(selectMember)
-                    .content(reqCommentDTO.getCommentContent())
-                    .build();
-            entityManager.persist(comment);
+                // 대댓글(답글) insert
+                Comment reply = Comment.builder()
+                        .shareDoyak(selectShareDoyak)
+                        .member(selectMember)
+                        .content(reqCommentDTO.getCommentContent())
+                        .parentCommentId(reqCommentDTO.getParentCommentId())
+                        .build();
+                entityManager.persist(reply);
+
+            }
+
+            if(reqCommentDTO.getParentCommentId() == null){
+
+                // 댓글 insert
+                Comment comment = Comment.builder()
+                        .shareDoyak(selectShareDoyak)
+                        .member(selectMember)
+                        .content(reqCommentDTO.getCommentContent())
+                        .build();
+                entityManager.persist(comment);
+
+            }
+
         }
 
     }

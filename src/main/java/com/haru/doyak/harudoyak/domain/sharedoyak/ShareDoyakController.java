@@ -98,10 +98,11 @@ public class ShareDoyakController {
      * @return :
      * */
     @PostMapping("comments/{memberId}/{shareDoyakId}/{commentId}")
-    public void setCommentChildAdd(@PathVariable("memberId") Long memberId, @PathVariable("shareDoyakId") Long shareDoyakId, @PathVariable("commentId") Long commentId) {
-
-
-
+    public void setCommentChildAdd(@PathVariable("memberId") Long memberId, @PathVariable("shareDoyakId") Long shareDoyakId, @PathVariable("commentId") Long commentId, @RequestBody ReqCommentDTO reqCommentDTO) {
+        if(commentId != null){
+            reqCommentDTO.setParentCommentId(commentId);
+            shareDoyakService.setCommentAdd(memberId,shareDoyakId, reqCommentDTO);
+        }
     }
 
     /*
