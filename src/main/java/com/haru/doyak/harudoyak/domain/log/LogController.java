@@ -83,9 +83,9 @@ public class LogController {
      * res : 200 ok 400 등
      * */
     @PostMapping("{memberId}")
-    public ResponseEntity<ResLogDTO> setLogAdd(@PathVariable("memberId") Long memberId, @RequestBody ReqLogDTO reqLogDTO) {
-        ResLogDTO resLogDTO = logService.setLogAdd(reqLogDTO, memberId);
-        return ResponseEntity.ok().body(resLogDTO);
+    public ResponseEntity<ResLogDTO.ResLogAddDTO> setLogAdd(@PathVariable("memberId") Long memberId, @RequestBody ReqLogDTO reqLogDTO) {
+        ResLogDTO.ResLogAddDTO resLogAddDTO = logService.setLogAdd(reqLogDTO, memberId);
+        return ResponseEntity.ok().body(resLogAddDTO);
     }
 
 }

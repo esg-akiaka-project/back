@@ -1,8 +1,9 @@
 package com.haru.doyak.harudoyak.domain.member;
 
+import com.haru.doyak.harudoyak.domain.comment.CommentService;
 import com.haru.doyak.harudoyak.domain.sharedoyak.ShareDoyakService;
 import com.haru.doyak.harudoyak.dto.member.ChangeMemberInfoReqDTO;
-import com.haru.doyak.harudoyak.dto.sharedoyak.ResCommentDTO;
+import com.haru.doyak.harudoyak.dto.comment.ResCommentDTO;
 import com.haru.doyak.harudoyak.dto.sharedoyak.ResShareDoyakDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import java.util.List;
 public class MemberController {
     private final MemberService memberService;
     private final ShareDoyakService shareDoyakService;
+    private final CommentService commentService;
 
     /*
      * 회원의 댓글 모아보기
@@ -25,7 +27,7 @@ public class MemberController {
      * */
     @GetMapping("/{memberId}/comments")
     public ResponseEntity<List<ResCommentDTO>> getMemberCommentList(@PathVariable("memberId") Long memberId){
-        List<ResCommentDTO> resCommentDTOS= shareDoyakService.getMemberCommentList(memberId);
+        List<ResCommentDTO> resCommentDTOS= commentService.getMemberCommentList(memberId);
         return ResponseEntity.ok(resCommentDTOS);
     }
 

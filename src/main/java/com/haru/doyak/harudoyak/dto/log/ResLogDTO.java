@@ -13,8 +13,17 @@ public class ResLogDTO {
 
     private Long logId;        // 도약기록 아이디
     private LocalDateTime creationDate; // 도약기록 작성일
-    private Long memberId;
-    private String logContent;
+
+    /*
+    * 도약기록 작성 응답 DTO
+    * */
+    @Getter
+    @Setter
+    public static class ResLogAddDTO {
+        private Long logId;        // 도약기록 아이디
+        private Long memberId;
+        private String logContent;
+    }
 
     /*
     * 일간 도약기록 응답 DTO

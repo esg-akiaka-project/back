@@ -14,7 +14,5 @@ public class ResShareDoyakDTO {
     private String shareImageUrl;
     private Long commentCount;
     private Long doyakCount;
-    /*private List<ResCommentDTO> resComments;*/
-
 
 }

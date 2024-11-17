@@ -1,4 +1,4 @@
-package com.haru.doyak.harudoyak.dto.sharedoyak;
+package com.haru.doyak.harudoyak.dto.comment;
 
 import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
