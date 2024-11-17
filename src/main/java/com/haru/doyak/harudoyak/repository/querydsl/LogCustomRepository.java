@@ -11,6 +11,13 @@ import java.util.List;
 public interface LogCustomRepository {
 
     /*
+    * 월간 도약기록 상세 조회
+    * */
+    List<LetterWeeklyDTO.LetterMontlyDTO> findMontlyLetterAll(Long memberId, LocalDateTime creationDate);
+    List<EmotionDTO> findMontlyEmotion(Long memberId, LocalDateTime creationDate);
+    List<TagWeeklyDTO.TagMontlyDTO> findMontlyTagAll(Long memberId, LocalDateTime creationDate);
+
+    /*
     * 주간 도약기록 상세 조회
     * */
     List<LetterWeeklyDTO> findLetterByDate(Long memberId, LocalDateTime creationDate);

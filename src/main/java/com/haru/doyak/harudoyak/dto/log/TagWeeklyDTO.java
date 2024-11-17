@@ -16,4 +16,11 @@ public class TagWeeklyDTO {
     private String tagName;
     private Long rn;
 
+    @Getter
+    @Setter
+    public static class TagMontlyDTO {
+        /*private LocalDateTime montly;*/
+        private String tagName;
+    }
+
 }

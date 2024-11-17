@@ -15,4 +15,12 @@ public class ResWeeklyLogDTO {
     private List<TagWeeklyDTO> tags;
     private List<LetterWeeklyDTO> aiFeedbacks;
 
+    @Getter
+    @Setter
+    public static class ResMontlyLogDTO {
+        private List<EmotionDTO> emotions;
+        private List<TagWeeklyDTO.TagMontlyDTO> tags;
+        private List<LetterWeeklyDTO.LetterMontlyDTO> aiFeedbacks;
+    }
+
 }
