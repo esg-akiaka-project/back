@@ -16,4 +16,11 @@ public class LetterWeeklyDTO {
     private LocalDateTime feedBackDate;
     private String feedback;
 
+    @Getter
+    @Setter
+    public static class LetterMontlyDTO{
+        /*private LocalDateTime montly;*/
+        private Long aiFeedbackCount;
+    }
+
 }

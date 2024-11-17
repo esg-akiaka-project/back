@@ -17,12 +17,20 @@ public class LogController {
     private final LogService logService;
 
     /*
-     * 도약 기록
+     * 월간 도약기록 조회
+     * @param : memberId(Long), creationDate(LocalDateTime)
      * */
+    @GetMapping("montly")
+    public ResponseEntity<ResWeeklyLogDTO.ResMontlyLogDTO> getMontlyLogDetail(@RequestBody ReqWeeklyLogDTO reqWeeklyLogDTO) {
+        log.info("월간 도약기록 조회 memberId {}", reqWeeklyLogDTO.getMemberId());
+        log.info("월간 도약기록 조회 date야 넘어왔니? {}", reqWeeklyLogDTO.getCreationDate());
+        ResWeeklyLogDTO.ResMontlyLogDTO resMontlyLogDTO = logService.getMontlyLogDetail(reqWeeklyLogDTO);
+        return ResponseEntity.ok(resMontlyLogDTO);
+    }
 
     /*
      * 주간 도약기록 조회
-     * @param : memberId(Long), logId(Long)
+     * @param : memberId(Long), creationDate(LocalDateTime)
      * */
     @GetMapping("weekly")
     public ResponseEntity<ResWeeklyLogDTO> getWeeklyLogDetail(@RequestBody ReqWeeklyLogDTO reqWeeklyLogDTO) {

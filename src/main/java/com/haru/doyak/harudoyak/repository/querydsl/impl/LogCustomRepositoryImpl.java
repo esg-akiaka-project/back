@@ -2,6 +2,7 @@ package com.haru.doyak.harudoyak.repository.querydsl.impl;
 
 import com.haru.doyak.harudoyak.dto.log.*;
 import com.haru.doyak.harudoyak.repository.querydsl.LogCustomRepository;
+import com.querydsl.core.types.ConstantImpl;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.DateTemplate;
@@ -28,6 +29,76 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     /*
+    * 월간 도약기록 상세 조회
+    * */
+    // 태그 월간 집계
+    @Override
+    public List<TagWeeklyDTO.TagMontlyDTO> findMontlyTagAll(Long memberId, LocalDateTime creationDate){
+        List<TagWeeklyDTO.TagMontlyDTO> tagMontlyDTOS = jpaQueryFactory
+                .select(Projections.bean(
+                        TagWeeklyDTO.TagMontlyDTO.class,
+                        tag.name.as("tagName"),
+                        Expressions.numberTemplate(Long.class, "ROW_NUMBER() OVER (PARTITION BY {0}, DATE_FORMAT({1}, '%Y-%u') ORDER BY COUNT({2}) DESC)", log.member.memberId, creationDate, tag.name).as("rn")
+                ))
+                .from(log)
+                .join(logTag).on(log.logId.eq(logTag.log.logId))
+                .join(tag).on(logTag.tag.tagId.eq(tag.tagId))
+                .where(log.member.memberId.eq(memberId))
+                .groupBy(log.member.memberId, tag.name/*, montly*/)
+                .orderBy(/*montly.asc()*/tag.tagId.count().desc())
+                .limit(10L)
+                .fetch();
+        return tagMontlyDTOS;
+    }
+
+    // 감정 월간 집계
+    @Override
+    public List<EmotionDTO> findMontlyEmotion(Long memberId, LocalDateTime creationDate){
+        List<EmotionDTO> emotionDTOS = jpaQueryFactory
+                .select(Projections.bean(
+                        EmotionDTO.class,
+                        log.emotion,
+                        log.emotion.count().as("emotionCount"),
+                        Expressions.numberTemplate(Long.class, "ROW_NUMBER() OVER (PARTITION BY {0}, DATE_FORMAT({1}, '%Y-%u') ORDER BY COUNT({2}) DESC)", log.member.memberId, creationDate, log.emotion).as("rn")
+                ))
+                .from(log)
+                .where(log.member.memberId.eq(memberId))
+                .groupBy(log.member.memberId, log.emotion)
+                /*.orderBy()*/
+                .limit(3L)
+                .fetch();
+
+        return emotionDTOS;
+    }
+
+    // 도약이편지 Count
+    @Override
+    public List<LetterWeeklyDTO.LetterMontlyDTO> findMontlyLetterAll(Long memberId, LocalDateTime creationDate){
+
+        DateTemplate<LocalDateTime> montly = Expressions.dateTemplate(
+                LocalDateTime.class,
+                "DATE_FORMAT({0})",
+                creationDate, ConstantImpl.create("%Y-%m")
+        );
+
+        List<LetterWeeklyDTO.LetterMontlyDTO> letterMontlyDTOS = jpaQueryFactory
+                .select(Projections.bean(
+                        LetterWeeklyDTO.LetterMontlyDTO.class,
+                        /*montly.as("montly"),*/
+                        letter.letterId.count().as("aiFeedbackCount")
+                ))
+                .from(log)
+                .leftJoin(letter).on(log.logId.eq(letter.log.logId))
+                .where(log.member.memberId.eq(memberId))
+                /*.groupBy(montly.as("montly"))
+                .orderBy(montly.as("montly").desc())*/
+                .fetch();
+
+
+        return letterMontlyDTOS;
+    }
+
+    /*
     * 주간 도약기록 상세 조회
     * */
     // 도약이편지 목록
@@ -35,16 +106,23 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
     public List<LetterWeeklyDTO> findLetterByDate(Long memberId, LocalDateTime creationDate){
         // 월요일 날짜 계산
         LocalDateTime mondayDate = creationDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        LocalDateTime sundayDate = creationDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
-
-/*        DateTemplate<LocalDateTime> monday = Expressions.dateTemplate(
-                LocalDateTime.class, "DATE_FORMAT(ADDDATE({0}, - WEEKDAY({0})+0), '%Y-%m-%d')", creationDate);*/
+        // 일요일 날짜 계산
+        LocalDateTime sundayDate = creationDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        
         DateTemplate<LocalDateTime> monday = Expressions.dateTemplate(
-                LocalDateTime.class, "DATE_FORMAT({0}, '%Y-%m-%d')", mondayDate);
-/*        DateTemplate<LocalDateTime> sunday = Expressions.dateTemplate(
-                LocalDateTime.class, "DATE_FORMAT(ADDDATE({0}, - WEEKDAY({0})+6), '%Y-%m-%d')", creationDate);*/
+                LocalDateTime.class, "{0}", mondayDate);
+        /*DateTemplate<LocalDateTime> monday = Expressions.dateTemplate(
+                LocalDateTime.class,
+                "DATE_FORMAT(ADDDATE({0}, - WEEKDAY({0})+0), '%Y-%m-%d')",
+                mondayDate
+        );*/
         DateTemplate<LocalDateTime> sunday = Expressions.dateTemplate(
-                LocalDateTime.class, "DATE_FORMAT({0}, '%Y-%m-%d')", sundayDate);
+                LocalDateTime.class, "{0}", sundayDate);
+        /*DateTemplate<LocalDateTime> sunday = Expressions.dateTemplate(
+                LocalDateTime.class,
+                "DATE_FORMAT(ADDDATE({0}, - WEEKDAY({0})+6), '%Y-%m-%d')",
+                sundayDate
+        );*/
         List<LetterWeeklyDTO> letterWeeklyDTOS = jpaQueryFactory
                 .select(Projections.bean(
                         LetterWeeklyDTO.class,
@@ -56,21 +134,31 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .from(log)
                 .join(member).on(log.member.memberId.eq(member.memberId))
                 .join(letter).on(log.logId.eq(letter.log.logId))
-                .where(member.memberId.eq(memberId))
-                .groupBy(member.memberId, monday, sunday)
+                .where(log.member.memberId.eq(memberId))
+                .groupBy(letter.letterId/*,monday, sunday*/)
                 .orderBy(monday.asc())
                 .fetch();
 
         return letterWeeklyDTOS;
     }
 
-    // 감정 집계
+    // 감정 주간 집계
     @Override
     public List<EmotionDTO> findEmotionByDate(Long memberId, LocalDateTime creationDate){
+        // 월요일 날짜 계산
+        LocalDateTime mondayDate = creationDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        // 일요일 날짜 계산
+        LocalDateTime sundayDate = creationDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+/*        DateTemplate<LocalDateTime> monday = Expressions.dateTemplate(
+                LocalDateTime.class, "DATE_FORMAT(ADDDATE({0}, - WEEKDAY({0})+0), '%Y-%m-%d')", creationDate);*/
         DateTemplate<LocalDateTime> monday = Expressions.dateTemplate(
-                LocalDateTime.class, "DATE_FORMAT(ADDDATE({0}, - WEEKDAY({0})+0), '%Y-%m-%d')", creationDate);
+                LocalDateTime.class, "{0}", mondayDate);
+
+/*        DateTemplate<LocalDateTime> sunday = Expressions.dateTemplate(
+                LocalDateTime.class, "DATE_FORMAT(ADDDATE({0}, - WEEKDAY({0})+6), '%Y-%m-%d')", creationDate);*/
         DateTemplate<LocalDateTime> sunday = Expressions.dateTemplate(
-                LocalDateTime.class, "DATE_FORMAT(ADDDATE({0}, - WEEKDAY({0})+6), '%Y-%m-%d')", creationDate);
+                LocalDateTime.class, "{0}", sundayDate);
+
         List<EmotionDTO> emotionDTOS = jpaQueryFactory
                 .select(Projections.bean(
                         EmotionDTO.class,
@@ -88,13 +176,22 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
         return emotionDTOS;
     }
 
-    // 태그 집계
+    // 태그 주간 집계
     @Override
     public List<TagWeeklyDTO> findTagsByName(Long memberId, LocalDateTime creationDate){
+        // 월요일 날짜 계산
+        LocalDateTime mondayDate = creationDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        // 일요일 날짜 계산
+        LocalDateTime sundayDate = creationDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+/*        DateTemplate<LocalDateTime> monday = Expressions.dateTemplate(
+                LocalDateTime.class, "DATE_FORMAT(ADDDATE({0}, - WEEKDAY({0})+0), '%Y-%m-%d')", creationDate);*/
         DateTemplate<LocalDateTime> monday = Expressions.dateTemplate(
-                LocalDateTime.class, "DATE_FORMAT(ADDDATE({0}, - WEEKDAY({0})+0), '%Y-%m-%d')", creationDate);
+                LocalDateTime.class, "{0}", mondayDate);
+
+/*        DateTemplate<LocalDateTime> sunday = Expressions.dateTemplate(
+                LocalDateTime.class, "DATE_FORMAT(ADDDATE({0}, - WEEKDAY({0})+6), '%Y-%m-%d')", creationDate);*/
         DateTemplate<LocalDateTime> sunday = Expressions.dateTemplate(
-                LocalDateTime.class, "DATE_FORMAT(ADDDATE({0}, - WEEKDAY({0})+6), '%Y-%m-%d')", creationDate);
+                LocalDateTime.class, "{0}", sundayDate);
         List<TagWeeklyDTO> tagWeeklyDTOS = jpaQueryFactory
                 .select(Projections.bean(
                         TagWeeklyDTO.class,
@@ -109,7 +206,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .leftJoin(tag).on(logTag.logTagId.tagId.eq(tag.tagId))
                 .where(log.member.memberId.eq(memberId))
                 .groupBy(monday, sunday, tag.name)
-                .having(Expressions.numberTemplate(Long.class, "rn").loe(10))
+                /*.having(Expressions.numberTemplate(Long.class, "rn").loe(10))*/
                 .orderBy(monday.asc())
                 .fetch();
         return tagWeeklyDTOS;

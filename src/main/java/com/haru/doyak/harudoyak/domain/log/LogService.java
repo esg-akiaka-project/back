@@ -26,6 +26,23 @@ public class LogService {
     private final LevelRepository levelRepository;
 
     /*
+     * 월간 도약기록 조회
+     * @param : memberId(Long), creationDate(LocalDateTime)
+     * */
+    public ResWeeklyLogDTO.ResMontlyLogDTO getMontlyLogDetail(ReqWeeklyLogDTO reqWeeklyLogDTO) {
+        List<LetterWeeklyDTO.LetterMontlyDTO> letterMontlyDTOS = logRepository.findMontlyLetterAll(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
+        List<EmotionDTO> emotionDTOS = logRepository.findMontlyEmotion(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
+        List<TagWeeklyDTO.TagMontlyDTO> tagMontlyDTOS = logRepository.findMontlyTagAll(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
+
+        ResWeeklyLogDTO.ResMontlyLogDTO resMontlyLogDTO = new ResWeeklyLogDTO.ResMontlyLogDTO();
+        resMontlyLogDTO.setAiFeedbacks(letterMontlyDTOS);
+        resMontlyLogDTO.setEmotions(emotionDTOS);
+        resMontlyLogDTO.setTags(tagMontlyDTOS);
+
+        return resMontlyLogDTO;
+    }
+
+    /*
      * 주간 도약기록 조회
      * @param : memberId(Long)
      * */
@@ -35,12 +52,12 @@ public class LogService {
         ResWeeklyLogDTO resWeeklyLogDTO = new ResWeeklyLogDTO();
         List<LetterWeeklyDTO> letterWeeklyDTOS = logRepository.findLetterByDate(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
         log.info("로그 서비스 여기에 찍히닝?!");
-//        List<EmotionDTO> emotionDTOS = logRepository.findEmotionByDate(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
-//        List<TagWeeklyDTO> tagWeeklyDTOS = logRepository.findTagsByName(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
+        List<EmotionDTO> emotionDTOS = logRepository.findEmotionByDate(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
+        List<TagWeeklyDTO> tagWeeklyDTOS = logRepository.findTagsByName(reqWeeklyLogDTO.getMemberId(), reqWeeklyLogDTO.getCreationDate());
 
-//        resWeeklyLogDTO.setTags(tagWeeklyDTOS);
-//        resWeeklyLogDTO.setEmotions(emotionDTOS);
         resWeeklyLogDTO.setAiFeedbacks(letterWeeklyDTOS);
+        resWeeklyLogDTO.setEmotions(emotionDTOS);
+        resWeeklyLogDTO.setTags(tagWeeklyDTOS);
         return resWeeklyLogDTO;
     }
 
