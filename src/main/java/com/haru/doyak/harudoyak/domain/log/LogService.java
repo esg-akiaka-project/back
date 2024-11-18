@@ -14,7 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -35,7 +36,12 @@ public class LogService {
     public ResLogDTO.ResMontlyLogDTO getMontlyLogDetail(Long memberId, String creationDate) {
 
         // String 문자열 LocalDateTime으로 변환
-        LocalDateTime resultDate = dateUtil.stringToLocalDateTime(creationDate);
+        Date resultDate = null;
+        try {
+            resultDate = dateUtil.stringToLocalDateTime(creationDate);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
 
         List<ResLetterDTO.LetterMontlyDTO> letterMontlyDTOS = logRepository.findMontlyLetterAll(memberId, resultDate);
         List<EmotionDTO> emotionDTOS = logRepository.findMontlyEmotion(memberId, resultDate);
@@ -57,17 +63,22 @@ public class LogService {
     public ResLogDTO.ResWeeklyLogDTO getWeeklyLogDetail(Long memberId, String creationDate) {
 
         // String 문자열 LocalDateTime으로 변환
-        LocalDateTime resultDate = dateUtil.stringToLocalDateTime(creationDate);
-
+        Date resultDate = null;
+        try {
+            resultDate = dateUtil.stringToLocalDateTime(creationDate);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        log.info("resultDate {}", resultDate);
         ResLogDTO.ResWeeklyLogDTO resWeeklyLogDTO = new ResLogDTO.ResWeeklyLogDTO();
         List<ResLetterDTO.LetterWeeklyDTO> letterWeeklyDTOS = logRepository.findLetterByDate(memberId, resultDate);
         log.info("로그 서비스 여기에 찍히닝?!");
-        List<EmotionDTO> emotionDTOS = logRepository.findEmotionByDate(memberId, resultDate);
-        List<ResTagDTO.TagWeeklyDTO> tagWeeklyDTOS = logRepository.findTagsByName(memberId, resultDate);
+//        List<EmotionDTO> emotionDTOS = logRepository.findEmotionByDate(memberId, resultDate);
+//        List<ResTagDTO.TagWeeklyDTO> tagWeeklyDTOS = logRepository.findTagsByName(memberId, resultDate);
 
         resWeeklyLogDTO.setAiFeedbacks(letterWeeklyDTOS);
-        resWeeklyLogDTO.setEmotions(emotionDTOS);
-        resWeeklyLogDTO.setTags(tagWeeklyDTOS);
+//        resWeeklyLogDTO.setEmotions(emotionDTOS);
+//        resWeeklyLogDTO.setTags(tagWeeklyDTOS);
         return resWeeklyLogDTO;
     }
 

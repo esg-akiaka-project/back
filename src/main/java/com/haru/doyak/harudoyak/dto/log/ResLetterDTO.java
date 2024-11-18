@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Setter
@@ -22,8 +23,8 @@ public class ResLetterDTO {
     @Getter
     public static class LetterWeeklyDTO {
 
-        private LocalDateTime monday;
-        private LocalDateTime sunday;
+        private Date monday;
+        private Date sunday;
         private LocalDateTime feedBackDate;
         private String feedback;
 
