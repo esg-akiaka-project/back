@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.haru.doyak.harudoyak.entity.QComment.comment;
 import static com.haru.doyak.harudoyak.entity.QMember.member;
@@ -83,8 +84,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
      * */
     @Override
     public List<ResCommentDTO.ResCommentDetailDTO> findeCommentAll(Long shareDoyakId) {
-
-        return jpaQueryFactory
+        List<ResCommentDTO.ResCommentDetailDTO> resCommentDTOS = jpaQueryFactory
                 .select(Projections.bean(
                         ResCommentDTO.ResCommentDetailDTO.class,
                         comment.shareDoyak.shareDoyakId.as("commentShareDoyakId"),
@@ -100,24 +100,36 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
                                         .where(comment.parentCommentId.eq(comment.commentId)),
                                 "replyCommentCount")
 
-                        // 좀 더 공부해야 함
-                       /* ExpressionUtils.as(
-                                JPAExpressions
-                                        .select(comment.commentId)
-                                        .from(comment)
-                                        .where(comment.parentCommentId.eq(comment.commentId))
-                                        .fetch()
-                                        .stream()
-                                        .collect(Collectors.toList()),
-
-                        "replyCommentIds")*/
-
                 ))
                 .from(comment)
                 .leftJoin(member).on(comment.member.memberId.eq(member.memberId))
                 .where(comment.parentCommentId.isNull(), comment.shareDoyak.shareDoyakId.eq(shareDoyakId))
                 .orderBy(comment.creationDate.desc())
                 .fetch();
+
+        List<ResCommentDTO.ResReplyDetailDTO> resReplyDetailDTOS = jpaQueryFactory
+                .select(Projections.bean(
+                        ResCommentDTO.ResReplyDetailDTO.class,
+                        comment.shareDoyak.shareDoyakId.as("commentShareDoyakId"),
+                        comment.commentId.as("replyId"),
+                        comment.content.as("replyContent"),
+                        member.nickname.as("replyAuthorNickname"),
+                        comment.parentCommentId
+                ))
+                .from(comment)
+                .leftJoin(member).on(comment.member.memberId.eq(member.memberId))
+                .where(comment.parentCommentId.isNotNull())
+                .fetch();
+
+        resCommentDTOS.stream()
+                .peek(resCommentDetailDTO -> resCommentDetailDTO.setReplies(
+                        resReplyDetailDTOS.stream()
+                                .filter(comment -> comment.getParentCommentId().equals(resCommentDetailDTO.getCommentId()))
+                                .collect(Collectors.toList())
+                ))
+                .collect(Collectors.toList());
+
+        return resCommentDTOS;
 
     }
 
