@@ -284,6 +284,11 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
     }
 
 
+    /**
+     * @param startDate startDate 이상
+     * @param endDate endDate 이하
+     * @return <List> 기간 내에 작성한 로그의 member, letter
+     */
     @Override
     public List<Tuple> findLetterMemberWhereBetweenLogCreationDateTime(LocalDateTime startDate, LocalDateTime endDate) {
          return jpaQueryFactory.select(letter.content, member.memberId, member.aiNickname)
@@ -298,16 +303,21 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .fetch();
     }
 
+    /**
+     * @param startDate
+     * @param endDate
+     * @return <List> 기간 내에 로그 작성한 member, log count
+     */
     @Override
     public List<Tuple> findLogMemberWhereBetweenLogCreationDatetime(LocalDateTime startDate, LocalDateTime endDate) {
-        return jpaQueryFactory.select(log.member.memberId, log.member.memberId.count())
+        return jpaQueryFactory.select(member.memberId, log.member.memberId.count())
                 .from(log)
                 .leftJoin(member)
                 .on(member.memberId.eq(log.member.memberId))
                 .where(
                         log.creationDate.between(startDate, endDate)
                 )
-                .groupBy(log.member.memberId)
+                .groupBy(member.memberId)
                 .fetch();
     }
 
