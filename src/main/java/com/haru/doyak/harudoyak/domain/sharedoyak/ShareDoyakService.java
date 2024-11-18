@@ -32,9 +32,9 @@ public class ShareDoyakService {
      * 회원의 서로도약 글 모아보기
      * @param : membaerId(Long)
      * */
-    public List<ResShareDoyakDTO> getMemberShareDoyakList(Long memberId){
-        List<ResShareDoyakDTO> resShareDoyakDTOS = shareDoyakRepository.findMemberShareDoyakAll(memberId);
-        return resShareDoyakDTOS;
+    public List<ResShareDoyakDTO.ResMemberShareDoyakDYO> getMemberShareDoyakList(Long memberId){
+        List<ResShareDoyakDTO.ResMemberShareDoyakDYO> resMemberShareDoyakDYOS = shareDoyakRepository.findMemberShareDoyakAll(memberId);
+        return resMemberShareDoyakDYOS;
     }
 
     /*

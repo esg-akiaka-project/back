@@ -20,11 +20,11 @@ public class LogController {
      * 월간 도약기록 조회
      * @param : memberId(Long), creationDate(LocalDateTime)
      * */
-    @GetMapping("montly")
-    public ResponseEntity<ResLogDTO.ResMontlyLogDTO> getMontlyLogDetail(@RequestBody ReqWeeklyLogDTO reqWeeklyLogDTO) {
-        log.info("월간 도약기록 조회 memberId {}", reqWeeklyLogDTO.getMemberId());
-        log.info("월간 도약기록 조회 date야 넘어왔니? {}", reqWeeklyLogDTO.getCreationDate());
-        ResLogDTO.ResMontlyLogDTO resMontlyLogDTO = logService.getMontlyLogDetail(reqWeeklyLogDTO);
+    @GetMapping("montly/{memberId}/{creationDate}")
+    public ResponseEntity<ResLogDTO.ResMontlyLogDTO> getMontlyLogDetail(@PathVariable("memberId") Long memberId, @PathVariable("creationDate") String creationDate) {
+        log.info("월간 도약기록 조회 memberId {}", memberId);
+        log.info("월간 도약기록 조회 date야 넘어왔니? {}", creationDate);
+        ResLogDTO.ResMontlyLogDTO resMontlyLogDTO = logService.getMontlyLogDetail(memberId, creationDate);
         return ResponseEntity.ok(resMontlyLogDTO);
     }
 
@@ -32,12 +32,12 @@ public class LogController {
      * 주간 도약기록 조회
      * @param : memberId(Long), creationDate(LocalDateTime)
      * */
-    @GetMapping("weekly")
-    public ResponseEntity<ResLogDTO.ResWeeklyLogDTO> getWeeklyLogDetail(@RequestBody ReqWeeklyLogDTO reqWeeklyLogDTO) {
+    @GetMapping("weekly/{memberId}/{creationDate}")
+    public ResponseEntity<ResLogDTO.ResWeeklyLogDTO> getWeeklyLogDetail(@PathVariable("memberId") Long memberId, @PathVariable("creationDate") String creationDate) {
 
-        log.info("memberId {}", reqWeeklyLogDTO.getMemberId());
-        log.info("date야 넘어왔니? {}", reqWeeklyLogDTO.getCreationDate());
-        ResLogDTO.ResWeeklyLogDTO resWeeklyLogDTOS = logService.getWeeklyLogDetail(reqWeeklyLogDTO);
+        log.info("memberId {}", memberId);
+        log.info("date야 넘어왔니? {}", creationDate);
+        ResLogDTO.ResWeeklyLogDTO resWeeklyLogDTOS = logService.getWeeklyLogDetail(memberId, creationDate);
 
         return ResponseEntity.ok(resWeeklyLogDTOS);
     }

@@ -36,9 +36,9 @@ public class MemberController {
     * @param : membaerId(Long)
     * */
     @GetMapping("/{memberId}/posts")
-    public ResponseEntity<List<ResShareDoyakDTO>> getMemberShareDoyakList(@PathVariable("memberId") Long memberId){
-        List<ResShareDoyakDTO> resShareDoyakDTOS = shareDoyakService.getMemberShareDoyakList(memberId);
-        return ResponseEntity.ok(resShareDoyakDTOS);
+    public ResponseEntity<List<ResShareDoyakDTO.ResMemberShareDoyakDYO>> getMemberShareDoyakList(@PathVariable("memberId") Long memberId){
+        List<ResShareDoyakDTO.ResMemberShareDoyakDYO> resMemberShareDoyakDYOS = shareDoyakService.getMemberShareDoyakList(memberId);
+        return ResponseEntity.ok(resMemberShareDoyakDYOS);
     }
 
     @GetMapping("check")

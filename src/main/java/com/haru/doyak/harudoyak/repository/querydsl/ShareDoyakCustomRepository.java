@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ShareDoyakCustomRepository {
 
-    List<ResShareDoyakDTO> findMemberShareDoyakAll(Long memberId);
+    List<ResShareDoyakDTO.ResMemberShareDoyakDYO> findMemberShareDoyakAll(Long memberId);
 
     long shareDoyakDelete(Long shareDoyakId);
 
