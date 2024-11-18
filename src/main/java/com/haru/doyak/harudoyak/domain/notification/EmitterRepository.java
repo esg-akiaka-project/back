@@ -22,6 +22,5 @@ public class EmitterRepository {
 
     public SseEmitter get(Long memberId) {
         return emitters.get(memberId);
-
     }
 }
