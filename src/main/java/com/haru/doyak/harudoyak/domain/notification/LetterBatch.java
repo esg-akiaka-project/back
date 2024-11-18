@@ -35,8 +35,8 @@ public class LetterBatch {
     }
 
     // 매일 7am 실행 -> 하루도약작성일 다음 날이면 알림
-    @Scheduled(cron = "0 * * * * *")
-//    @Scheduled(cron = "0 0 7 * * *")
+//    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 7 * * *")
     public void sendDailyFeedback(){
         LocalDate today = LocalDate.now();
         LocalDateTime startDateTime = today.minusDays(1).atStartOfDay();// 어제 00:00
@@ -55,8 +55,8 @@ public class LetterBatch {
     }
 
     // 매 주 월요일 7시에 알림
-    @Scheduled(cron = "0 * * * * *")
-//    @Scheduled(cron = "0 0 7 * * MON")
+//    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 7 * * MON")
     public void sendWeekFeedback() {
         LocalDate today = LocalDate.now();
         LocalDate startOfThisWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
@@ -78,8 +78,8 @@ public class LetterBatch {
     }
 
     // 매 월 1일 7시에 알림
-    @Scheduled(cron = "0 * * * * *")
-//    @Scheduled(cron = "0 0 7 1 * ?")
+//    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 7 1 * ?")
     public void sendMonthFeedback() {
         LocalDate today = LocalDate.now();
         YearMonth lastMonth = YearMonth.from(today).minusMonths(1);
