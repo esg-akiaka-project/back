@@ -20,7 +20,7 @@ public class LogController {
      * 월간 도약기록 조회
      * @param : memberId(Long), creationDate(LocalDateTime)
      * */
-    @GetMapping("montly/{memberId}/{creationDate}")
+    @GetMapping("monthly/{memberId}/{creationDate}")
     public ResponseEntity<ResLogDTO.ResMontlyLogDTO> getMontlyLogDetail(@PathVariable("memberId") Long memberId, @PathVariable("creationDate") String creationDate) {
         log.info("월간 도약기록 조회 memberId {}", memberId);
         log.info("월간 도약기록 조회 date야 넘어왔니? {}", creationDate);
