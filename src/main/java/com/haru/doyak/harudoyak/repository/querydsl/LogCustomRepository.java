@@ -1,11 +1,12 @@
 package com.haru.doyak.harudoyak.repository.querydsl;
 
-import com.haru.doyak.harudoyak.dto.log.*;
+import com.haru.doyak.harudoyak.dto.log.EmotionDTO;
+import com.haru.doyak.harudoyak.dto.log.ResLetterDTO;
 import com.haru.doyak.harudoyak.dto.log.ResLogDTO;
+import com.haru.doyak.harudoyak.dto.log.ResTagDTO;
 import com.querydsl.core.Tuple;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 public interface LogCustomRepository {
@@ -13,16 +14,16 @@ public interface LogCustomRepository {
     /*
     * 월간 도약기록 상세 조회
     * */
-    List<ResLetterDTO.LetterMontlyDTO> findMontlyLetterAll(Long memberId, Date creationDate);
-    List<EmotionDTO> findMontlyEmotion(Long memberId, Date creationDate);
-    List<ResTagDTO.TagMontlyDTO> findMontlyTagAll(Long memberId, Date creationDate);
+    List<ResLetterDTO.LetterMontlyDTO> findMontlyLetterAll(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate);
+    List<EmotionDTO.ResEmotionMonthlyDTO> findMontlyEmotion(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate);
+    List<ResTagDTO.TagMontlyDTO> findMontlyTagAll(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate);
 
     /*
     * 주간 도약기록 상세 조회
     * */
-    List<ResLetterDTO.LetterWeeklyDTO> findLetterByDate(Long memberId, Date creationDate);
-    List<EmotionDTO> findEmotionByDate(Long memberId, Date creationDate);
-    List<ResTagDTO.TagWeeklyDTO> findTagsByName(Long memberId, Date creationDate);
+    List<ResLetterDTO.LetterWeeklyDTO> findLetterByDate(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate);
+    List<EmotionDTO> findEmotionByDate(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate);
+    List<ResTagDTO.TagWeeklyDTO> findTagsByName(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate);
 
     /*
      * 일간 도약기록 상세 조회
