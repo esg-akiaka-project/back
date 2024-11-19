@@ -60,7 +60,7 @@ public class AuthController {
     }
 
     @PostMapping("email/verify")
-    public ResponseEntity<String> emailVerify(@RequestHeader(value = "Referer") String referer,
+    public ResponseEntity<String> emailVerify(@RequestHeader(value = "Referer", required = false) String referer,
                                               @RequestBody EmailVerifyReqDTO dto)
     {
         if(memberService.isEmailAvailable(dto.getEmail())){
