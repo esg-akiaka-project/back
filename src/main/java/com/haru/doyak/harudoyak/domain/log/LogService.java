@@ -147,7 +147,7 @@ public class LogService {
     @Transactional
     public ResLogDTO.ResLogAddDTO setLogAdd(ReqLogDTO reqLogDTO, Long memberId) {
 
-        // 도약기록 insert 전 회원 존재하는지 isExists 확인
+        // 도약기록 insert 해당 회원이 있는지 확인
          Member selectMember = memberRepository.findMemberByMemberId(memberId).orElseThrow();
 
          ResLogDTO.ResLogAddDTO resLogAddDTO = new ResLogDTO.ResLogAddDTO();
