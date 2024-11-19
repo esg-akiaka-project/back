@@ -22,8 +22,8 @@ public class ResLetterDTO {
     @Getter
     public static class LetterWeeklyDTO {
 
-        private LocalDateTime monday;
-        private LocalDateTime sunday;
+/*        private LocalDateTime monday;
+        private LocalDateTime sunday;*/
         private LocalDateTime feedBackDate;
         private String feedback;
 
@@ -34,9 +34,12 @@ public class ResLetterDTO {
     * */
     @Getter
     @Setter
-    public static class LetterMontlyDTO{
-        /*private LocalDateTime montly;*/
+    public static class LetterMonthlyDTO{
+
+/*        private LocalDateTime startMonthDay;
+        private LocalDateTime endMonthDay;*/
         private Long aiFeedbackCount;
+
     }
 
 }

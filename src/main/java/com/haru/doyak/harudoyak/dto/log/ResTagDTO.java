@@ -3,8 +3,6 @@ package com.haru.doyak.harudoyak.dto.log;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 public class ResTagDTO {
@@ -19,8 +17,8 @@ public class ResTagDTO {
     @Setter
     public static class TagWeeklyDTO {
 
-        private LocalDateTime monday;
-        private LocalDateTime sunday;
+/*        private LocalDateTime monday;
+        private LocalDateTime sunday;*/
         private String tagName;
         private Long rn;
 
@@ -31,9 +29,12 @@ public class ResTagDTO {
     * */
     @Getter
     @Setter
-    public static class TagMontlyDTO {
-        /*private LocalDateTime montly;*/
+    public static class TagMonthlyDTO {
+
+/*        private LocalDateTime startMonthDay;
+        private LocalDateTime endMonthDay;*/
         private String tagName;
+
     }
 
 }
