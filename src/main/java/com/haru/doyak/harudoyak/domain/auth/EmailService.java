@@ -40,7 +40,7 @@ public class EmailService {
     }
 
     public String getMailVerifyUri(String referrer){
-        if(referrer!= null && referrer.startsWith("https//harudoyak.site")) return mailVerifyUriSite;
+        if(referrer!= null && referrer.startsWith("https://www.harudoyak.site")) return mailVerifyUriSite;
         else return mailVerifyUriLocal;
     }
 }
