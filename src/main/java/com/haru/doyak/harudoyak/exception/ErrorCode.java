@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     ERROR_CODE(HttpStatus.BAD_REQUEST, "errorMessage"),
     // 400 Bad Request
-    NULL_VALUE(HttpStatus.BAD_REQUEST, "필수값이 잘못되었습니다."),
+    NULL_VALUE(HttpStatus.BAD_REQUEST, "필수값이 비었습니다."),
 
     // 401 Unauthorized
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "잘못된 비밀번호 입니다."),

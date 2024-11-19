@@ -47,16 +47,17 @@ public class MemberController {
     @GetMapping("check")
     public ResponseEntity check(@RequestParam("nickname")String nickname) {
         if(memberService.isNicknameAvailable(nickname)){
-            return ResponseEntity.ok().body(nickname+"가 사용 가능합니다.");
+            MemberResDTO res = MemberResDTO.builder()
+                    .nickname(nickname)
+                    .build();
+            return ResponseEntity.ok().body(res);
         }else throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
     }
 
     @PutMapping("{memberId}/nickname")
     public ResponseEntity chageNickname(@PathVariable("memberId") Long memberId,
                                         @RequestBody ChangeMemberInfoReqDTO dto){
-        if(dto.getNickname()==null){
-            throw new CustomException(ErrorCode.NULL_VALUE);
-        }
+        if(dto.getNickname()==null) throw new CustomException(ErrorCode.NULL_VALUE);
         MemberResDTO res = memberService.changeNickname(memberId, dto.getNickname());
         return ResponseEntity.ok().body(res);
     }
@@ -64,9 +65,7 @@ public class MemberController {
     @PutMapping("{memberId}/aiNickname")
     public ResponseEntity changeAiNickname(@PathVariable("memberId") Long memberId,
                                            @RequestBody ChangeMemberInfoReqDTO dto){
-        if(dto.getAiNickname()==null){
-            return ResponseEntity.badRequest().body("도약이 닉네임이 null 입니다.");
-        }
+        if(dto.getAiNickname()==null) throw new CustomException(ErrorCode.NULL_VALUE);
         MemberResDTO res = memberService.changeAiNickname(memberId, dto.getAiNickname());
         return ResponseEntity.ok().body(res);
     }
@@ -74,9 +73,7 @@ public class MemberController {
     @PutMapping("{memberId}/goalName")
     public ResponseEntity changeGoalName(@PathVariable("memberId") Long memberId,
                                          @RequestBody ChangeMemberInfoReqDTO dto){
-        if(dto.getGoalName()==null){
-            return ResponseEntity.badRequest().body("도약목표가 null 입니다.");
-        }
+        if(dto.getGoalName()==null) throw new CustomException(ErrorCode.NULL_VALUE);
         MemberResDTO res = memberService.changeGoalName(memberId, dto.getGoalName());
         return ResponseEntity.ok().body(res);
     }
@@ -84,9 +81,7 @@ public class MemberController {
     @PutMapping("{memberId}/pwd")
     public ResponseEntity changePassword(@PathVariable("memberId") Long memberId,
                                          @RequestBody ChangeMemberInfoReqDTO dto){
-        if(dto.getPassword()==null){
-            return ResponseEntity.badRequest().body("비밀번호가 null 입니다.");
-        }
+        if(dto.getPassword()==null) throw new CustomException(ErrorCode.NULL_VALUE);
         memberService.changePassword(memberId, dto.getPassword());
         return ResponseEntity.ok().body("비밀번호가 변경되었습니다.");
     }

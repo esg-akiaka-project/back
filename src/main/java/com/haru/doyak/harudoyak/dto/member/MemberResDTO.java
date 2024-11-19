@@ -3,13 +3,14 @@ package com.haru.doyak.harudoyak.dto.member;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.JoinColumn;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Data
 public class MemberResDTO {
 
