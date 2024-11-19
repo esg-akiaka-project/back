@@ -21,11 +21,11 @@ public class LogController {
      * @param : memberId(Long), creationDate(LocalDateTime)
      * */
     @GetMapping("monthly/{memberId}/{creationDate}")
-    public ResponseEntity<ResLogDTO.ResMontlyLogDTO> getMontlyLogDetail(@PathVariable("memberId") Long memberId, @PathVariable("creationDate") String creationDate) {
+    public ResponseEntity<ResLogDTO.ResMonthlyLogDTO> getMontlyLogDetail(@PathVariable("memberId") Long memberId, @PathVariable("creationDate") String creationDate) {
         log.info("월간 도약기록 조회 memberId {}", memberId);
         log.info("월간 도약기록 조회 date야 넘어왔니? {}", creationDate);
-        ResLogDTO.ResMontlyLogDTO resMontlyLogDTO = logService.getMontlyLogDetail(memberId, creationDate);
-        return ResponseEntity.ok(resMontlyLogDTO);
+        ResLogDTO.ResMonthlyLogDTO resMonthlyLogDTO = logService.getMontlyLogDetail(memberId, creationDate);
+        return ResponseEntity.ok(resMonthlyLogDTO);
     }
 
     /*

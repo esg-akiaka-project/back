@@ -4,15 +4,13 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Data
 @Getter
 @Setter
 public class EmotionDTO {
 
-    private LocalDateTime monday;
-    private LocalDateTime sunday;
+/*    private LocalDateTime monday;
+    private LocalDateTime sunday;*/
     private String emotion;
     private Long emotionCount;
 
