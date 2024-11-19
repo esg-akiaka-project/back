@@ -1,5 +1,7 @@
 package com.haru.doyak.harudoyak.domain.notification;
 
+import com.haru.doyak.harudoyak.entity.Notification;
+import com.haru.doyak.harudoyak.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -10,6 +12,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class NotificationService {
     private final EmitterRepository emitterRepository;
+    private final NotificationRepository notificationRepository;
 
 
     private static final Long DEFAULT_TIMEOUT = 600L * 1000 * 60;
@@ -59,6 +62,16 @@ public class NotificationService {
                 emitter.completeWithError(e);
             }
         }
+    }
+
+    private void saveNotification(Long memberId, String title, String content, SseEventName sseEventName) {
+        Notification notification = Notification.builder()
+                .title(title)
+                .content(content)
+                .sseEventName(sseEventName)
+                .memberId(memberId)
+                .build();
+        notificationRepository.save(notification);
     }
 
     private SseEmitter createEmitter(Long memberId) {

@@ -22,6 +22,7 @@ public class Notification {
     @NotNull
     private String content;
     @NotNull
+    @Enumerated(EnumType.STRING)
     private SseEventName sseEventName;
     @NotNull
     private Boolean isRead;
