@@ -14,9 +14,9 @@ public interface LogCustomRepository {
     /*
     * 월간 도약기록 상세 조회
     * */
-    List<ResLetterDTO.LetterMontlyDTO> findMontlyLetterAll(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate);
+    List<ResLetterDTO.LetterMonthlyDTO> findMontlyLetterAll(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate);
     List<EmotionDTO.ResEmotionMonthlyDTO> findMontlyEmotion(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate);
-    List<ResTagDTO.TagMontlyDTO> findMontlyTagAll(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate);
+    List<ResTagDTO.TagMonthlyDTO> findMontlyTagAll(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate);
 
     /*
     * 주간 도약기록 상세 조회

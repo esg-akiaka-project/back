@@ -34,7 +34,7 @@ public class ResLetterDTO {
     * */
     @Getter
     @Setter
-    public static class LetterMontlyDTO{
+    public static class LetterMonthlyDTO{
 
 /*        private LocalDateTime startMonthDay;
         private LocalDateTime endMonthDay;*/

@@ -34,7 +34,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
     * */
     // 태그 월간 집계
     @Override
-    public List<ResTagDTO.TagMontlyDTO> findMontlyTagAll(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate){
+    public List<ResTagDTO.TagMonthlyDTO> findMontlyTagAll(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate){
 
         DateTemplate<LocalDateTime> startMonthDay = Expressions.dateTemplate(
                 LocalDateTime.class, "{0}", startMonthDayDate);
@@ -42,9 +42,9 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
         DateTemplate<LocalDateTime> endMonthDay = Expressions.dateTemplate(
                 LocalDateTime.class, "{0}", endMonthDayDate);
 
-        List<ResTagDTO.TagMontlyDTO> tagMontlyDTOS = jpaQueryFactory
+        List<ResTagDTO.TagMonthlyDTO> tagMonthlyDTOS = jpaQueryFactory
                 .select(Projections.bean(
-                        ResTagDTO.TagMontlyDTO.class,
+                        ResTagDTO.TagMonthlyDTO.class,
 /*                        startMonthDay.as("startMonthDay"),
                         endMonthDay.as("endMonthDay"),*/
                         tag.name.as("tagName"),
@@ -58,7 +58,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .orderBy(tag.name.count().desc())
                 .limit(10)
                 .fetch();
-        return tagMontlyDTOS;
+        return tagMonthlyDTOS;
     }
 
     // 감정 월간 집계
@@ -92,7 +92,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
 
     // 도약이편지 Count
     @Override
-    public List<ResLetterDTO.LetterMontlyDTO> findMontlyLetterAll(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate){
+    public List<ResLetterDTO.LetterMonthlyDTO> findMontlyLetterAll(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate){
 
         DateTemplate<LocalDateTime> startMonthDay = Expressions.dateTemplate(
                 LocalDateTime.class, "{0}", startMonthDayDate);
@@ -100,22 +100,20 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
         DateTemplate<LocalDateTime> endMonthDay = Expressions.dateTemplate(
                 LocalDateTime.class, "{0}", endMonthDayDate);
 
-        List<ResLetterDTO.LetterMontlyDTO> letterMontlyDTOS = jpaQueryFactory
+        List<ResLetterDTO.LetterMonthlyDTO> letterMonthlyDTOS = jpaQueryFactory
                 .select(Projections.bean(
-                        ResLetterDTO.LetterMontlyDTO.class,
+                        ResLetterDTO.LetterMonthlyDTO.class,
 /*                        startMonthDay.as("startMonthDay"),
                         endMonthDay.as("endMonthDay"),*/
                         letter.letterId.count().as("aiFeedbackCount")
                 ))
                 .from(log)
                 .leftJoin(letter).on(log.logId.eq(letter.log.logId))
-                .where(log.member.memberId.eq(memberId), log.creationDate.between(startMonthDayDate, endMonthDayDate))
-                /*.groupBy(montly.as("montly"))
-                .orderBy(montly.as("montly").desc())*/
+                .where(log.member.memberId.eq(memberId), letter.arrivedDate.between(startMonthDayDate, endMonthDayDate))
                 .fetch();
 
 
-        return letterMontlyDTOS;
+        return letterMonthlyDTOS;
     }
 
     /*
@@ -142,7 +140,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .from(log)
                 .join(member).on(log.member.memberId.eq(member.memberId))
                 .join(letter).on(log.logId.eq(letter.log.logId))
-                .where(log.member.memberId.eq(memberId), log.creationDate.between(mondayDate, sundayDate))
+                .where(log.member.memberId.eq(memberId), letter.arrivedDate.between(mondayDate, sundayDate))
                 /*.groupBy(log.creationDate*//*, monday, sunday*//*
                         *//*Expressions.dateTemplate(
                                 LocalDateTime.class, "{0}", mondayDate),

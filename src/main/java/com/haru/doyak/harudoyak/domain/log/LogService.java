@@ -35,7 +35,7 @@ public class LogService {
      * 월간 도약기록 조회
      * @param : memberId(Long), creationDate(LocalDateTime)
      * */
-    public ResLogDTO.ResMontlyLogDTO getMontlyLogDetail(Long memberId, String creationDate) {
+    public ResLogDTO.ResMonthlyLogDTO getMontlyLogDetail(Long memberId, String creationDate) {
 
         // String 문자열 LocalDateTime으로 변환
         LocalDateTime resultLocalDateTime = null;
@@ -49,16 +49,16 @@ public class LogService {
         LocalDateTime endMonthDayDate = resultLocalDateTime.with(TemporalAdjusters.lastDayOfMonth()).toLocalDate().atStartOfDay();
         log.info("startMonthDayDate---------------------> {}", startMonthDayDate);
         log.info("endMonthDayDate---------------------> {}", endMonthDayDate);
-        List<ResLetterDTO.LetterMontlyDTO> letterMontlyDTOS = logRepository.findMontlyLetterAll(memberId, startMonthDayDate, endMonthDayDate);
+        List<ResLetterDTO.LetterMonthlyDTO> letterMonthlyDTOS = logRepository.findMontlyLetterAll(memberId, startMonthDayDate, endMonthDayDate);
         List<EmotionDTO.ResEmotionMonthlyDTO> emotionDTOS = logRepository.findMontlyEmotion(memberId, startMonthDayDate, endMonthDayDate);
-        List<ResTagDTO.TagMontlyDTO> tagMontlyDTOS = logRepository.findMontlyTagAll(memberId, startMonthDayDate, endMonthDayDate);
+        List<ResTagDTO.TagMonthlyDTO> tagMonthlyDTOS = logRepository.findMontlyTagAll(memberId, startMonthDayDate, endMonthDayDate);
 
-        ResLogDTO.ResMontlyLogDTO resMontlyLogDTO = new ResLogDTO.ResMontlyLogDTO();
-        resMontlyLogDTO.setAiFeedbacks(letterMontlyDTOS);
-        resMontlyLogDTO.setEmotions(emotionDTOS);
-        resMontlyLogDTO.setTags(tagMontlyDTOS);
+        ResLogDTO.ResMonthlyLogDTO resMonthlyLogDTO = new ResLogDTO.ResMonthlyLogDTO();
+        resMonthlyLogDTO.setAiFeedbacks(letterMonthlyDTOS);
+        resMonthlyLogDTO.setEmotions(emotionDTOS);
+        resMonthlyLogDTO.setTags(tagMonthlyDTOS);
 
-        return resMontlyLogDTO;
+        return resMonthlyLogDTO;
     }
 
     /*

@@ -29,7 +29,7 @@ public class ResTagDTO {
     * */
     @Getter
     @Setter
-    public static class TagMontlyDTO {
+    public static class TagMonthlyDTO {
 
 /*        private LocalDateTime startMonthDay;
         private LocalDateTime endMonthDay;*/
