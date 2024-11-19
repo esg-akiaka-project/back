@@ -59,12 +59,9 @@ public class AuthController {
 
     @PostMapping("join")
     public ResponseEntity<String> join(@RequestBody JoinReqDTO joinReqDto){
-        if(!joinReqDto.getIsVerified()) return ResponseEntity.badRequest().body("이메일 인증이 필요합니다.");
-        if(authService.joinMember(joinReqDto)){
-            return ResponseEntity.ok().body("회원가입이 완료되었습니다.");
-        }else {
-            return ResponseEntity.badRequest().body("회원가입 실패");
-        }
+        if(!joinReqDto.getIsVerified()) throw new CustomException(ErrorCode.EMAIL_NOT_VERIFIED);
+        authService.joinMember(joinReqDto);
+        return ResponseEntity.ok().body("회원가입이 완료되었습니다.");
     }
 
     @PostMapping("email/verify")

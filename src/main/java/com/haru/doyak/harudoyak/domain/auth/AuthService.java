@@ -10,6 +10,8 @@ import com.haru.doyak.harudoyak.dto.auth.jwt.JwtRecord;
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtReqDTO;
 import com.haru.doyak.harudoyak.entity.Level;
 import com.haru.doyak.harudoyak.entity.Member;
+import com.haru.doyak.harudoyak.exception.CustomException;
+import com.haru.doyak.harudoyak.exception.ErrorCode;
 import com.haru.doyak.harudoyak.repository.FileRepository;
 import com.haru.doyak.harudoyak.repository.LevelRepository;
 import com.haru.doyak.harudoyak.repository.MemberRepository;
@@ -34,8 +36,8 @@ public class AuthService {
     private String local_client_name;
 
     public boolean joinMember(JoinReqDTO joinReqDTO){
-        if(memberRepository.findMemberByEmail(joinReqDTO.getEmail()).isEmpty()){
-            return false;
+        if(memberRepository.findMemberByEmail(joinReqDTO.getEmail()).isPresent()){
+            throw new CustomException(ErrorCode.DUPLICATE_MEMBER);
         }
         Member member = Member.builder()
                 .email(joinReqDTO.getEmail())
@@ -64,11 +66,11 @@ public class AuthService {
     public JwtMemberDTO login(LoginReqDTO loginReqDTO) throws Exception {
         Optional<Member> memberOptional = memberRepository.findMemberByEmail(loginReqDTO.getEmail());
         if(memberOptional.isEmpty()){
-            throw new Exception("member no exist");
+            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
         }
         Member savedMember = memberOptional.get();
         if(!passwordEncoder.matches(loginReqDTO.getPassword(), savedMember.getPassword())){
-            throw new Exception("wrong password");
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
         // 토큰 발행
         JwtRecord jwtRecord = jwtProvider.getJwtRecord(savedMember);
