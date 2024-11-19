@@ -61,7 +61,7 @@ public class ResLogDTO {
     @Getter
     @Setter
     public static class ResMontlyLogDTO {
-        private List<EmotionDTO> emotions;
+        private List<EmotionDTO.ResEmotionMonthlyDTO> emotions;
         private List<ResTagDTO.TagMontlyDTO> tags;
         private List<ResLetterDTO.LetterMontlyDTO> aiFeedbacks;
     }
