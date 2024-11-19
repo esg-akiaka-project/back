@@ -10,6 +10,7 @@ import com.haru.doyak.harudoyak.dto.auth.jwt.JwtResDTO;
 import com.haru.doyak.harudoyak.exception.CustomException;
 import com.haru.doyak.harudoyak.exception.ErrorCode;
 import com.haru.doyak.harudoyak.security.AuthenticatedUser;
+import jakarta.mail.FolderClosedException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import lombok.RequiredArgsConstructor;
@@ -65,10 +66,14 @@ public class AuthController {
     }
 
     @PostMapping("email/verify")
-    public ResponseEntity<String> emailVerify(@RequestBody EmailVerifyReqDTO dto) throws MessagingException {
+    public ResponseEntity<String> emailVerify(@RequestBody EmailVerifyReqDTO dto) {
         if(memberService.isEmailAvailable(dto.getEmail())){
-            emailService.sendAuthLinkEmail(dto.getEmail());
-            return ResponseEntity.ok().body("인증 메일이 발송되었습니다.");
+            try {
+                emailService.sendAuthLinkEmail(dto.getEmail());
+                return ResponseEntity.ok().body("인증 메일이 발송되었습니다.");
+            } catch (MessagingException e) {
+                throw new CustomException(ErrorCode.EMAIL_SEND_FAIL);
+            }
         }else throw new CustomException(ErrorCode.DUPLICATE_MEMBER);
     }
 

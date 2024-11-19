@@ -1,5 +1,6 @@
 package com.haru.doyak.harudoyak.exception;
 
+import com.haru.doyak.harudoyak.domain.auth.EmailService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,7 +36,8 @@ public enum ErrorCode {
 
 
     // 500 Internal Server Error
-    UNKNOWN_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "unknown error");
+    UNKNOWN_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "unknown error"),
+    EMAIL_SEND_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "이메일 전송 중 실패 : 다시 시도하세요");
 
     private final HttpStatus status;
     private final String errorMessage;

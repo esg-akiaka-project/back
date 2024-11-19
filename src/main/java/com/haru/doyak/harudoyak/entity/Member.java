@@ -29,6 +29,7 @@ public class Member {
     @JoinColumn
     private Long fileId;// 프로필 사진
 
+    @Column(unique = true)
     private String email;      // 이메일 주소
     private String password;        // 비밀번호
     @NotNull
