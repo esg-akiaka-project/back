@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -35,7 +36,7 @@ public class AuthService {
     @Value("${spring.oauth2.local.client-name}")
     private String local_client_name;
 
-    public boolean joinMember(JoinReqDTO joinReqDTO){
+    public void joinMember(JoinReqDTO joinReqDTO){
         if(memberRepository.findMemberByEmail(joinReqDTO.getEmail()).isPresent()){
             throw new CustomException(ErrorCode.DUPLICATE_MEMBER);
         }
@@ -48,27 +49,25 @@ public class AuthService {
 
         memberRepository.save(member);
         member.updateLocalProviderId();
+        memberRepository.save(member);
         // 레벨 생성하기
         Level level = Level.builder()
                 .memberId(member.getMemberId())
                 .point(10L)// 가입시 10포인트
                 .build();
         levelRepository.save(level);
-        return true;
     }
 
     /**
-     *
      * @param loginReqDTO email, password
      * @return 일치하는 member를 찾아 jwt를 생성해 member와 jwt를 반환
      * @throws Exception 가입되지 않은 경우, 비밀번호가 틀릴 경우
      */
-    public JwtMemberDTO login(LoginReqDTO loginReqDTO) throws Exception {
+    public JwtMemberDTO login(LoginReqDTO loginReqDTO) {
         Optional<Member> memberOptional = memberRepository.findMemberByEmail(loginReqDTO.getEmail());
-        if(memberOptional.isEmpty()){
-            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
-        }
-        Member savedMember = memberOptional.get();
+        Member savedMember = memberOptional
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
         if(!passwordEncoder.matches(loginReqDTO.getPassword(), savedMember.getPassword())){
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
@@ -91,19 +90,23 @@ public class AuthService {
         // 검증
         if(jwtProvider.validateAndExtractClaims(jwtReqDTO.getRefreshToken(), "refresh")!=null){
             // rtk로 유저 찾기
-            Member savedMember = memberRepository.findMemberByRefreshToken(jwtReqDTO.getRefreshToken()).orElseThrow();
+            Member savedMember = memberRepository.findMemberByRefreshToken(jwtReqDTO.getRefreshToken())
+                    .orElseThrow(()-> new CustomException(ErrorCode.INVALID_TOKEN));
             // 재발급
             JwtRecord jwtRecord = jwtProvider.getJwtRecord(savedMember);
+            savedMember.updateRefreshToken(jwtRecord.refreshToken());
+            memberRepository.save(savedMember);
             return JwtMemberDTO.builder()
                     .jwtRecord(jwtRecord)
                     .member(savedMember)
                     .build();
         }
-        return null;
+        throw new CustomException(ErrorCode.INVALID_TOKEN);
     }
 
     public LoginResDTO makeLoginResDTO(Long memberId) {
-        Tuple tuple = memberRepository.findLevelAndFileByMemberId(memberId);
+        Tuple tuple = memberRepository.findLevelAndFileByMemberId(memberId)
+                .orElseThrow(()-> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         return LoginResDTO.builder()
                 .member(tuple.get(member))
                 .level(tuple.get(level))
@@ -112,8 +115,9 @@ public class AuthService {
     }
 
     public boolean logout(Long memberId, String refreshToken) {
-        Member member = memberRepository.findMemberByRefreshToken(refreshToken).orElseThrow();
-        if(member.getMemberId()!=memberId) return false;
+        Member member = memberRepository.findMemberByRefreshToken(refreshToken)
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
+        if(!Objects.equals(member.getMemberId(), memberId)) throw new CustomException(ErrorCode.DIFFERENT_MEMBER_TOKEN);
         member.updateRefreshToken(null);
         memberRepository.save(member);
         return true;

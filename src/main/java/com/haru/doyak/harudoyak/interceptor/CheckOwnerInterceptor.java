@@ -23,7 +23,7 @@ public class CheckOwnerInterceptor implements HandlerInterceptor {
     private final JwtProvider jwtProvider;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if(handler instanceof HandlerMethod) {
             // 핸들러가 메서드일 경우에만 진행
 

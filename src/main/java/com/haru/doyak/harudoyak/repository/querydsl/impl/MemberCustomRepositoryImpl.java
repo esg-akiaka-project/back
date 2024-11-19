@@ -62,13 +62,14 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     }
 
     @Override
-    public Tuple findLevelAndFileByMemberId(Long memberId) {
-        return jpaQueryFactory.select(member, level, file)
+    public Optional<Tuple> findLevelAndFileByMemberId(Long memberId) {
+        Tuple tuple = jpaQueryFactory.select(member, level, file)
                 .from(member)
                 .leftJoin(level).on(member.memberId.eq(level.memberId))
                 .leftJoin(file).on(member.fileId.eq(file.fileId))
                 .where(member.memberId.eq(memberId))
                 .fetchOne();
+        return Optional.ofNullable(tuple);
     }
 
     @Override

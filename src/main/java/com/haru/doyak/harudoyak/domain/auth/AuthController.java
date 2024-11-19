@@ -32,7 +32,7 @@ public class AuthController {
     private final MemberService memberService;
 
     @PostMapping("login")
-    public ResponseEntity<LoginResDTO> login(@RequestBody LoginReqDTO loginReqDTO) throws Exception {
+    public ResponseEntity<LoginResDTO> login(@RequestBody LoginReqDTO loginReqDTO) {
         JwtMemberDTO jwtMemberDTO = authService.login(loginReqDTO);
         LoginResDTO loginResDTO = authService.makeLoginResDTO(jwtMemberDTO.getMember().getMemberId());
         return ResponseEntity.ok()
@@ -50,7 +50,7 @@ public class AuthController {
     }
 
     @PostMapping("login/kakao")
-    public ResponseEntity kakaoLogin(@RequestBody LoginReqDTO loginReqDTO) throws Exception {
+    public ResponseEntity kakaoLogin(@RequestBody LoginReqDTO loginReqDTO) {
         JwtMemberDTO jwtMemberDTO = oAuthService.kakaoLogin(loginReqDTO.getCode());
         LoginResDTO loginResDTO = authService.makeLoginResDTO(jwtMemberDTO.getMember().getMemberId());
         return ResponseEntity.ok()
@@ -84,6 +84,7 @@ public class AuthController {
 
     @PostMapping("reissue")
     public ResponseEntity<JwtResDTO> reissue(@RequestBody JwtReqDTO jwtReqDTO){
+        if(jwtReqDTO.getRefreshToken()==null) throw new CustomException(ErrorCode.NULL_VALUE);
         JwtMemberDTO jwtMemberDTO = authService.reissue(jwtReqDTO);
         JwtResDTO jwtResDTO = JwtResDTO.builder()
                 .memberId(jwtMemberDTO.getMember().getMemberId())
@@ -96,13 +97,10 @@ public class AuthController {
 
     @PostMapping("logout/{memberId}")
     public ResponseEntity logout(@PathVariable("memberId") Long memberId,
-                                 @RequestBody JwtReqDTO jwtReqDTO){
-        if(jwtReqDTO.getRefreshToken()==null){
-            return ResponseEntity.badRequest().body("refresh token is null");
-        }
-        if(authService.logout(memberId, jwtReqDTO.getRefreshToken())){
-            return ResponseEntity.ok().body("로그아웃이 완료되었습니다.");
-        }
-        return ResponseEntity.badRequest().body("member jwt conflict");
+                                 @RequestBody JwtReqDTO jwtReqDTO)
+    {
+        if(jwtReqDTO.getRefreshToken()==null) throw new CustomException(ErrorCode.NULL_VALUE);
+        if(authService.logout(memberId, jwtReqDTO.getRefreshToken())) return ResponseEntity.ok().body("로그아웃이 완료되었습니다.");
+        throw new CustomException(ErrorCode.INVALID_TOKEN);
     }
 }
