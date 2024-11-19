@@ -16,10 +16,13 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
     @Value("${spring.mail.username}")
     private String mailUsername;
-    @Value("${spring.mail.verify-uri}")
-    private String mailVerifyUri;
+    @Value("${spring.mail.verify-uri-local}")
+    private String mailVerifyUriLocal;
+    @Value("${spring.mail.verify-uri-site}")
+    private String mailVerifyUriSite;
 
-    public void sendAuthLinkEmail(String recipient) throws MessagingException {
+    public void sendAuthLinkEmail(String referrer, String recipient) throws MessagingException {
+        String  mailVerifyUri = getMailVerifyUri(referrer);
         String authLink = mailVerifyUri+"email="+recipient+"&isVerified=true&expireDate="+ LocalDateTime.now().plusDays(1);
 
         MimeMessage message = javaMailSender.createMimeMessage();
@@ -34,5 +37,10 @@ public class EmailService {
         helper.setText(htmlContent, true);
         helper.setFrom(mailUsername);
         javaMailSender.send(message);
+    }
+
+    public String getMailVerifyUri(String referrer){
+        if(referrer.startsWith("https//harudoyak.site")) return mailVerifyUriSite;
+        else return mailVerifyUriLocal;
     }
 }

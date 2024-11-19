@@ -60,10 +60,12 @@ public class AuthController {
     }
 
     @PostMapping("email/verify")
-    public ResponseEntity<String> emailVerify(@RequestBody EmailVerifyReqDTO dto) {
+    public ResponseEntity<String> emailVerify(@RequestHeader(value = "Referer") String referer,
+                                              @RequestBody EmailVerifyReqDTO dto)
+    {
         if(memberService.isEmailAvailable(dto.getEmail())){
             try {
-                emailService.sendAuthLinkEmail(dto.getEmail());
+                emailService.sendAuthLinkEmail(referer, dto.getEmail());
                 return ResponseEntity.ok().body("인증 메일이 발송되었습니다.");
             } catch (MessagingException e) {
                 throw new CustomException(ErrorCode.EMAIL_SEND_FAIL);
