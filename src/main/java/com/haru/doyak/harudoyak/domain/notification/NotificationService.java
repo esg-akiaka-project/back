@@ -24,6 +24,13 @@ public class NotificationService {
         return emitter;
     }
 
+    /**
+     * @param memberId 고유한 id, map으로 구분해서 없어도 괜찮음
+     * @param data 클라이언트에 전달되는 데이터 내용
+     * @param comment 클라이언트에선 주석처리됨 안보임
+     * @param type 이벤트 이름
+     * @param <T>
+     */
     public <T> void customNotify(Long memberId, T data, String comment, String type) {
         sendToClient(memberId, data, comment, type);
     }
@@ -47,7 +54,7 @@ public class NotificationService {
         }
     }
 
-
+//TODO: data json 으로 보내기
     private <T> void sendToClient(Long memberId, T data, String comment, String type) {
         SseEmitter emitter = emitterRepository.get(memberId);
         if (emitter != null) {
