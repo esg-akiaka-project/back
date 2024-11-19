@@ -1,10 +1,13 @@
 package com.haru.doyak.harudoyak.domain.member;
 
+import com.haru.doyak.harudoyak.dto.member.MemberResDTO;
 import com.haru.doyak.harudoyak.entity.File;
 import com.haru.doyak.harudoyak.entity.Member;
 import static com.haru.doyak.harudoyak.entity.QFile.file;
 import static com.haru.doyak.harudoyak.entity.QMember.member;
 
+import com.haru.doyak.harudoyak.exception.CustomException;
+import com.haru.doyak.harudoyak.exception.ErrorCode;
 import com.haru.doyak.harudoyak.repository.FileRepository;
 import com.haru.doyak.harudoyak.repository.MemberRepository;
 import com.querydsl.core.Tuple;
@@ -36,40 +39,42 @@ public class MemberService {
         return optionalMember.isEmpty();
     }
 
-    public void changeNickname(Long memberId, String newNickname) {
-        Optional<Member> optionalMember = memberRepository.findMemberById(memberId);
-        if(optionalMember.isEmpty()) return;
-        Member member = optionalMember.get();
+    public MemberResDTO changeNickname(Long memberId, String newNickname) {
+        Member member = getMemberById(memberId);
         member.updateNickname(newNickname);
+
         memberRepository.save(member);
+        return MemberResDTO.builder()
+                .nickname(member.getNickname())
+                .build();
     }
 
-    public void changeAiNickname(Long memberId, String newAiNickname) {
-        Optional<Member> optionalMember = memberRepository.findMemberById(memberId);
-        if(optionalMember.isEmpty()) return;
-        Member member = optionalMember.get();
+    public MemberResDTO changeAiNickname(Long memberId, String newAiNickname) {
+        Member member = getMemberById(memberId);
         member.updateAiNickname(newAiNickname);
         memberRepository.save(member);
+        return MemberResDTO.builder()
+                .aiNickname(member.getAiNickname())
+                .build();
     }
 
-    public void changeGoalName(Long memberId, String newGoalName) {
-        Optional<Member> optionalMember = memberRepository.findMemberById(memberId);
-        if(optionalMember.isEmpty()) return;
-        Member member = optionalMember.get();
+    public MemberResDTO changeGoalName(Long memberId, String newGoalName) {
+        Member member = getMemberById(memberId);
         member.updateGoalName(newGoalName);
         memberRepository.save(member);
+        return MemberResDTO.builder()
+                .goalName(member.getGoalName())
+                .build();
     }
 
     public void changePassword(Long memberId, String newPassword) {
         String encoded = passwordEncoder.encode(newPassword);
-        Optional<Member> optionalMember = memberRepository.findMemberById(memberId);
-        if(optionalMember.isEmpty()) return;
-        Member member = optionalMember.get();
+        Member member = getMemberById(memberId);
         member.updatePassword(encoded);
         memberRepository.save(member);
     }
 
-    public void changeProfilePhoto(Long memberId, String newPhotoUrl) {
+    public MemberResDTO changeProfilePhoto(Long memberId, String newPhotoUrl) {
         Tuple tuple = memberRepository.findMemberFileByMemberId(memberId).orElseThrow();
         File getFile = tuple.get(file);
         if(getFile==null){
@@ -85,6 +90,9 @@ public class MemberService {
         }
         getFile.updateFilePathName(newPhotoUrl);
         fileRepository.save(getFile);
+        return MemberResDTO.builder()
+                .profileUrl(getFile.getFilePathName())
+                .build();
     }
 
     /**
@@ -93,8 +101,14 @@ public class MemberService {
      * @return 비밀번호가 맞으면 true, 틀리면 false
      */
     public boolean isCorrectPassword(Long memberId, String password){
-        Member member = memberRepository.findMemberById(memberId).orElseThrow();
+        Member member = getMemberById(memberId);
         return passwordEncoder.matches(password, member.getPassword());
+    }
+
+    public Member getMemberById(Long memberId) {
+        Optional<Member> optionalMember = memberRepository.findMemberById(memberId);
+        if(optionalMember.isEmpty()) throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
+        return optionalMember.get();
     }
     
 }

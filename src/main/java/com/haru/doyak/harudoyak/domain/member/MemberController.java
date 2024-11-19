@@ -4,7 +4,10 @@ import com.haru.doyak.harudoyak.domain.comment.CommentService;
 import com.haru.doyak.harudoyak.domain.sharedoyak.ShareDoyakService;
 import com.haru.doyak.harudoyak.dto.member.ChangeMemberInfoReqDTO;
 import com.haru.doyak.harudoyak.dto.comment.ResCommentDTO;
+import com.haru.doyak.harudoyak.dto.member.MemberResDTO;
 import com.haru.doyak.harudoyak.dto.sharedoyak.ResShareDoyakDTO;
+import com.haru.doyak.harudoyak.exception.CustomException;
+import com.haru.doyak.harudoyak.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -45,20 +48,17 @@ public class MemberController {
     public ResponseEntity check(@RequestParam("nickname")String nickname) {
         if(memberService.isNicknameAvailable(nickname)){
             return ResponseEntity.ok().body(nickname+"가 사용 가능합니다.");
-        }
-        return ResponseEntity.badRequest().body(nickname+"가 중복입니다.");
+        }else throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
     }
 
-//TODO: 데이터 변경시 바뀐걸로 로드할 수 있게 객체 response로 반환해주기
     @PutMapping("{memberId}/nickname")
     public ResponseEntity chageNickname(@PathVariable("memberId") Long memberId,
                                         @RequestBody ChangeMemberInfoReqDTO dto){
-        System.out.println(dto);
         if(dto.getNickname()==null){
-            return ResponseEntity.badRequest().body("닉네임이 null 입니다.");
+            throw new CustomException(ErrorCode.NULL_VALUE);
         }
-        memberService.changeNickname(memberId, dto.getNickname());
-        return ResponseEntity.ok().body("닉네임이 변경되었습니다.");
+        MemberResDTO res = memberService.changeNickname(memberId, dto.getNickname());
+        return ResponseEntity.ok().body(res);
     }
 
     @PutMapping("{memberId}/aiNickname")
@@ -67,8 +67,8 @@ public class MemberController {
         if(dto.getAiNickname()==null){
             return ResponseEntity.badRequest().body("도약이 닉네임이 null 입니다.");
         }
-        memberService.changeAiNickname(memberId, dto.getAiNickname());
-        return ResponseEntity.ok().body("도약이 닉네임이 변경되었습니다.");
+        MemberResDTO res = memberService.changeAiNickname(memberId, dto.getAiNickname());
+        return ResponseEntity.ok().body(res);
     }
 
     @PutMapping("{memberId}/goalName")
@@ -77,8 +77,8 @@ public class MemberController {
         if(dto.getGoalName()==null){
             return ResponseEntity.badRequest().body("도약목표가 null 입니다.");
         }
-        memberService.changeGoalName(memberId, dto.getGoalName());
-        return ResponseEntity.ok().body("도약목표가 변경되었습니다.");
+        MemberResDTO res = memberService.changeGoalName(memberId, dto.getGoalName());
+        return ResponseEntity.ok().body(res);
     }
 
     @PutMapping("{memberId}/pwd")
@@ -94,23 +94,19 @@ public class MemberController {
     @PostMapping("{memberId}/pwd")
     public ResponseEntity confirmPwd(@PathVariable("memberId") Long memberId,
                                          @RequestBody ChangeMemberInfoReqDTO dto){
-        if(dto.getPassword()==null){
-            return ResponseEntity.badRequest().body("비밀번호가 null 입니다.");
-        }
+        if(dto.getPassword()==null) throw new CustomException(ErrorCode.NULL_VALUE);
         if(memberService.isCorrectPassword(memberId, dto.getPassword())) {
             return ResponseEntity.ok().body("비밀번호가 일치합니다.");
         }
-        return ResponseEntity.badRequest().body("비밀번호가 불일치 합니다");
+        throw new CustomException(ErrorCode.INVALID_PASSWORD);
     }
 
     @PutMapping("{memberId}/profile")
     public ResponseEntity changeProfile(@PathVariable("memberId") Long memberId,
                                         @RequestBody ChangeMemberInfoReqDTO dto){
-        if(dto.getPhotoUrl()==null){
-            return ResponseEntity.badRequest().body("photo url이 없습니다.");
-        }
-        memberService.changeProfilePhoto(memberId, dto.getPhotoUrl());
-        return ResponseEntity.ok().body("프로필이 변경되었습니다.");
+        if(dto.getPhotoUrl()==null) throw new CustomException(ErrorCode.NULL_VALUE);
+        MemberResDTO res = memberService.changeProfilePhoto(memberId, dto.getPhotoUrl());
+        return ResponseEntity.ok().body(res);
     }
 
 }
