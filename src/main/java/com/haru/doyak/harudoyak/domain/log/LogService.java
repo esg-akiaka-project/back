@@ -14,7 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 @Service
@@ -35,11 +38,20 @@ public class LogService {
     public ResLogDTO.ResMontlyLogDTO getMontlyLogDetail(Long memberId, String creationDate) {
 
         // String 문자열 LocalDateTime으로 변환
-        LocalDateTime resultDate = dateUtil.stringToLocalDateTime(creationDate);
-
-        List<ResLetterDTO.LetterMontlyDTO> letterMontlyDTOS = logRepository.findMontlyLetterAll(memberId, resultDate);
-        List<EmotionDTO> emotionDTOS = logRepository.findMontlyEmotion(memberId, resultDate);
-        List<ResTagDTO.TagMontlyDTO> tagMontlyDTOS = logRepository.findMontlyTagAll(memberId, resultDate);
+        LocalDateTime resultLocalDateTime = null;
+        try {
+            resultLocalDateTime = dateUtil.stringToLocalDateTime(creationDate);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        // 해당 월의 시작일과 종료일 계산
+        LocalDateTime startMonthDayDate = resultLocalDateTime.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate().atStartOfDay();
+        LocalDateTime endMonthDayDate = resultLocalDateTime.with(TemporalAdjusters.lastDayOfMonth()).toLocalDate().atStartOfDay();
+        log.info("startMonthDayDate---------------------> {}", startMonthDayDate);
+        log.info("endMonthDayDate---------------------> {}", endMonthDayDate);
+        List<ResLetterDTO.LetterMontlyDTO> letterMontlyDTOS = logRepository.findMontlyLetterAll(memberId, startMonthDayDate, endMonthDayDate);
+        List<EmotionDTO.ResEmotionMonthlyDTO> emotionDTOS = logRepository.findMontlyEmotion(memberId, startMonthDayDate, endMonthDayDate);
+        List<ResTagDTO.TagMontlyDTO> tagMontlyDTOS = logRepository.findMontlyTagAll(memberId, startMonthDayDate, endMonthDayDate);
 
         ResLogDTO.ResMontlyLogDTO resMontlyLogDTO = new ResLogDTO.ResMontlyLogDTO();
         resMontlyLogDTO.setAiFeedbacks(letterMontlyDTOS);
@@ -57,13 +69,23 @@ public class LogService {
     public ResLogDTO.ResWeeklyLogDTO getWeeklyLogDetail(Long memberId, String creationDate) {
 
         // String 문자열 LocalDateTime으로 변환
-        LocalDateTime resultDate = dateUtil.stringToLocalDateTime(creationDate);
+        LocalDateTime resultLocalDateTime = null;
+        try {
+            resultLocalDateTime = dateUtil.stringToLocalDateTime(creationDate);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        // 월요일 날짜 계산
+        LocalDateTime mondayDate = resultLocalDateTime.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        // 일요일 날짜 계산
+        LocalDateTime sundayDate = resultLocalDateTime.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
 
+        log.info("mondayDate---------------------> {}", mondayDate);
+        log.info("sundayDate---------------------> {}", sundayDate);
         ResLogDTO.ResWeeklyLogDTO resWeeklyLogDTO = new ResLogDTO.ResWeeklyLogDTO();
-        List<ResLetterDTO.LetterWeeklyDTO> letterWeeklyDTOS = logRepository.findLetterByDate(memberId, resultDate);
-        log.info("로그 서비스 여기에 찍히닝?!");
-        List<EmotionDTO> emotionDTOS = logRepository.findEmotionByDate(memberId, resultDate);
-        List<ResTagDTO.TagWeeklyDTO> tagWeeklyDTOS = logRepository.findTagsByName(memberId, resultDate);
+        List<ResLetterDTO.LetterWeeklyDTO> letterWeeklyDTOS = logRepository.findLetterByDate(memberId, mondayDate, sundayDate);
+        List<EmotionDTO> emotionDTOS = logRepository.findEmotionByDate(memberId, mondayDate, sundayDate);
+        List<ResTagDTO.TagWeeklyDTO> tagWeeklyDTOS = logRepository.findTagsByName(memberId, mondayDate, sundayDate);
 
         resWeeklyLogDTO.setAiFeedbacks(letterWeeklyDTOS);
         resWeeklyLogDTO.setEmotions(emotionDTOS);
