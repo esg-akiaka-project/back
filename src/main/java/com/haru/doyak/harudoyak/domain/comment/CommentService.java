@@ -109,17 +109,19 @@ public class CommentService {
 
         }
 
-        // 회원 존재 여부 확인
+        /*// 회원 존재 여부 확인
         boolean isExistsMember = memberRepository.existsByMemberId(memberId);
 
         // 서로도약 존재 여부 확인
-        boolean isExistsShareDoyak = shareDoyakRepository.existsById(shareDoyakId);
+        boolean isExistsShareDoyak = shareDoyakRepository.existsById(shareDoyakId);*/
 
-        if(isExistsMember && isExistsShareDoyak){
-            // 회원 select
-            Member selectMember = memberRepository.findMemberByMemberId(memberId);
-            // 서로도약 select
-            ShareDoyak selectShareDoyak = shareDoyakRepository.findShareDoyakByShareDoyakId(shareDoyakId);
+        // 회원 select
+        Member selectMember = memberRepository.findMemberByMemberId(memberId).orElseThrow();
+
+        // 서로도약 select
+        ShareDoyak selectShareDoyak = shareDoyakRepository.findShareDoyakByShareDoyakId(shareDoyakId).orElseThrow();
+
+        if(selectMember.getMemberId() != null && selectShareDoyak.getShareDoyakId() != null){
 
             if(reqCommentDTO.getParentCommentId() != null){
 

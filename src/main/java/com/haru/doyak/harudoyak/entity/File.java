@@ -22,7 +22,7 @@ public class File {
     @NotNull
     private String filePathName; // 파일경로+파일명
 
-//    @NotNull
+
     private String originalName; // 업로드시파일명
 
     @Builder

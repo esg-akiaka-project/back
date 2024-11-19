@@ -8,6 +8,7 @@ import com.querydsl.core.Tuple;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface LogCustomRepository {
 
@@ -22,18 +23,18 @@ public interface LogCustomRepository {
     * 주간 도약기록 상세 조회
     * */
     List<ResLetterDTO.LetterWeeklyDTO> findLetterByDate(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate);
-    List<EmotionDTO> findEmotionByDate(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate);
-    List<ResTagDTO.TagWeeklyDTO> findTagsByName(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate);
+    Optional<List<EmotionDTO>> findEmotionByDate(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate);
+    Optional<List<ResTagDTO.TagWeeklyDTO>> findTagsByName(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate);
 
     /*
      * 일간 도약기록 상세 조회
      * */
-    List<ResLogDTO.ResDailyLogDTO> findLogByLogIdAndMemberId(Long memberId, Long logId);
+    Optional<List<ResLogDTO.ResDailyLogDTO>> findLogByLogIdAndMemberId(Long memberId, Long logId);
 
     /*
      * 도약 기록 목록 조회
      * */
-    List<ResLogDTO> findLogAllByMemberId(Long memberId);
+    Optional<List<ResLogDTO>> findLogAllByMemberId(Long memberId);
 
     List<Tuple> findLetterMemberWhereBetweenLogCreationDateTime(LocalDateTime startDate, LocalDateTime endDate);
 

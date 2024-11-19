@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static com.haru.doyak.harudoyak.entity.QFile.file;
 import static com.haru.doyak.harudoyak.entity.QLetter.letter;
@@ -162,7 +163,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
 
     // 감정 주간 집계
     @Override
-    public List<EmotionDTO> findEmotionByDate(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate){
+    public Optional<List<EmotionDTO>> findEmotionByDate(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate){
         DateTemplate<LocalDateTime> monday = Expressions.dateTemplate(
                 LocalDateTime.class, "{0}", mondayDate);
 
@@ -184,12 +185,12 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .orderBy(log.emotion.count().desc())
                 .limit(3)
                 .fetch();
-        return emotionDTOS;
+        return Optional.ofNullable(emotionDTOS);
     }
 
     // 태그 주간 집계
     @Override
-    public List<ResTagDTO.TagWeeklyDTO> findTagsByName(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate){
+    public Optional<List<ResTagDTO.TagWeeklyDTO>> findTagsByName(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate){
         DateTemplate<LocalDateTime> monday = Expressions.dateTemplate(
                 LocalDateTime.class, "{0}", mondayDate);
 
@@ -213,14 +214,14 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .orderBy(tag.name.count().desc())
                 .limit(10)
                 .fetch();
-        return tagWeeklyDTOS;
+        return Optional.ofNullable(tagWeeklyDTOS);
     }
 
     /*
     * 일간 도약기록 상세 조회
     * */
     @Override
-    public List<ResLogDTO.ResDailyLogDTO> findLogByLogIdAndMemberId(Long memberId, Long logId){
+    public Optional<List<ResLogDTO.ResDailyLogDTO>> findLogByLogIdAndMemberId(Long memberId, Long logId){
         List<ResLogDTO.ResDailyLogDTO> resDailyLogDTOS = jpaQueryFactory
                 .select(Projections.bean(
                         ResLogDTO.ResDailyLogDTO.class,
@@ -262,7 +263,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
             resDailyLogDTO.setTagNameList(resTagDTOS);
         });
 
-        return resDailyLogDTOS;
+        return Optional.ofNullable(resDailyLogDTOS);
 
     }
 
@@ -271,7 +272,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
     * @param : meberId(Long)
     * */
     @Override
-    public List<ResLogDTO> findLogAllByMemberId(Long memberId) {
+    public Optional<List<ResLogDTO>> findLogAllByMemberId(Long memberId) {
         List<ResLogDTO> resLogDTOs = jpaQueryFactory
                 .select(Projections.bean(ResLogDTO.class,
                         log.logId,
@@ -280,7 +281,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .from(log)
                 .where(log.member.memberId.eq(memberId))
                 .fetch();
-        return resLogDTOs;
+        return Optional.ofNullable(resLogDTOs);
     }
 
 
