@@ -47,9 +47,9 @@ public class LogService {
         LocalDateTime endMonthDayDate = resultLocalDateTime.with(TemporalAdjusters.lastDayOfMonth()).toLocalDate().atStartOfDay();
         log.info("startMonthDayDate---------------------> {}", startMonthDayDate);
         log.info("endMonthDayDate---------------------> {}", endMonthDayDate);
-        List<ResLetterDTO.LetterMonthlyDTO> letterMonthlyDTOS = logRepository.findMontlyLetterAll(memberId, startMonthDayDate, endMonthDayDate);
-        List<EmotionDTO.ResEmotionMonthlyDTO> emotionDTOS = logRepository.findMontlyEmotion(memberId, startMonthDayDate, endMonthDayDate);
-        List<ResTagDTO.TagMonthlyDTO> tagMonthlyDTOS = logRepository.findMontlyTagAll(memberId, startMonthDayDate, endMonthDayDate);
+        List<ResLetterDTO.LetterMonthlyDTO> letterMonthlyDTOS = logRepository.findMontlyLetterAll(memberId, startMonthDayDate, endMonthDayDate).orElseThrow();
+        List<EmotionDTO.ResEmotionMonthlyDTO> emotionDTOS = logRepository.findMontlyEmotion(memberId, startMonthDayDate, endMonthDayDate).orElseThrow();
+        List<ResTagDTO.TagMonthlyDTO> tagMonthlyDTOS = logRepository.findMontlyTagAll(memberId, startMonthDayDate, endMonthDayDate).orElseThrow();
 
         ResLogDTO.ResMonthlyLogDTO resMonthlyLogDTO = new ResLogDTO.ResMonthlyLogDTO();
         resMonthlyLogDTO.setAiFeedbacks(letterMonthlyDTOS);
@@ -81,7 +81,7 @@ public class LogService {
         log.info("mondayDate---------------------> {}", mondayDate);
         log.info("sundayDate---------------------> {}", sundayDate);
         ResLogDTO.ResWeeklyLogDTO resWeeklyLogDTO = new ResLogDTO.ResWeeklyLogDTO();
-        List<ResLetterDTO.LetterWeeklyDTO> letterWeeklyDTOS = logRepository.findLetterByDate(memberId, mondayDate, sundayDate);
+        List<ResLetterDTO.LetterWeeklyDTO> letterWeeklyDTOS = logRepository.findLetterByDate(memberId, mondayDate, sundayDate).orElseThrow();
         List<EmotionDTO> emotionDTOS = logRepository.findEmotionByDate(memberId, mondayDate, sundayDate).orElseThrow();
         List<ResTagDTO.TagWeeklyDTO> tagWeeklyDTOS = logRepository.findTagsByName(memberId, mondayDate, sundayDate).orElseThrow();
 

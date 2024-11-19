@@ -45,19 +45,15 @@ public class ShareDoyakService {
     public long setShareDoyakDelete(Long memberId, Long shareDoyakId) {
 
         // 서로도약 작성자가 맞는지
-        long shareDoyakAuthorId = 0;
-        try{
-
-            ShareDoyak selectShareDoyak = shareDoyakRepository.findShaereDoyakByMemeberId(memberId, shareDoyakId);
-            shareDoyakAuthorId = selectShareDoyak.getMember().getMemberId();
-        }catch (NullPointerException nullPointerException){
-            throw new NullPointerException("해당 글의 작성자가 아닙니다.");
-        }
+        ShareDoyak selectShareDoyak = shareDoyakRepository.findShaereDoyakByMemeberId(memberId, shareDoyakId).orElseThrow();
+        long shareDoyakAuthorId = selectShareDoyak.getMember().getMemberId();
 
         // 해당 서로도약 글의 작성자가 맞다면
         long shareDoyakDeleteResult = 0;
         if(shareDoyakAuthorId == memberId) {
-            shareDoyakDeleteResult = shareDoyakRepository.shareDoyakDelete(shareDoyakId);
+            shareDoyakDeleteResult = shareDoyakRepository.shareDoyakDelete(memberId, shareDoyakId);
+            long fileDeleteResult = fileRepository.fileDelete(selectShareDoyak.getFile().getFileId());
+
             return shareDoyakDeleteResult;
         }
         // 아니라면
@@ -74,7 +70,7 @@ public class ShareDoyakService {
 
         long shareDoyakAuthor = 0;
         try {
-            ShareDoyak selectShareDoyak = shareDoyakRepository.findShaereDoyakByMemeberId(memberId, shareDoyakId);
+            ShareDoyak selectShareDoyak = shareDoyakRepository.findShaereDoyakByMemeberId(memberId, shareDoyakId).orElseThrow();
             shareDoyakAuthor = selectShareDoyak.getMember().getMemberId();
         }catch (NullPointerException nullPointerException){
             throw new NullPointerException("해당 글의 작성자가 아닙니다.");

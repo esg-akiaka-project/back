@@ -23,7 +23,7 @@ public class ShareDoyakController {
     * @param : memberId(Long), shareDoyakId(Long)
     * */
     @DeleteMapping("{memberId}/{shareDoyakId}")
-    public ResponseEntity<String> setShareDoyakDelete(@PathVariable("memberId") Long memberId, @PathVariable Long shareDoyakId) {
+    public ResponseEntity<String> setShareDoyakDelete(@PathVariable("memberId") Long memberId, @PathVariable("shareDoyakId") Long shareDoyakId) {
         long shareDoyakDeleteResult = shareDoyakService.setShareDoyakDelete(memberId, shareDoyakId);
         if(shareDoyakDeleteResult == 1) {
             return ResponseEntity.ok("서로도약 삭제가 완료되었습니다.");

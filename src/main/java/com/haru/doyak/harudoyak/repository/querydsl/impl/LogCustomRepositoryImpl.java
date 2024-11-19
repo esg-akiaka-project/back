@@ -35,7 +35,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
     * */
     // 태그 월간 집계
     @Override
-    public List<ResTagDTO.TagMonthlyDTO> findMontlyTagAll(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate){
+    public Optional<List<ResTagDTO.TagMonthlyDTO>> findMontlyTagAll(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate){
 
         DateTemplate<LocalDateTime> startMonthDay = Expressions.dateTemplate(
                 LocalDateTime.class, "{0}", startMonthDayDate);
@@ -59,12 +59,12 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .orderBy(tag.name.count().desc())
                 .limit(10)
                 .fetch();
-        return tagMonthlyDTOS;
+        return Optional.ofNullable(tagMonthlyDTOS);
     }
 
     // 감정 월간 집계
     @Override
-    public List<EmotionDTO.ResEmotionMonthlyDTO> findMontlyEmotion(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate){
+    public Optional<List<EmotionDTO.ResEmotionMonthlyDTO>> findMontlyEmotion(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate){
 
         DateTemplate<LocalDateTime> startMonthDay = Expressions.dateTemplate(
                 LocalDateTime.class, "{0}", startMonthDayDate);
@@ -88,12 +88,12 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .limit(3)
                 .fetch();
 
-        return emotionDTOS;
+        return Optional.ofNullable(emotionDTOS);
     }
 
     // 도약이편지 Count
     @Override
-    public List<ResLetterDTO.LetterMonthlyDTO> findMontlyLetterAll(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate){
+    public Optional<List<ResLetterDTO.LetterMonthlyDTO>> findMontlyLetterAll(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate){
 
         DateTemplate<LocalDateTime> startMonthDay = Expressions.dateTemplate(
                 LocalDateTime.class, "{0}", startMonthDayDate);
@@ -114,7 +114,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .fetch();
 
 
-        return letterMonthlyDTOS;
+        return Optional.ofNullable(letterMonthlyDTOS);
     }
 
     /*
@@ -122,7 +122,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
     * */
     // 도약이편지 목록
     @Override
-    public List<ResLetterDTO.LetterWeeklyDTO> findLetterByDate(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate){
+    public Optional<List<ResLetterDTO.LetterWeeklyDTO>> findLetterByDate(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate){
 
         DateTemplate<LocalDateTime> monday = Expressions.dateTemplate(
                 LocalDateTime.class, "{0}", mondayDate);
@@ -158,7 +158,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 )
                 .fetch();
 
-        return letterWeeklyDTOS;
+        return Optional.ofNullable(letterWeeklyDTOS);
     }
 
     // 감정 주간 집계
