@@ -51,8 +51,8 @@ public class ShareDoyakService {
         // 해당 서로도약 글의 작성자가 맞다면
         long shareDoyakDeleteResult = 0;
         if(shareDoyakAuthorId == memberId) {
-            shareDoyakDeleteResult = shareDoyakRepository.shareDoyakDelete(memberId, shareDoyakId);
             long fileDeleteResult = fileRepository.fileDelete(selectShareDoyak.getFile().getFileId());
+            shareDoyakDeleteResult = shareDoyakRepository.shareDoyakDelete(memberId, shareDoyakId);
 
             return shareDoyakDeleteResult;
         }
