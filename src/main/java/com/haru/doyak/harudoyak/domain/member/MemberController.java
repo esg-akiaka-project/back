@@ -56,10 +56,16 @@ public class MemberController {
 
     @PutMapping("{memberId}/nickname")
     public ResponseEntity chageNickname(@PathVariable("memberId") Long memberId,
-                                        @RequestBody ChangeMemberInfoReqDTO dto){
+                                        @RequestBody ChangeMemberInfoReqDTO dto)
+    {
         if(dto.getNickname()==null) throw new CustomException(ErrorCode.NULL_VALUE);
-        MemberResDTO res = memberService.changeNickname(memberId, dto.getNickname());
-        return ResponseEntity.ok().body(res);
+
+        if(memberService.isNicknameAvailable(dto.getNickname())){
+            MemberResDTO res = memberService.changeNickname(memberId, dto.getNickname());
+            return ResponseEntity.ok().body(res);
+        }else{
+            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
+        }
     }
 
     @PutMapping("{memberId}/aiNickname")
