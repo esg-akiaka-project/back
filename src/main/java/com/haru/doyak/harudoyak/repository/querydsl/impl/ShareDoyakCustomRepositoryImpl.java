@@ -45,10 +45,10 @@ public class ShareDoyakCustomRepositoryImpl implements ShareDoyakCustomRepositor
     * 서로도약 delete
     * */
     @Override
-    public long shareDoyakDelete(Long MemberId, Long shareDoyakId) {
+    public long shareDoyakDelete(Long memberId, Long shareDoyakId) {
         return jpaQueryFactory
                 .delete(shareDoyak)
-                .where(shareDoyak.member.memberId.eq(MemberId), shareDoyak.shareDoyakId.eq(shareDoyakId))
+                .where(shareDoyak.member.memberId.eq(memberId), shareDoyak.shareDoyakId.eq(shareDoyakId))
                 .execute();
     }
 
