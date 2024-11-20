@@ -3,12 +3,8 @@ package com.haru.doyak.harudoyak.domain.log;
 import com.haru.doyak.harudoyak.dto.letter.ReqLetterDTO;
 import com.haru.doyak.harudoyak.dto.log.*;
 import com.haru.doyak.harudoyak.entity.*;
-import com.haru.doyak.harudoyak.repository.FileRepository;
-import com.haru.doyak.harudoyak.repository.LevelRepository;
-import com.haru.doyak.harudoyak.repository.LogRepository;
-import com.haru.doyak.harudoyak.repository.MemberRepository;
+import com.haru.doyak.harudoyak.repository.*;
 import com.haru.doyak.harudoyak.util.DateUtil;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,10 +21,12 @@ import java.util.List;
 @Slf4j
 public class LogService {
     private final LogRepository logRepository;
-    private final EntityManager entityManager;
     private final MemberRepository memberRepository;
     private final FileRepository fileRepository;
     private final LevelRepository levelRepository;
+    private final TagRepository tagRepository;
+    private final LogTagRepository logTagRepository;
+    private final LetterRepository letterRepository;
     private final DateUtil dateUtil;
 
     /*
@@ -49,9 +47,9 @@ public class LogService {
         LocalDateTime endMonthDayDate = resultLocalDateTime.with(TemporalAdjusters.lastDayOfMonth()).toLocalDate().atStartOfDay();
         log.info("startMonthDayDate---------------------> {}", startMonthDayDate);
         log.info("endMonthDayDate---------------------> {}", endMonthDayDate);
-        List<ResLetterDTO.LetterMonthlyDTO> letterMonthlyDTOS = logRepository.findMontlyLetterAll(memberId, startMonthDayDate, endMonthDayDate);
-        List<EmotionDTO.ResEmotionMonthlyDTO> emotionDTOS = logRepository.findMontlyEmotion(memberId, startMonthDayDate, endMonthDayDate);
-        List<ResTagDTO.TagMonthlyDTO> tagMonthlyDTOS = logRepository.findMontlyTagAll(memberId, startMonthDayDate, endMonthDayDate);
+        List<ResLetterDTO.LetterMonthlyDTO> letterMonthlyDTOS = logRepository.findMontlyLetterAll(memberId, startMonthDayDate, endMonthDayDate).orElseThrow();
+        List<EmotionDTO.ResEmotionMonthlyDTO> emotionDTOS = logRepository.findMontlyEmotion(memberId, startMonthDayDate, endMonthDayDate).orElseThrow();
+        List<ResTagDTO.TagMonthlyDTO> tagMonthlyDTOS = logRepository.findMontlyTagAll(memberId, startMonthDayDate, endMonthDayDate).orElseThrow();
 
         ResLogDTO.ResMonthlyLogDTO resMonthlyLogDTO = new ResLogDTO.ResMonthlyLogDTO();
         resMonthlyLogDTO.setAiFeedbacks(letterMonthlyDTOS);
@@ -83,9 +81,9 @@ public class LogService {
         log.info("mondayDate---------------------> {}", mondayDate);
         log.info("sundayDate---------------------> {}", sundayDate);
         ResLogDTO.ResWeeklyLogDTO resWeeklyLogDTO = new ResLogDTO.ResWeeklyLogDTO();
-        List<ResLetterDTO.LetterWeeklyDTO> letterWeeklyDTOS = logRepository.findLetterByDate(memberId, mondayDate, sundayDate);
-        List<EmotionDTO> emotionDTOS = logRepository.findEmotionByDate(memberId, mondayDate, sundayDate);
-        List<ResTagDTO.TagWeeklyDTO> tagWeeklyDTOS = logRepository.findTagsByName(memberId, mondayDate, sundayDate);
+        List<ResLetterDTO.LetterWeeklyDTO> letterWeeklyDTOS = logRepository.findLetterByDate(memberId, mondayDate, sundayDate).orElseThrow();
+        List<EmotionDTO> emotionDTOS = logRepository.findEmotionByDate(memberId, mondayDate, sundayDate).orElseThrow();
+        List<ResTagDTO.TagWeeklyDTO> tagWeeklyDTOS = logRepository.findTagsByName(memberId, mondayDate, sundayDate).orElseThrow();
 
         resWeeklyLogDTO.setAiFeedbacks(letterWeeklyDTOS);
         resWeeklyLogDTO.setEmotions(emotionDTOS);
@@ -99,7 +97,7 @@ public class LogService {
      * */
     public List<ResLogDTO.ResDailyLogDTO> getDailyLogDetail(Long memberId, Long logId) {
 
-        List<ResLogDTO.ResDailyLogDTO> resDailyLogDTOS = logRepository.findLogByLogIdAndMemberId(memberId, logId);
+        List<ResLogDTO.ResDailyLogDTO> resDailyLogDTOS = logRepository.findLogByLogIdAndMemberId(memberId, logId).orElseThrow();
 
         return resDailyLogDTOS;
     }
@@ -125,7 +123,7 @@ public class LogService {
                     .log(selectLog)
                     .content(reqLetterDTO.getLetterContent())
                     .build();
-            entityManager.persist(letter);
+            letterRepository.save(letter);
         }
     }
 
@@ -136,7 +134,7 @@ public class LogService {
      * */
     public List<ResLogDTO> getLogList(Long memberId){
 
-        List<ResLogDTO> resLogDTOS = logRepository.findLogAllByMemberId(memberId);
+        List<ResLogDTO> resLogDTOS = logRepository.findLogAllByMemberId(memberId).orElseThrow();
 
         return resLogDTOS;
     }
@@ -149,38 +147,78 @@ public class LogService {
     @Transactional
     public ResLogDTO.ResLogAddDTO setLogAdd(ReqLogDTO reqLogDTO, Long memberId) {
 
-        // 도약기록 insert 전 회원 존재하는지 isExists 확인
-         boolean isExistsMember = memberRepository.existsByMemberId(memberId);
+        // 도약기록 insert 해당 회원이 있는지 확인
+         Member selectMember = memberRepository.findMemberByMemberId(memberId).orElseThrow();
 
          ResLogDTO.ResLogAddDTO resLogAddDTO = new ResLogDTO.ResLogAddDTO();
          // 회원이 존재한다면
-         if (isExistsMember){
+         if (selectMember.getMemberId() != null){
 
-             // 이미지파일url insert
-             File file = File.builder()
-                     .filePathName(reqLogDTO.getLogImageUrl())
-                     .build();
-             entityManager.persist(file);
+             if(reqLogDTO.getLogImageUrl() != null){
 
-             File selectFile = fileRepository.findByFileId(file.getFileId());
-             Member selectByMember = memberRepository.findMemberByMemberId(memberId);
-
-             // 도약기록 insert
-             Log log = Log.builder()
-                     .member(selectByMember)
-                     .file(selectFile)
-                     .content(reqLogDTO.getLogContent())
-                     .emotion(reqLogDTO.getEmotion())
-                     .build();
-             entityManager.persist(log);
-
-             // 태그 insert
-             for(ResTagDTO resTagDTO : reqLogDTO.getTagNameList()){
-                 Tag tag = Tag.builder()
-                         .name(resTagDTO.getTagName())
+                 // 이미지파일url insert
+                 File file = File.builder()
+                         .filePathName(reqLogDTO.getLogImageUrl())
                          .build();
-                 entityManager.persist(tag);
-                 setLogTag(log, tag);
+                 fileRepository.save(file);
+
+                 File selectFile = fileRepository.findByFileId(file.getFileId()).orElseThrow();
+                 Member selectByMember = memberRepository.findMemberByMemberId(memberId).orElseThrow();
+
+                 // 도약기록 insert
+                 Log log = Log.builder()
+                         .member(selectByMember)
+                         .file(selectFile)
+                         .content(reqLogDTO.getLogContent())
+                         .emotion(reqLogDTO.getEmotion())
+                         .build();
+                 logRepository.save(log);
+
+                 // 태그 insert
+                 for(ResTagDTO resTagDTO : reqLogDTO.getTagNameList()){
+                     Tag tag = Tag.builder()
+                             .name(resTagDTO.getTagName())
+                             .build();
+                     tagRepository.save(tag);
+                     LogTag logTag = LogTag.builder()
+                             .logTagId(new LogTagId(log.getLogId(), tag.getTagId()))
+                             .log(log)
+                             .tag(tag)
+                             .build();
+                     logTagRepository.save(logTag);
+                 }
+                 resLogAddDTO.setLogId(log.getLogId());
+                 resLogAddDTO.setMemberId(selectByMember.getMemberId());
+                 resLogAddDTO.setLogContent("도약기록 작성을 완료했습니다.");
+
+             }else {
+
+                 Member selectByMember = memberRepository.findMemberByMemberId(memberId).orElseThrow();
+                 // 도약기록 insert
+                 Log log = Log.builder()
+                         .member(selectByMember)
+                         .content(reqLogDTO.getLogContent())
+                         .emotion(reqLogDTO.getEmotion())
+                         .build();
+                 logRepository.save(log);
+
+                 // 태그 insert
+                 for(ResTagDTO resTagDTO : reqLogDTO.getTagNameList()){
+                     Tag tag = Tag.builder()
+                             .name(resTagDTO.getTagName())
+                             .build();
+                     tagRepository.save(tag);
+                     LogTag logTag = LogTag.builder()
+                             .logTagId(new LogTagId(log.getLogId(), tag.getTagId()))
+                             .log(log)
+                             .tag(tag)
+                             .build();
+                     logTagRepository.save(logTag);
+                 }
+                 resLogAddDTO.setLogId(log.getLogId());
+                 resLogAddDTO.setMemberId(selectByMember.getMemberId());
+                 resLogAddDTO.setLogContent("도약기록 작성을 완료했습니다.");
+
              }
 
              // 레벨 update
@@ -188,27 +226,11 @@ public class LogService {
              level.updateWhenPostLog();
              levelRepository.save(level);
 
-             resLogAddDTO.setLogId(log.getLogId());
-             resLogAddDTO.setMemberId(selectByMember.getMemberId());
-             resLogAddDTO.setLogContent("도약기록 작성을 완료했습니다.");
+             return resLogAddDTO;
          }
 
          // 회원이 존재하지 않다면
         return resLogAddDTO;
-    }
-
-    /*
-    * 로그&태그 저장
-    * req : log(Long), tag(Long)
-    * */
-    @Transactional
-    public void setLogTag(Log log, Tag tag){
-        LogTag logTag = LogTag.builder()
-                .logTagId(new LogTagId(log.getLogId(), tag.getTagId()))
-                .log(log)
-                .tag(tag)
-                .build();
-        entityManager.persist(logTag);
     }
 
 }

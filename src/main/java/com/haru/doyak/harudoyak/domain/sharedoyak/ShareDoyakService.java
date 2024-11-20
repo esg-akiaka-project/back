@@ -45,19 +45,17 @@ public class ShareDoyakService {
     public long setShareDoyakDelete(Long memberId, Long shareDoyakId) {
 
         // 서로도약 작성자가 맞는지
-        long shareDoyakAuthorId = 0;
-        try{
+        ShareDoyak selectShareDoyak = shareDoyakRepository.findShaereDoyakByMemeberId(memberId, shareDoyakId).orElseThrow();
+        long shareDoyakAuthorId = selectShareDoyak.getMember().getMemberId();
 
-            ShareDoyak selectShareDoyak = shareDoyakRepository.findShaereDoyakByMemeberId(memberId, shareDoyakId);
-            shareDoyakAuthorId = selectShareDoyak.getMember().getMemberId();
-        }catch (NullPointerException nullPointerException){
-            throw new NullPointerException("해당 글의 작성자가 아닙니다.");
-        }
-
+        log.info("파일 아이디가 있니? {} ", selectShareDoyak.getFile().getFileId());
         // 해당 서로도약 글의 작성자가 맞다면
         long shareDoyakDeleteResult = 0;
         if(shareDoyakAuthorId == memberId) {
-            shareDoyakDeleteResult = shareDoyakRepository.shareDoyakDelete(shareDoyakId);
+            long doyakDeleteResult = doyakCustomRepository.deleteDoyakByShareDoyakId(selectShareDoyak.getShareDoyakId());
+            shareDoyakDeleteResult = shareDoyakRepository.shareDoyakDelete(memberId, shareDoyakId);
+            long fileDeleteResult = fileRepository.fileDelete(selectShareDoyak.getFile().getFileId());
+
             return shareDoyakDeleteResult;
         }
         // 아니라면
@@ -74,7 +72,7 @@ public class ShareDoyakService {
 
         long shareDoyakAuthor = 0;
         try {
-            ShareDoyak selectShareDoyak = shareDoyakRepository.findShaereDoyakByMemeberId(memberId, shareDoyakId);
+            ShareDoyak selectShareDoyak = shareDoyakRepository.findShaereDoyakByMemeberId(memberId, shareDoyakId).orElseThrow();
             shareDoyakAuthor = selectShareDoyak.getMember().getMemberId();
         }catch (NullPointerException nullPointerException){
             throw new NullPointerException("해당 글의 작성자가 아닙니다.");
@@ -114,7 +112,7 @@ public class ShareDoyakService {
         ResDoyakDTO resDoyakDTO = new ResDoyakDTO();
         //
         if (isExistsDoyak) {
-            doyakCustomRepository.deleteDoyak(memberId, shareDoyakId);
+            doyakCustomRepository.deleteDoyakByMemberIdAndShareDoyakId(memberId, shareDoyakId);
             Long doyakCount = doyakCustomRepository.findDoyakAllCount(shareDoyakId);
             resDoyakDTO.setDoyakCount(doyakCount);
             return resDoyakDTO;
@@ -127,8 +125,8 @@ public class ShareDoyakService {
         // 회원과 서로도약게시글이 존재 한다면
         if(isExistsMember && isExistsShareDoyak){
 
-            Member selectMember = memberRepository.findMemberByMemberId(memberId);
-            ShareDoyak selectShareDoyak = shareDoyakRepository.findShareDoyakByShareDoyakId(shareDoyakId);
+            Member selectMember = memberRepository.findMemberByMemberId(memberId).orElseThrow();
+            ShareDoyak selectShareDoyak = shareDoyakRepository.findShareDoyakByShareDoyakId(shareDoyakId).orElseThrow();
 
             Doyak doyak = Doyak.builder()
                     .doyakId(new DoyakId(
@@ -177,8 +175,8 @@ public class ShareDoyakService {
             entityManager.persist(file);
 
             // persist()는 insert와 동시에 pk값을 조회할 수 있음 .getXXX()
-            File selectFile = fileRepository.findByFileId(file.getFileId());
-            Member selectMember = memberRepository.findMemberByMemberId(memberId);
+            File selectFile = fileRepository.findByFileId(file.getFileId()).orElseThrow();
+            Member selectMember = memberRepository.findMemberByMemberId(memberId).orElseThrow();
 
             // 서로도약 insert
             ShareDoyak shareDoyak = ShareDoyak.builder()

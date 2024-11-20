@@ -1,13 +1,15 @@
 package com.haru.doyak.harudoyak.repository;
 
 import com.haru.doyak.harudoyak.entity.File;
+import com.haru.doyak.harudoyak.repository.querydsl.FileCustomRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface FileRepository extends JpaRepository<File, Long> {
+import java.util.Optional;
 
-    File findByFileId(Long fileId);
+
+public interface FileRepository extends JpaRepository<File, Long>, FileCustomRepository {
+
+    Optional<File> findByFileId(Long fileId);
     boolean existsFileByFileId(Long fileId);
 
 }

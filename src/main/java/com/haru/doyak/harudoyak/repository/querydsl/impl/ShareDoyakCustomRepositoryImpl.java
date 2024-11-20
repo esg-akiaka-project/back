@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.haru.doyak.harudoyak.entity.QComment.comment;
 import static com.haru.doyak.harudoyak.entity.QDoyak.doyak;
@@ -44,10 +45,10 @@ public class ShareDoyakCustomRepositoryImpl implements ShareDoyakCustomRepositor
     * 서로도약 delete
     * */
     @Override
-    public long shareDoyakDelete(Long shareDoyakId) {
+    public long shareDoyakDelete(Long memberId, Long shareDoyakId) {
         return jpaQueryFactory
                 .delete(shareDoyak)
-                .where(shareDoyak.shareDoyakId.eq(shareDoyakId))
+                .where(shareDoyak.member.memberId.eq(memberId), shareDoyak.shareDoyakId.eq(shareDoyakId))
                 .execute();
     }
 
@@ -55,14 +56,14 @@ public class ShareDoyakCustomRepositoryImpl implements ShareDoyakCustomRepositor
     * 서로도약 작성한 회원 select
     * */
     @Override
-    public ShareDoyak findShaereDoyakByMemeberId(Long memeberId, Long shareDoyakId){
+    public Optional<ShareDoyak> findShaereDoyakByMemeberId(Long memeberId, Long shareDoyakId){
 
-        return jpaQueryFactory
+        return Optional.ofNullable(jpaQueryFactory
                 .select(shareDoyak)
                 .from(shareDoyak)
                 .leftJoin(member).on(shareDoyak.member.memberId.eq(member.memberId))
                 .where(shareDoyak.member.memberId.eq(memeberId), shareDoyak.shareDoyakId.eq(shareDoyakId))
-                .fetchOne();
+                .fetchOne());
     }
 
     /*
