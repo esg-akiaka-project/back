@@ -1,9 +1,13 @@
 package com.haru.doyak.harudoyak.repository.querydsl.impl;
 
+import com.haru.doyak.harudoyak.entity.Doyak;
 import com.haru.doyak.harudoyak.repository.querydsl.DoyakCustomRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
 
 import static com.haru.doyak.harudoyak.entity.QDoyak.doyak;
 
@@ -11,6 +15,15 @@ import static com.haru.doyak.harudoyak.entity.QDoyak.doyak;
 @RequiredArgsConstructor
 public class DoyakCustomRepositoryImpl implements DoyakCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
+
+    @Override
+    public Optional<List<Doyak>> findDoyakAllByShareDoyakId(Long ShareDoyakId) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(doyak)
+                .from(doyak)
+                .where(doyak.shareDoyak.shareDoyakId.eq(ShareDoyakId))
+                .fetch());
+    }
 
     @Override
     public boolean existsByMemberIdAndShareDoyakId(Long memberId, Long shareDoyakId) {
