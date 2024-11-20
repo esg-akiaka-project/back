@@ -1,5 +1,6 @@
 package com.haru.doyak.harudoyak.domain.sharedoyak;
 
+import com.haru.doyak.harudoyak.dto.comment.ResCommentDTO;
 import com.haru.doyak.harudoyak.dto.sharedoyak.*;
 import com.haru.doyak.harudoyak.entity.*;
 import com.haru.doyak.harudoyak.exception.CustomException;
@@ -8,6 +9,7 @@ import com.haru.doyak.harudoyak.repository.FileRepository;
 import com.haru.doyak.harudoyak.repository.LevelRepository;
 import com.haru.doyak.harudoyak.repository.MemberRepository;
 import com.haru.doyak.harudoyak.repository.ShareDoyakRepository;
+import com.haru.doyak.harudoyak.repository.querydsl.CommentCustomRepository;
 import com.haru.doyak.harudoyak.repository.querydsl.DoyakCustomRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -26,6 +28,7 @@ public class ShareDoyakService {
     private final MemberRepository memberRepository;
     private final DoyakCustomRepository doyakCustomRepository;
     private final FileRepository fileRepository;
+    private final CommentCustomRepository commentCustomRepository;
     private final LevelRepository levelRepository;
 
     /*
@@ -53,7 +56,11 @@ public class ShareDoyakService {
         long shareDoyakDeleteResult = 0;
         if(shareDoyakAuthorId == memberId) {
             File file = fileRepository.findByFileId(selectShareDoyak.getFile().getFileId()).orElseThrow();
+            List<ResCommentDTO.ResCommentDetailDTO> comments = commentCustomRepository.findeCommentAll(selectShareDoyak.getShareDoyakId());
             long doyakDeleteResult = doyakCustomRepository.deleteDoyakByShareDoyakId(selectShareDoyak.getShareDoyakId());
+            for(ResCommentDTO.ResCommentDetailDTO comment : comments){
+               long commentDeleteResult = commentCustomRepository.commentDelete(comment.getCommentId());
+            }
             shareDoyakDeleteResult = shareDoyakRepository.shareDoyakDelete(memberId, shareDoyakId);
             long fileDeleteResult = fileRepository.fileDelete(file.getFileId());
 
