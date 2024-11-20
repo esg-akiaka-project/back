@@ -57,9 +57,14 @@ public class ShareDoyakService {
         if(shareDoyakAuthorId == memberId) {
             File file = fileRepository.findByFileId(selectShareDoyak.getFile().getFileId()).orElseThrow();
             List<ResCommentDTO.ResCommentDetailDTO> comments = commentCustomRepository.findeCommentAll(selectShareDoyak.getShareDoyakId());
-            long doyakDeleteResult = doyakCustomRepository.deleteDoyakByShareDoyakId(selectShareDoyak.getShareDoyakId());
-            for(ResCommentDTO.ResCommentDetailDTO comment : comments){
-               long commentDeleteResult = commentCustomRepository.commentDelete(comment.getCommentId());
+            List<Doyak> doyaks = doyakCustomRepository.findDoyakAllByShareDoyakId(selectShareDoyak.getShareDoyakId()).orElseThrow();
+            if(comments.size() != 0){
+                for(ResCommentDTO.ResCommentDetailDTO comment : comments){
+                    long commentDeleteResult = commentCustomRepository.commentDelete(comment.getCommentId());
+                }
+            }
+            if(doyaks.size() != 0){
+                doyakCustomRepository.deleteDoyakByShareDoyakId(selectShareDoyak.getShareDoyakId());
             }
             shareDoyakDeleteResult = shareDoyakRepository.shareDoyakDelete(memberId, shareDoyakId);
             long fileDeleteResult = fileRepository.fileDelete(file.getFileId());
