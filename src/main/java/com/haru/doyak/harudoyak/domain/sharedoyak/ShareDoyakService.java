@@ -48,11 +48,13 @@ public class ShareDoyakService {
         ShareDoyak selectShareDoyak = shareDoyakRepository.findShaereDoyakByMemeberId(memberId, shareDoyakId).orElseThrow();
         long shareDoyakAuthorId = selectShareDoyak.getMember().getMemberId();
 
+        log.info("파일 아이디가 있니? {} ", selectShareDoyak.getFile().getFileId());
         // 해당 서로도약 글의 작성자가 맞다면
         long shareDoyakDeleteResult = 0;
         if(shareDoyakAuthorId == memberId) {
-            long fileDeleteResult = fileRepository.fileDelete(selectShareDoyak.getFile().getFileId());
+            long doyakDeleteResult = doyakCustomRepository.deleteDoyakByShareDoyakId(selectShareDoyak.getShareDoyakId());
             shareDoyakDeleteResult = shareDoyakRepository.shareDoyakDelete(memberId, shareDoyakId);
+            long fileDeleteResult = fileRepository.fileDelete(selectShareDoyak.getFile().getFileId());
 
             return shareDoyakDeleteResult;
         }
@@ -110,7 +112,7 @@ public class ShareDoyakService {
         ResDoyakDTO resDoyakDTO = new ResDoyakDTO();
         //
         if (isExistsDoyak) {
-            doyakCustomRepository.deleteDoyak(memberId, shareDoyakId);
+            doyakCustomRepository.deleteDoyakByMemberIdAndShareDoyakId(memberId, shareDoyakId);
             Long doyakCount = doyakCustomRepository.findDoyakAllCount(shareDoyakId);
             resDoyakDTO.setDoyakCount(doyakCount);
             return resDoyakDTO;

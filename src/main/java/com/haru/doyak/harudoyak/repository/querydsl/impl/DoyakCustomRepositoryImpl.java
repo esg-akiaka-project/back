@@ -26,10 +26,23 @@ public class DoyakCustomRepositoryImpl implements DoyakCustomRepository {
      * req : memberId(Long)
      * */
     @Override
-    public Long deleteDoyak(Long memberId, Long shareDoyakId) {
+    public Long deleteDoyakByMemberIdAndShareDoyakId(Long memberId, Long shareDoyakId) {
         Long deleteDoyak = jpaQueryFactory
                 .delete(doyak)
                 .where(doyak.member.memberId.eq(memberId), doyak.shareDoyak.shareDoyakId.eq(shareDoyakId))
+                .execute();
+        return deleteDoyak ;
+    }
+
+    /*
+    * 도약 삭제 : 서로도약 ID로 도약삭제
+    * @param : shareDoyakId(Long)
+    * */
+    @Override
+    public long deleteDoyakByShareDoyakId(Long shareDoyakId){
+        long deleteDoyak = jpaQueryFactory
+                .delete(doyak)
+                .where(doyak.shareDoyak.shareDoyakId.eq(shareDoyakId))
                 .execute();
         return deleteDoyak ;
     }
