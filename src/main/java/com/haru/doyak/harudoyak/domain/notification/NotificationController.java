@@ -1,5 +1,8 @@
 package com.haru.doyak.harudoyak.domain.notification;
 
+import com.haru.doyak.harudoyak.entity.Notification;
+import com.haru.doyak.harudoyak.exception.CustomException;
+import com.haru.doyak.harudoyak.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.data.repository.query.Param;
@@ -22,10 +25,28 @@ public class NotificationController {
         return notificationService.subscribe(memberId);
     }
 
-    @PostMapping("/add")
+    @PostMapping("add")
     public ResponseEntity add(@RequestParam("memberId")Long memberId, @RequestParam("content")String content){
         letterBatch.addLetterForUser(memberId, content, "도약이 편지가 도착했어요");
         return ResponseEntity.status(HttpStatus.OK).body("메세지 추가");
+    }
+
+    /**
+     * @param memberId
+     * @param category 알림 카테고리 [도약기록, 서로도약] = [log, post]
+     * @return 알림 리스트
+     */
+    @GetMapping("{memberId}/list")
+    public ResponseEntity getList(@PathVariable("memberId") Long memberId,
+                                  @RequestParam("category") String category)
+    {
+        if(category.equals("log")) {
+            return ResponseEntity.ok().body(notificationService.getLogNotifications(memberId, category));
+        }
+        if(category.equals("post")){
+            return ResponseEntity.ok().body(notificationService.getLogNotifications(memberId, category));
+        }
+        else throw new CustomException(ErrorCode.BAD_CATEGORY_NAME);
     }
 
 }

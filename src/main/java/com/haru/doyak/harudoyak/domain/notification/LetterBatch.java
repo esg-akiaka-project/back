@@ -32,6 +32,14 @@ public class LetterBatch {
     public void addLetterForUser(Long memberId, String letterContent, String message) {
         userLetters.computeIfAbsent(memberId, k -> new ArrayList<>()).add(letterContent);
         notificationService.customNotify(memberId, userLetters.get(memberId),message, "letter");
+        notificationService.saveNotification(
+                memberId,
+                SseDataDTO.builder()
+                        .postTitle("test")
+                        .content("content")
+                        .sender("sender")
+                .build(),
+                SseEventName.POST_COMMENT);
     }
 
     // 매일 7am 실행 -> 하루도약작성일 다음 날이면 알림

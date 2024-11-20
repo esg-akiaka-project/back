@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -71,15 +72,6 @@ public class NotificationService {
         }
     }
 
-    private void saveNotification(Long memberId, String title, String content, SseEventName sseEventName) {
-        Notification notification = Notification.builder()
-                .title(title)
-                .content(content)
-                .sseEventName(sseEventName)
-                .memberId(memberId)
-                .build();
-        notificationRepository.save(notification);
-    }
 
     private SseEmitter createEmitter(Long memberId) {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
@@ -94,4 +86,17 @@ public class NotificationService {
 //    private User validUser(Long memberId) {
 //        return memberRepository.findById(memberId).orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND_USER));
 //    }
+
+    public List<Notification> getLogNotifications(Long memberId, String category) {
+        return notificationRepository.findAllByMemberIdAndCategory(memberId, category);
+    }
+
+    public void saveNotification(Long memberId, SseDataDTO sseDataDTO, SseEventName sseEventName) {
+        Notification notification = Notification.builder()
+                .data(sseDataDTO)
+                .sseEventName(sseEventName)
+                .memberId(memberId)
+                .build();
+        notificationRepository.save(notification);
+    }
 }

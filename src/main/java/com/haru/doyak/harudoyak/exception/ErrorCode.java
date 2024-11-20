@@ -12,6 +12,7 @@ public enum ErrorCode {
     // 400 Bad Request
     NULL_VALUE(HttpStatus.BAD_REQUEST, "필수값이 비었습니다."),
     EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "이메일 인증 후 시도해주새요."),
+    BAD_CATEGORY_NAME(HttpStatus.BAD_REQUEST, "일치하는 카테고리가 없습니다."),
 
     // 401 Unauthorized
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "잘못된 비밀번호 입니다."),

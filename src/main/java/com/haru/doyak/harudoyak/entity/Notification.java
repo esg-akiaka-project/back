@@ -1,10 +1,13 @@
 package com.haru.doyak.harudoyak.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.haru.doyak.harudoyak.domain.notification.SseDataConverter;
+import com.haru.doyak.harudoyak.domain.notification.SseDataDTO;
 import com.haru.doyak.harudoyak.domain.notification.SseEventName;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -17,24 +20,34 @@ public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long notificationId;
+
     @NotNull
-    private String title;
-    @NotNull
-    private String content;
+    @Column(columnDefinition = "json")
+    @Convert(converter = SseDataConverter.class)
+    private SseDataDTO data;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private SseEventName sseEventName;
     @NotNull
+    private String category;
+    @NotNull
     private Boolean isRead;
-    @CreatedDate
+    @CreationTimestamp
     private LocalDateTime creationDate;
 
+    @JsonIgnore
     @JoinColumn
     private Long memberId;
 
     @PrePersist
     protected void prePersist() {
-        if(this.isRead == null) this.isRead = false;
+        if(this.isRead == null){
+            this.isRead = false;
+        }
+        if(this.category == null){
+            this.category = this.sseEventName.getCategory();
+        }
     }
 
 }
