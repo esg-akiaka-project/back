@@ -38,7 +38,7 @@ public class LetterBatch {
                         .postTitle("test")
                         .content("content")
                         .sender("sender")
-                .build(),
+                        .build(),
                 SseEventName.POST_COMMENT);
     }
 
@@ -87,7 +87,7 @@ public class LetterBatch {
         List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, endDateTime);
         for(Tuple tuple : tuples) {
             Long memberId = tuple.get(member.memberId);
-            Long count = tuple.get(log.member.count());
+            Long count = tuple.get(log.member.memberId.count());
 
             SseDataDTO sseDataDTO = SseDataDTO.builder()
                     .count(count)
@@ -95,8 +95,8 @@ public class LetterBatch {
 
             // 알림 전송
             notificationService.customNotify(
-                    tuple.get(member.memberId),
-                    sseDataDTO, 
+                    memberId,
+                    sseDataDTO,
                     "지난주 성장기록 알림",
                     SseEventName.WEEK);
         }
@@ -118,7 +118,7 @@ public class LetterBatch {
         List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, endDateTime);
         for(Tuple tuple : tuples) {
             Long memberId = tuple.get(member.memberId);
-            Long count = tuple.get(log.member.count());
+            Long count = tuple.get(log.member.memberId.count());
 
             SseDataDTO sseDataDTO = SseDataDTO.builder()
                     .count(count)
@@ -126,7 +126,7 @@ public class LetterBatch {
 
             // 알림 전송
             notificationService.customNotify(
-                    tuple.get(member.memberId),
+                    memberId,
                     sseDataDTO,
                     "저번달 성장기록 알림",
                     SseEventName.MONTH);
