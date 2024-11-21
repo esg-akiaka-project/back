@@ -2,6 +2,7 @@ package com.haru.doyak.harudoyak.domain.notification;
 
 import static com.haru.doyak.harudoyak.entity.QMember.member;
 import static com.haru.doyak.harudoyak.entity.QLog.log;
+import static com.haru.doyak.harudoyak.entity.QLetter.letter;
 import com.haru.doyak.harudoyak.repository.LogRepository;
 import com.haru.doyak.harudoyak.repository.MemberRepository;
 import com.querydsl.core.Tuple;
@@ -23,7 +24,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Component
 public class LetterBatch {
-    private final MemberRepository memberRepository;
     private final LogRepository logRepository;
     private final NotificationService notificationService;
     // 임시 편지 리스트
@@ -31,7 +31,7 @@ public class LetterBatch {
 
     public void addLetterForUser(Long memberId, String letterContent, String message) {
         userLetters.computeIfAbsent(memberId, k -> new ArrayList<>()).add(letterContent);
-        notificationService.customNotify(memberId, userLetters.get(memberId),message, "letter");
+        notificationService.customNotify(memberId, userLetters.get(memberId),message, null);
         notificationService.saveNotification(
                 memberId,
                 SseDataDTO.builder()
@@ -53,12 +53,21 @@ public class LetterBatch {
         // 도약기록 작성일로 검색해서 편지 가져오기
         List<Tuple> tuples = logRepository.findLetterMemberWhereBetweenLogCreationDateTime(startDateTime, endDateTime);
         for(Tuple tuple : tuples){
-            System.out.println(tuple);
+            Long memberId = tuple.get(member.memberId);
+            String sender = tuple.get(member.aiNickname);
+            String content = tuple.get(letter.content)
+                    .substring(0, Math.min( tuple.get(letter.content).length(), 10)).concat("...");
+
+            SseDataDTO sseDataDTO = SseDataDTO.builder()
+                    .sender(sender)
+                    .content(content)
+                    .build();
+            // 알림 전송
             notificationService.customNotify(
-                    tuple.get(member.memberId),
-                    tuple.get(member.aiNickname)+"의 편지가 도착했어요.",
-                    tuple.get(member.memberId)+"의 편지 알림 완료",
-                    "daily");
+                    memberId,
+                    sseDataDTO,
+                    "7am, letter arrived",
+                    SseEventName.DAILY);
         }
     }
 
@@ -77,11 +86,19 @@ public class LetterBatch {
         // 저번주 도약기록 작성한 유저만 뽑기
         List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, endDateTime);
         for(Tuple tuple : tuples) {
+            Long memberId = tuple.get(member.memberId);
+            Long count = tuple.get(log.member.count());
+
+            SseDataDTO sseDataDTO = SseDataDTO.builder()
+                    .count(count)
+                    .build();
+
+            // 알림 전송
             notificationService.customNotify(
                     tuple.get(member.memberId),
-                    "지난 주 "+tuple.get(log.member.memberId.count())+"개의 피드백이 있습니다.",
-                    tuple.get(member.memberId)+"의 지난 주 피드백 알림 완료.",
-                    "week");
+                    sseDataDTO, 
+                    "7am, check last week logs",
+                    SseEventName.WEEK);
         }
     }
 
@@ -100,11 +117,19 @@ public class LetterBatch {
         // 저번달 도약기록 작성한 유저 뽑기
         List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, endDateTime);
         for(Tuple tuple : tuples) {
+            Long memberId = tuple.get(member.memberId);
+            Long count = tuple.get(log.member.count());
+
+            SseDataDTO sseDataDTO = SseDataDTO.builder()
+                    .count(count)
+                    .build();
+
+            // 알림 전송
             notificationService.customNotify(
                     tuple.get(member.memberId),
-                    "지난 달 "+tuple.get(log.member.memberId.count())+"개의 피드백이 있습니다.",
-                    tuple.get(member.memberId)+"의 지난 달 피드백 알림 완료.",
-                    "month");
+                    sseDataDTO,
+                    "7am, check last week logs",
+                    SseEventName.MONTH);
         }
     }
 

@@ -29,11 +29,11 @@ public class NotificationService {
      * @param memberId 고유한 id, map으로 구분해서 없어도 괜찮음
      * @param data 클라이언트에 전달되는 데이터 내용
      * @param comment 클라이언트에선 주석처리됨 안보임
-     * @param type 이벤트 이름
+     * @param sseEventName 이벤트 이름
      * @param <T>
      */
-    public <T> void customNotify(Long memberId, T data, String comment, String type) {
-        sendToClient(memberId, data, comment, type);
+    public <T> void customNotify(Long memberId, T data, String comment, SseEventName sseEventName) {
+        sendToClient(memberId, data, comment, sseEventName);
     }
     public void notify(Long memberId, Object data, String comment) {
         sendToClient(memberId, data, comment);
@@ -56,13 +56,13 @@ public class NotificationService {
     }
 
 //TODO: data json 으로 보내기
-    private <T> void sendToClient(Long memberId, T data, String comment, String type) {
+    private <T> void sendToClient(Long memberId, T data, String comment, SseEventName sseEventName) {
         SseEmitter emitter = emitterRepository.get(memberId);
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
                         .id(String.valueOf(memberId))
-                        .name(type)
+                        .name(sseEventName.getEventName())
                         .data(data)
                         .comment(comment));
             } catch (IOException e) {
@@ -70,6 +70,8 @@ public class NotificationService {
                 emitter.completeWithError(e);
             }
         }
+
+        saveNotification(memberId, data, sseEventName);
     }
 
 
@@ -83,17 +85,13 @@ public class NotificationService {
         return emitter;
     }
 
-//    private User validUser(Long memberId) {
-//        return memberRepository.findById(memberId).orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND_USER));
-//    }
-
     public List<Notification> getLogNotifications(Long memberId, String category) {
         return notificationRepository.findAllByMemberIdAndCategory(memberId, category);
     }
 
-    public void saveNotification(Long memberId, SseDataDTO sseDataDTO, SseEventName sseEventName) {
+    public <T> void saveNotification(Long memberId, T sseDataDTO, SseEventName sseEventName) {
         Notification notification = Notification.builder()
-                .data(sseDataDTO)
+                .data((SseDataDTO) sseDataDTO)
                 .sseEventName(sseEventName)
                 .memberId(memberId)
                 .build();
