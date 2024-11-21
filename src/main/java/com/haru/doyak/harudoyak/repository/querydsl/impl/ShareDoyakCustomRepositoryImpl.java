@@ -82,7 +82,7 @@ public class ShareDoyakCustomRepositoryImpl implements ShareDoyakCustomRepositor
     * 서로도약 목록에 쓰일 data select
     * */
     @Override
-    public List<ResShareDoyakDTO> findeAll() {
+    public Optional<List<ResShareDoyakDTO>> findeAll() {
 
         // 서로도약의 데이터 목록을 select
         List<ResShareDoyakDTO> resShareDoyakDTOS = jpaQueryFactory
@@ -105,7 +105,7 @@ public class ShareDoyakCustomRepositoryImpl implements ShareDoyakCustomRepositor
                 .orderBy(shareDoyak.creationDate.desc())
                 .fetch();
 
-        return resShareDoyakDTOS;
+        return Optional.ofNullable(resShareDoyakDTOS);
 
     }
 

@@ -12,11 +12,12 @@ import com.haru.doyak.harudoyak.repository.LevelRepository;
 import com.haru.doyak.harudoyak.repository.MemberRepository;
 import com.haru.doyak.harudoyak.repository.ShareDoyakRepository;
 import com.haru.doyak.harudoyak.repository.querydsl.CommentRepository;
-import com.haru.doyak.harudoyak.repository.querydsl.DoyakCustomRepository;
-import jakarta.persistence.EntityManager;
+import com.haru.doyak.harudoyak.repository.querydsl.DoyakRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,9 +27,8 @@ import java.util.List;
 @Slf4j
 public class ShareDoyakService {
     private final ShareDoyakRepository shareDoyakRepository;
-    private final EntityManager entityManager;
     private final MemberRepository memberRepository;
-    private final DoyakCustomRepository doyakCustomRepository;
+    private final DoyakRepository doyakRepository;
     private final FileRepository fileRepository;
     private final CommentRepository commentRepository;
     private final LevelRepository levelRepository;
@@ -59,14 +59,14 @@ public class ShareDoyakService {
         if(shareDoyakAuthorId == memberId) {
             File file = fileRepository.findByFileId(selectShareDoyak.getFile().getFileId()).orElseThrow();
             List<ResCommentDTO.ResCommentDetailDTO> comments = commentRepository.findeCommentAll(selectShareDoyak.getShareDoyakId()).orElseThrow();
-            List<Doyak> doyaks = doyakCustomRepository.findDoyakAllByShareDoyakId(selectShareDoyak.getShareDoyakId()).orElseThrow();
+            List<Doyak> doyaks = doyakRepository.findDoyakAllByShareDoyakId(selectShareDoyak.getShareDoyakId()).orElseThrow();
             if(comments.size() != 0){
                 for(ResCommentDTO.ResCommentDetailDTO comment : comments){
                     long commentDeleteResult = commentRepository.commentDelete(comment.getCommentId());
                 }
             }
             if(doyaks.size() != 0){
-                doyakCustomRepository.deleteDoyakByShareDoyakId(selectShareDoyak.getShareDoyakId());
+                doyakRepository.deleteDoyakByShareDoyakId(selectShareDoyak.getShareDoyakId());
             }
             shareDoyakDeleteResult = shareDoyakRepository.shareDoyakDelete(memberId, shareDoyakId);
             long fileDeleteResult = fileRepository.fileDelete(file.getFileId());
@@ -85,33 +85,45 @@ public class ShareDoyakService {
     @Transactional
     public long setShareDoyakUpdate(Long memberId, Long shareDoyakId, ReqShareDoyakDTO reqShareDoyakDTO){
 
-        long shareDoyakAuthor = 0;
         try {
-            ShareDoyak selectShareDoyak = shareDoyakRepository.findShaereDoyakByMemeberId(memberId, shareDoyakId).orElseThrow();
-            shareDoyakAuthor = selectShareDoyak.getMember().getMemberId();
-        }catch (NullPointerException nullPointerException){
-            throw new NullPointerException("해당 글의 작성자가 아닙니다.");
+            // 서로도약 작성자가 맞는지
+            ShareDoyak selectShareDoyak = shareDoyakRepository.findShaereDoyakByMemeberId(memberId, shareDoyakId)
+                                          .orElseThrow();
+            long shareDoyakAuthor = selectShareDoyak.getMember().getMemberId();
+            // 서로도약 작성자가 해당 회원이 맞다면
+            if(shareDoyakAuthor == memberId){
+                long shareDoyakUpdateResult = shareDoyakRepository.shareContentUpdate(shareDoyakId, reqShareDoyakDTO);
+                return shareDoyakUpdateResult;
+            }else {
+                throw new CustomException(ErrorCode.COMMENT_NOT_AUTHOR);
+            }
+        } catch (EntityNotFoundException entityNotFoundException) {
+            throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
+        } catch (Exception exception){
+            throw new CustomException(ErrorCode.SYSTEM_CONNECTION_ERROR);
         }
-        // 서로도약 작성자가 해당 회원이 맞다면
-        long shareDoyakUpdateResult = 0;
-        if(shareDoyakAuthor == memberId){
-            shareDoyakUpdateResult = shareDoyakRepository.shareContentUpdate(shareDoyakId, reqShareDoyakDTO);
-            return shareDoyakUpdateResult;
-        }
-        // 아니라면
-
-        return 0;
     }
 
-    /*
+    /**
      * 서로도약 목록
-     * @param :
-     * @return : List<ResShareDoyakDTO>
-     * */
+     * @return resDoyakDTOS shareAuthorNickname(서로도약 작성자 닉네임), shareDoyakId(서로도약pk), goalName(서로도약 작성자 목표명),
+     *                      shareContent(서로도약 내용), shareImageUrl(서로도약 이미지파일 url), commentCount(댓글 총 수),
+     *                      doyakCount(도약 총 수)
+     */
     @Transactional
     public List<ResShareDoyakDTO> getShareDoyakList(){
-        List<ResShareDoyakDTO> resDoyakDTOS = shareDoyakRepository.findeAll();
-        return resDoyakDTOS;
+        try {
+
+            List<ResShareDoyakDTO> resDoyakDTOS = shareDoyakRepository.findeAll().orElseThrow(() -> new CustomException(ErrorCode.SHARE_DOYAK_LIST_NOT_FOUND));
+            return resDoyakDTOS;
+
+        } catch (IllegalArgumentException illegalArgumentException){
+            throw new CustomException(ErrorCode.SYNTAX_INVALID_FIELD);
+        } catch (NullPointerException nullPointerException){
+            throw new CustomException(ErrorCode.EMPTY_VALUE);
+        } catch (Exception exception){
+            throw new CustomException(ErrorCode.SYSTEM_CONNECTION_ERROR);
+        }
     }
 
     /*
@@ -123,12 +135,12 @@ public class ShareDoyakService {
     public ResDoyakDTO setDoyakAdd(Long memberId, Long shareDoyakId) {
 
         // 도약 테이블에 memberId 존재 여부
-        boolean isExistsDoyak = doyakCustomRepository.existsByMemberIdAndShareDoyakId(memberId, shareDoyakId);
+        boolean isExistsDoyak = doyakRepository.existsByMemberIdAndShareDoyakId(memberId, shareDoyakId);
         ResDoyakDTO resDoyakDTO = new ResDoyakDTO();
         //
         if (isExistsDoyak) {
-            doyakCustomRepository.deleteDoyakByMemberIdAndShareDoyakId(memberId, shareDoyakId);
-            Long doyakCount = doyakCustomRepository.findDoyakAllCount(shareDoyakId);
+            doyakRepository.deleteDoyakByMemberIdAndShareDoyakId(memberId, shareDoyakId);
+            Long doyakCount = doyakRepository.findDoyakAllCount(shareDoyakId);
             resDoyakDTO.setDoyakCount(doyakCount);
             return resDoyakDTO;
         }
@@ -154,55 +166,64 @@ public class ShareDoyakService {
                     .member(selectMember)
                     .shareDoyak(selectShareDoyak)
                     .build();
-            entityManager.persist(doyak);
+            doyakRepository.save(doyak);
         }
 
         // 해당 게시글의 총 도약수 select
-        Long doyakCount = doyakCustomRepository.findDoyakAllCount(shareDoyakId);
+        Long doyakCount = doyakRepository.findDoyakAllCount(shareDoyakId);
         resDoyakDTO.setDoyakCount(doyakCount);
         log.info("===============해당 게시글의 총 도약수 {}", resDoyakDTO.getDoyakCount());
         return resDoyakDTO;
 
     }
 
-    /*
+    /**
      * 서로도약 작성
-     * @param : memberId(Long), shareContent(String), shareImegeUrl(String), shareOriginalName(String)
-     * @return :
-     * */
+     * @param memberId 회원pk
+     * @param reqShareDoyakDTO shareContent(서로도약 내용), shareImegeUrl(서로도약 이미지파일 url)
+     */
     @Transactional
     public void setShareDoyakAdd(Long memberId, ReqShareDoyakDTO reqShareDoyakDTO){
 
-        // 회원 존재 여부 확인
-        boolean isExistsMember = memberRepository.existsByMemberId(memberId);
+        try {
 
-        // 회원이 존재 한다면
-        if(isExistsMember){
+            // 회원 존재 여부 확인
+            Member selectMember = memberRepository.findMemberByMemberId(memberId).orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-            // 파일 DB insert
-            File file = File.builder()
-                    .filePathName(reqShareDoyakDTO.getShareImegeUrl())
-                    .build();
-            entityManager.persist(file);
+            // 회원이 존재 한다면
+            if(selectMember.getMemberId() != null){
 
-            // persist()는 insert와 동시에 pk값을 조회할 수 있음 .getXXX()
-            File selectFile = fileRepository.findByFileId(file.getFileId()).orElseThrow();
-            Member selectMember = memberRepository.findMemberByMemberId(memberId).orElseThrow();
+                // 파일 DB insert
+                File file = File.builder()
+                        .filePathName(reqShareDoyakDTO.getShareImegeUrl())
+                        .build();
+                fileRepository.save(file);
 
-            // 서로도약 insert
-            ShareDoyak shareDoyak = ShareDoyak.builder()
-                    .member(selectMember)
-                    .content(reqShareDoyakDTO.getShareContent())
-                    .file(selectFile)
-                    .build();
-            entityManager.persist(shareDoyak);
+                // persist()는 insert와 동시에 pk값을 조회할 수 있음 .getXXX()
+                File selectFile = fileRepository.findByFileId(file.getFileId()).orElseThrow(() ->  new CustomException(ErrorCode.FILE_NOT_FOUND));
 
-            // 레벨 update
-            Level level = levelRepository.findLevelByMemberId(memberId).orElseThrow();
-            level.updateWhenPostShareDoyak();
-            levelRepository.save(level);
+                // 서로도약 insert
+                ShareDoyak shareDoyak = ShareDoyak.builder()
+                        .member(selectMember)
+                        .content(reqShareDoyakDTO.getShareContent())
+                        .file(selectFile)
+                        .build();
+                shareDoyakRepository.save(shareDoyak);
+
+                // 레벨 update
+                Level level = levelRepository.findLevelByMemberId(memberId).orElseThrow(() ->  new CustomException(ErrorCode.LEVEL_NOT_FOUND));
+                level.updateWhenPostShareDoyak();
+                levelRepository.save(level);
+
+            }else {
+                throw new CustomException(ErrorCode.NULL_VALUE);
+            }
+
+        } catch (DataIntegrityViolationException dataIntegrityViolationException){
+            throw new CustomException(ErrorCode.SHARE_DOYAK_INVALID_INPUT);
+        } catch (Exception exception){
+            throw new CustomException(ErrorCode.SYSTEM_CONNECTION_ERROR);
         }
-
 
     }
 

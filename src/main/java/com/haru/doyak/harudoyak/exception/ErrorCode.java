@@ -14,6 +14,7 @@ public enum ErrorCode {
     BAD_CATEGORY_NAME(HttpStatus.BAD_REQUEST, "일치하는 카테고리가 없습니다."),
     LOG_INVALID_INPUT(HttpStatus.BAD_REQUEST, "잘못 입력된 데이터 입니다."),
     LETTER_INVALID_INPUT(HttpStatus.BAD_REQUEST, "잘못 입력된 데이터 입니다."),
+    SHARE_DOYAK_INVALID_INPUT(HttpStatus.BAD_REQUEST, "잘못 입력된 데이터 입니다."),
 
     // 401 Unauthorized
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "잘못된 비밀번호 입니다."),
@@ -28,6 +29,7 @@ public enum ErrorCode {
     // 404 Not Found
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "탈퇴한 회원이거나 없는 회원 입니다."),
     SHARE_DOYAK_LIST_NOT_FOUND(HttpStatus.NOT_FOUND, "이미 삭제된 게시글이거나 없는 게시글 입니다."),
+    SHARE_DOYAK_NOT_FOUND(HttpStatus.NOT_FOUND, "이미 삭제된 게시글이거나 없는 게시글 입니다."),
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "이미 삭제된 파일이거나 없는 파일 입니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "이미 삭제된 댓글이거나 없는 댓글 입니다."),
     LEVEL_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 레벨이 없습니다."),
