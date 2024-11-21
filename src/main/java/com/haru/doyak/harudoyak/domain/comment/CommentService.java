@@ -146,6 +146,7 @@ public class CommentService {
                         .sender(reply.getMember().getNickname())
                         .content(reply.getContent().substring(0, Math.min(15, reply.getContent().length())).concat("..."))
                         .postTitle(selectShareDoyak.getTitle())
+                        .shareDoyakId(parent.getShareDoyak().getShareDoyakId())
                 .build();
                 notificationService.customNotify(parent.getMember().getMemberId(), sseDataDTO, "대댓글 알림", SseEventName.REPLY_COMMENT);
             }
@@ -164,6 +165,7 @@ public class CommentService {
                 SseDataDTO sseDataDTO = SseDataDTO.builder()
                         .sender(selectShareDoyak.getMember().getNickname())
                         .content(comment.getContent().substring(0, Math.min(15, comment.getContent().length())).concat("..."))
+                        .shareDoyakId(comment.getShareDoyak().getShareDoyakId())
                         .build();
                 notificationService.customNotify(selectShareDoyak.getMember().getMemberId(), sseDataDTO, "서로도약 댓글 알림", SseEventName.POST_COMMENT);
             }

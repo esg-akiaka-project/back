@@ -292,7 +292,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
      */
     @Override
     public List<Tuple> findLetterMemberWhereBetweenLogCreationDateTime(LocalDateTime startDate, LocalDateTime endDate) {
-         return jpaQueryFactory.select(letter.content, member.memberId, member.aiNickname)
+         return jpaQueryFactory.select(letter.content, member.memberId, member.aiNickname, log.logId)
                 .from(log)
                 .leftJoin(member)
                 .on(member.memberId.eq(log.member.memberId))

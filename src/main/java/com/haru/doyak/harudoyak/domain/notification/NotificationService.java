@@ -46,7 +46,7 @@ public class NotificationService {
             try {
                 emitter.send(SseEmitter.event()
                         .id(String.valueOf(memberId))
-                        .name("sse")
+                        .name("SSE")
                         .data(data)
                         .comment(comment));
             } catch (IOException e) {
@@ -62,7 +62,7 @@ public class NotificationService {
             try {
                 emitter.send(SseEmitter.event()
                         .id(String.valueOf(memberId))
-                        .name(sseEventName.getEventName())
+                        .name(sseEventName.name())
                         .data(data)
                         .comment(comment));
             } catch (IOException e) {

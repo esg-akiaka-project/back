@@ -58,10 +58,12 @@ public class LetterBatch {
             String sender = tuple.get(member.aiNickname);
             String content = tuple.get(letter.content)
                     .substring(0, Math.min( tuple.get(letter.content).length(), 20)).concat("...");
+            Long logId = tuple.get(log.logId);
 
             SseDataDTO sseDataDTO = SseDataDTO.builder()
                     .sender(sender)
                     .content(content)
+                    .logId(logId)
                     .build();
             // 알림 전송
             notificationService.customNotify(
@@ -85,13 +87,14 @@ public class LetterBatch {
         LocalDateTime endDateTime = setLastTime(endOfLastWeek);
 
         // 저번주 도약기록 작성한 유저만 뽑기
-        List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, endDateTime);
+        List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, setLastTime(today));
         for(Tuple tuple : tuples) {
             Long memberId = tuple.get(member.memberId);
             Long count = tuple.get(log.member.memberId.count());
 
             SseDataDTO sseDataDTO = SseDataDTO.builder()
                     .count(count)
+                    .startDate(startOfLastWeek.toString())
                     .build();
 
             // 알림 전송
@@ -116,13 +119,14 @@ public class LetterBatch {
         LocalDateTime endDateTime = setLastTime(endOfLastMonth);
 
         // 저번달 도약기록 작성한 유저 뽑기
-        List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, endDateTime);
+        List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, setLastTime(today));
         for(Tuple tuple : tuples) {
             Long memberId = tuple.get(member.memberId);
             Long count = tuple.get(log.member.memberId.count());
 
             SseDataDTO sseDataDTO = SseDataDTO.builder()
                     .count(count)
+                    .startDate(startOfLastMonth.toString())
                     .build();
 
             // 알림 전송
