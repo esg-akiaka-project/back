@@ -1,4 +1,4 @@
-package com.haru.doyak.harudoyak.domain.notification;
+package com.haru.doyak.harudoyak.dto.notification;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
@@ -13,8 +13,8 @@ public class SseDataDTO {
     private String postTitle;// 게시글 타이틀
     private String content;// 자른 내용
     private Long count;// 기록 개수
-    // 성장기록 - sender, count
+    // 성장기록 - count
     // 편지 - sender, content
-    // 댓글 - sender, postTitle
+    // 댓글 - sender, postTitle, content
     // 대댓글 - sender, content
 }

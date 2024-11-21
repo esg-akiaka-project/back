@@ -1,7 +1,7 @@
 package com.haru.doyak.harudoyak.domain.comment;
 
 import com.haru.doyak.harudoyak.domain.notification.NotificationService;
-import com.haru.doyak.harudoyak.domain.notification.SseDataDTO;
+import com.haru.doyak.harudoyak.dto.notification.SseDataDTO;
 import com.haru.doyak.harudoyak.domain.notification.SseEventName;
 import com.haru.doyak.harudoyak.dto.comment.ReqCommentDTO;
 import com.haru.doyak.harudoyak.dto.comment.ResCommentDTO;

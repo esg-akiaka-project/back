@@ -3,8 +3,9 @@ package com.haru.doyak.harudoyak.domain.notification;
 import static com.haru.doyak.harudoyak.entity.QMember.member;
 import static com.haru.doyak.harudoyak.entity.QLog.log;
 import static com.haru.doyak.harudoyak.entity.QLetter.letter;
+
+import com.haru.doyak.harudoyak.dto.notification.SseDataDTO;
 import com.haru.doyak.harudoyak.repository.LogRepository;
-import com.haru.doyak.harudoyak.repository.MemberRepository;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;

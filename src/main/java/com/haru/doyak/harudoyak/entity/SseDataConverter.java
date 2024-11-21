@@ -1,9 +1,9 @@
-package com.haru.doyak.harudoyak.domain.notification;
+package com.haru.doyak.harudoyak.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.haru.doyak.harudoyak.dto.notification.SseDataDTO;
 import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Converter;
 
 @Converter
@@ -24,7 +24,7 @@ public class SseDataConverter implements AttributeConverter<SseDataDTO, String> 
         try {
             return objectMapper.readValue(string, SseDataDTO.class);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to convert JSON to SseDataDTO object", e);
+            throw new RuntimeException("failed to convert JSON to SseDataDTO object", e);
         }
     }
 }

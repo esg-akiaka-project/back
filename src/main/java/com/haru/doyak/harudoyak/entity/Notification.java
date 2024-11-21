@@ -1,8 +1,7 @@
 package com.haru.doyak.harudoyak.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.haru.doyak.harudoyak.domain.notification.SseDataConverter;
-import com.haru.doyak.harudoyak.domain.notification.SseDataDTO;
+import com.haru.doyak.harudoyak.dto.notification.SseDataDTO;
 import com.haru.doyak.harudoyak.domain.notification.SseEventName;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

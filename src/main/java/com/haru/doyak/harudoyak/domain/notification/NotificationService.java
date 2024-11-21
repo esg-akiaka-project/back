@@ -1,5 +1,6 @@
 package com.haru.doyak.harudoyak.domain.notification;
 
+import com.haru.doyak.harudoyak.dto.notification.SseDataDTO;
 import com.haru.doyak.harudoyak.entity.Notification;
 import com.haru.doyak.harudoyak.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +56,6 @@ public class NotificationService {
         }
     }
 
-//TODO: data json 으로 보내기
     private <T> void sendToClient(Long memberId, T data, String comment, SseEventName sseEventName) {
         SseEmitter emitter = emitterRepository.get(memberId);
         if (emitter != null) {
