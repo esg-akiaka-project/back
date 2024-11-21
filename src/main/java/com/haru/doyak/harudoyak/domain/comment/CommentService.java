@@ -182,7 +182,7 @@ public class CommentService {
                     commentRepository.save(reply);
 
                 // 대댓글일떄 parent에 댓글 알림 전송
-                Comment parent = commentCustomRepository.findCommentByCommentId(reply.getParentCommentId()).orElseThrow();
+                Comment parent = commentRepository.findCommentByCommentId(reply.getParentCommentId()).orElseThrow();
                 SseDataDTO sseDataDTO = SseDataDTO.builder()
                         .sender(reply.getMember().getNickname())
                         .content(reply.getContent().substring(0, Math.min(15, reply.getContent().length())).concat("..."))
@@ -203,15 +203,16 @@ public class CommentService {
                             .build();
                     commentRepository.save(comment);
 
+                    // 게시글 작성자에게 댓글 알림 전송
+                    SseDataDTO sseDataDTO = SseDataDTO.builder()
+                            .sender(selectShareDoyak.getMember().getNickname())
+                            .content(comment.getContent().substring(0, Math.min(15, comment.getContent().length())).concat("..."))
+                            .shareDoyakId(comment.getShareDoyak().getShareDoyakId())
+                            .build();
+                    notificationService.customNotify(selectShareDoyak.getMember().getMemberId(), sseDataDTO, "서로도약 댓글 알림", SseEventName.POST_COMMENT);
+
                 }
 
-                // 게시글 작성자에게 댓글 알림 전송
-                SseDataDTO sseDataDTO = SseDataDTO.builder()
-                        .sender(selectShareDoyak.getMember().getNickname())
-                        .content(comment.getContent().substring(0, Math.min(15, comment.getContent().length())).concat("..."))
-                        .shareDoyakId(comment.getShareDoyak().getShareDoyakId())
-                        .build();
-                notificationService.customNotify(selectShareDoyak.getMember().getMemberId(), sseDataDTO, "서로도약 댓글 알림", SseEventName.POST_COMMENT);
             }
 
         } catch (DataIntegrityViolationException dataIntegrityViolationException){
