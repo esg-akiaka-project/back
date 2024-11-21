@@ -6,6 +6,7 @@ import com.haru.doyak.harudoyak.dto.comment.ResCommentDTO;
 import com.haru.doyak.harudoyak.entity.Comment;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CommentCustomRepository {
 
@@ -15,8 +16,8 @@ public interface CommentCustomRepository {
 
     long commentContentUpdate(Long commentId, ReqCommentDTO reqCommentDTO);
 
-    Comment findCommentByMemberId(Long memberId, Long commentId);
+    Optional<Comment> findCommentByMemberId(Long memberId, Long commentId);
 
-    List<ResCommentDTO.ResCommentDetailDTO> findeCommentAll(Long shareDoyakId);
+    Optional<List<ResCommentDTO.ResCommentDetailDTO>> findeCommentAll(Long shareDoyakId);
 
 }

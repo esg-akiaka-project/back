@@ -8,7 +8,6 @@ import com.haru.doyak.harudoyak.repository.querydsl.LogCustomRepository;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.DateTemplate;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -37,17 +36,9 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
     @Override
     public Optional<List<ResTagDTO.TagMonthlyDTO>> findMontlyTagAll(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate){
 
-        DateTemplate<LocalDateTime> startMonthDay = Expressions.dateTemplate(
-                LocalDateTime.class, "{0}", startMonthDayDate);
-
-        DateTemplate<LocalDateTime> endMonthDay = Expressions.dateTemplate(
-                LocalDateTime.class, "{0}", endMonthDayDate);
-
         List<ResTagDTO.TagMonthlyDTO> tagMonthlyDTOS = jpaQueryFactory
                 .select(Projections.bean(
                         ResTagDTO.TagMonthlyDTO.class,
-/*                        startMonthDay.as("startMonthDay"),
-                        endMonthDay.as("endMonthDay"),*/
                         tag.name.as("tagName"),
                         Expressions.numberTemplate(Long.class, "ROW_NUMBER() OVER (PARTITION BY {0}, DATE_FORMAT({1}, '%Y-%u') ORDER BY COUNT({2}) DESC)", log.member.memberId, log.creationDate, tag.name).as("rn")
                 ))
@@ -55,28 +46,21 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .join(logTag).on(log.logId.eq(logTag.log.logId))
                 .join(tag).on(logTag.tag.tagId.eq(tag.tagId))
                 .where(log.member.memberId.eq(memberId), log.creationDate.between(startMonthDayDate, endMonthDayDate))
-                .groupBy(log.member.memberId, tag.name/*, montly*/)
+                .groupBy(log.member.memberId, tag.name)
                 .orderBy(tag.name.count().desc())
                 .limit(10)
                 .fetch();
         return Optional.ofNullable(tagMonthlyDTOS);
+
     }
 
     // 감정 월간 집계
     @Override
     public Optional<List<EmotionDTO.ResEmotionMonthlyDTO>> findMontlyEmotion(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate){
 
-        DateTemplate<LocalDateTime> startMonthDay = Expressions.dateTemplate(
-                LocalDateTime.class, "{0}", startMonthDayDate);
-
-        DateTemplate<LocalDateTime> endMonthDay = Expressions.dateTemplate(
-                LocalDateTime.class, "{0}", endMonthDayDate);
-
         List<EmotionDTO.ResEmotionMonthlyDTO> emotionDTOS = jpaQueryFactory
                 .select(Projections.bean(
                         EmotionDTO.ResEmotionMonthlyDTO.class,
-/*                        startMonthDay.as("startMonthDay"),
-                        endMonthDay.as("endMonthDay"),*/
                         log.emotion,
                         log.emotion.count().as("emotionCount"),
                         Expressions.numberTemplate(Long.class, "ROW_NUMBER() OVER (PARTITION BY {0}, DATE_FORMAT({1}, '%Y-%u') ORDER BY COUNT({2}) DESC)", log.member.memberId, log.creationDate, log.emotion).as("rn")
@@ -89,23 +73,16 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .fetch();
 
         return Optional.ofNullable(emotionDTOS);
+
     }
 
     // 도약이편지 Count
     @Override
     public Optional<List<ResLetterDTO.LetterMonthlyDTO>> findMontlyLetterAll(Long memberId, LocalDateTime startMonthDayDate, LocalDateTime endMonthDayDate){
 
-        DateTemplate<LocalDateTime> startMonthDay = Expressions.dateTemplate(
-                LocalDateTime.class, "{0}", startMonthDayDate);
-
-        DateTemplate<LocalDateTime> endMonthDay = Expressions.dateTemplate(
-                LocalDateTime.class, "{0}", endMonthDayDate);
-
         List<ResLetterDTO.LetterMonthlyDTO> letterMonthlyDTOS = jpaQueryFactory
                 .select(Projections.bean(
                         ResLetterDTO.LetterMonthlyDTO.class,
-/*                        startMonthDay.as("startMonthDay"),
-                        endMonthDay.as("endMonthDay"),*/
                         letter.letterId.count().as("aiFeedbackCount")
                 ))
                 .from(log)
@@ -115,6 +92,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
 
 
         return Optional.ofNullable(letterMonthlyDTOS);
+
     }
 
     /*
@@ -124,17 +102,9 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
     @Override
     public Optional<List<ResLetterDTO.LetterWeeklyDTO>> findLetterByDate(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate){
 
-        DateTemplate<LocalDateTime> monday = Expressions.dateTemplate(
-                LocalDateTime.class, "{0}", mondayDate);
-
-        DateTemplate<LocalDateTime> sunday = Expressions.dateTemplate(
-                LocalDateTime.class, "{0}", sundayDate);
-
         List<ResLetterDTO.LetterWeeklyDTO> letterWeeklyDTOS = jpaQueryFactory
                 .select(Projections.bean(
                         ResLetterDTO.LetterWeeklyDTO.class,
-/*                        monday.as("monday"),
-                        sunday.as("sunday"),*/
                         letter.arrivedDate.as("feedBackDate"),
                         letter.content.as("feedback")
                 ))
@@ -142,79 +112,57 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .join(member).on(log.member.memberId.eq(member.memberId))
                 .join(letter).on(log.logId.eq(letter.log.logId))
                 .where(log.member.memberId.eq(memberId), letter.arrivedDate.between(mondayDate, sundayDate))
-                /*.groupBy(log.creationDate*//*, monday, sunday*//*
-                        *//*Expressions.dateTemplate(
-                                LocalDateTime.class, "{0}", mondayDate),
-                        Expressions.dateTemplate(
-                                LocalDateTime.class, "{0}", sundayDate)*//*
-                )*/
-                .orderBy(log.creationDate.asc()
-                        /*Expressions.dateTemplate(
-                                Date.class,
-                                "DATE_FORMAT(ADDDATE({0}, -WEEKDAY({0})), '%Y-%m-%d')",
-                                log.creationDate
-                                Expressions.path(Date.class, "creationDate")
-                        ).asc()*/
-                )
+                .orderBy(log.creationDate.asc())
                 .fetch();
 
         return Optional.ofNullable(letterWeeklyDTOS);
+
     }
 
     // 감정 주간 집계
     @Override
     public Optional<List<EmotionDTO>> findEmotionByDate(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate){
-        DateTemplate<LocalDateTime> monday = Expressions.dateTemplate(
-                LocalDateTime.class, "{0}", mondayDate);
-
-        DateTemplate<LocalDateTime> sunday = Expressions.dateTemplate(
-                LocalDateTime.class, "{0}", sundayDate);
 
         List<EmotionDTO> emotionDTOS = jpaQueryFactory
                 .select(Projections.bean(
                         EmotionDTO.class,
                         log.emotion,
                         log.emotion.count().as("emotionCount"),
-/*                        monday.as("monday"),
-                        sunday.as("sunday"),*/
                         Expressions.numberTemplate(Long.class, "ROW_NUMBER() OVER (PARTITION BY {0}, DATE_FORMAT({1}, '%Y-%u') ORDER BY COUNT({2}) DESC)", log.member.memberId, log.creationDate, log.emotion).as("rn")
                 ))
                 .from(log)
                 .where(log.member.memberId.eq(memberId), log.creationDate.between(mondayDate, sundayDate))
-                .groupBy(log.member.memberId, /*monday,*/ log.emotion)
+                .groupBy(log.member.memberId, log.emotion)
                 .orderBy(log.emotion.count().desc())
                 .limit(3)
                 .fetch();
+
         return Optional.ofNullable(emotionDTOS);
+
     }
 
     // 태그 주간 집계
     @Override
     public Optional<List<ResTagDTO.TagWeeklyDTO>> findTagsByName(Long memberId, LocalDateTime mondayDate, LocalDateTime sundayDate){
-        DateTemplate<LocalDateTime> monday = Expressions.dateTemplate(
-                LocalDateTime.class, "{0}", mondayDate);
-
-        DateTemplate<LocalDateTime> sunday = Expressions.dateTemplate(
-                LocalDateTime.class, "{0}", sundayDate);
 
         List<ResTagDTO.TagWeeklyDTO> tagWeeklyDTOS = jpaQueryFactory
                 .select(Projections.bean(
                         ResTagDTO.TagWeeklyDTO.class,
                         tag.name.as("tagName"),
                         tag.name.count().as("tagCount"),
-/*                        monday.as("monday"),
-                        sunday.as("sunday"),*/
                         Expressions.numberTemplate(Long.class, "ROW_NUMBER() OVER (PARTITION BY {0}, DATE_FORMAT({1}, '%Y-%u') ORDER BY COUNT({2}) DESC)", log.member.memberId, log.creationDate, tag.name).as("rn")
                 ))
                 .from(log)
                 .leftJoin(logTag).on(log.logId.eq(logTag.logTagId.logId))
                 .leftJoin(tag).on(logTag.logTagId.tagId.eq(tag.tagId))
                 .where(log.member.memberId.eq(memberId), log.creationDate.between(mondayDate, sundayDate))
-                .groupBy(/*monday, sunday,*/ tag.name)
+                .groupBy(tag.name)
                 .orderBy(tag.name.count().desc())
                 .limit(10)
                 .fetch();
+
         return Optional.ofNullable(tagWeeklyDTOS);
+
     }
 
     /*
@@ -222,6 +170,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
     * */
     @Override
     public Optional<List<ResLogDTO.ResDailyLogDTO>> findLogByLogIdAndMemberId(Long memberId, Long logId){
+
         List<ResLogDTO.ResDailyLogDTO> resDailyLogDTOS = jpaQueryFactory
                 .select(Projections.bean(
                         ResLogDTO.ResDailyLogDTO.class,
@@ -281,6 +230,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .from(log)
                 .where(log.member.memberId.eq(memberId))
                 .fetch();
+
         return Optional.ofNullable(resLogDTOs);
     }
 

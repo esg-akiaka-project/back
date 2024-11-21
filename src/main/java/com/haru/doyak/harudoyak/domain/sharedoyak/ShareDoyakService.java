@@ -56,7 +56,7 @@ public class ShareDoyakService {
         long shareDoyakDeleteResult = 0;
         if(shareDoyakAuthorId == memberId) {
             File file = fileRepository.findByFileId(selectShareDoyak.getFile().getFileId()).orElseThrow();
-            List<ResCommentDTO.ResCommentDetailDTO> comments = commentCustomRepository.findeCommentAll(selectShareDoyak.getShareDoyakId());
+            List<ResCommentDTO.ResCommentDetailDTO> comments = commentCustomRepository.findeCommentAll(selectShareDoyak.getShareDoyakId()).orElseThrow();
             List<Doyak> doyaks = doyakCustomRepository.findDoyakAllByShareDoyakId(selectShareDoyak.getShareDoyakId()).orElseThrow();
             if(comments.size() != 0){
                 for(ResCommentDTO.ResCommentDetailDTO comment : comments){
@@ -138,8 +138,10 @@ public class ShareDoyakService {
         // 회원과 서로도약게시글이 존재 한다면
         if(isExistsMember && isExistsShareDoyak){
 
-            Member selectMember = memberRepository.findMemberByMemberId(memberId).orElseThrow();
-            ShareDoyak selectShareDoyak = shareDoyakRepository.findShareDoyakByShareDoyakId(shareDoyakId).orElseThrow();
+            Member selectMember = memberRepository.findMemberByMemberId(memberId)
+                                  .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+            ShareDoyak selectShareDoyak = shareDoyakRepository.findShareDoyakByShareDoyakId(shareDoyakId)
+                                          .orElseThrow(() -> new CustomException(ErrorCode.SHARE_DOYAK_LIST_NOT_FOUND));
 
             Doyak doyak = Doyak.builder()
                     .doyakId(new DoyakId(
@@ -151,12 +153,6 @@ public class ShareDoyakService {
                     .shareDoyak(selectShareDoyak)
                     .build();
             entityManager.persist(doyak);
-        }
-        // 회원이 존재하지 않다면
-        if(!isExistsMember){
-            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
-        }else if(!isExistsShareDoyak){
-            throw new CustomException(ErrorCode.POST_NOT_FOUND);
         }
 
         // 해당 게시글의 총 도약수 select
