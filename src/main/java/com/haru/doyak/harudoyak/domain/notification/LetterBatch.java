@@ -75,11 +75,11 @@ public class LetterBatch {
     }
 
     // 매 주 월요일 7시에 알림
-//    @Scheduled(cron = "0 * * * * *")
-    @Scheduled(cron = "0 0 7 * * MON")
+    @Scheduled(cron = "0 * * * * *")
+//    @Scheduled(cron = "0 0 7 * * MON")
     public void sendWeekFeedback() {
         LocalDate today = LocalDate.now();
-        LocalDate startOfThisWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+        LocalDate startOfThisWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate startOfLastWeek = startOfThisWeek.minusWeeks(1);
         LocalDate endOfLastWeek = startOfThisWeek.minusDays(1);
 
@@ -87,7 +87,7 @@ public class LetterBatch {
         LocalDateTime endDateTime = setLastTime(endOfLastWeek);
 
         // 저번주 도약기록 작성한 유저만 뽑기
-        List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, setLastTime(today));
+        List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, endDateTime);
         for(Tuple tuple : tuples) {
             Long memberId = tuple.get(member.memberId);
             Long count = tuple.get(log.member.memberId.count());
@@ -119,7 +119,7 @@ public class LetterBatch {
         LocalDateTime endDateTime = setLastTime(endOfLastMonth);
 
         // 저번달 도약기록 작성한 유저 뽑기
-        List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, setLastTime(today));
+        List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, endDateTime);
         for(Tuple tuple : tuples) {
             Long memberId = tuple.get(member.memberId);
             Long count = tuple.get(log.member.memberId.count());
