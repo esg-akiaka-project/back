@@ -25,19 +25,29 @@ public class CommentService {
     private final MemberRepository memberRepository;
     private final ShareDoyakRepository shareDoyakRepository;
 
-    /*
-     * 회원의 댓글 모아보기
-     * @param : membaerId(Long)
-     * */
+    /**
+     * 회원의 댓글 목록 모아보기
+     * @param memberId
+     * @return resCommentDTOS commentShareDoyakId(댓글의 서로도약pk), commentId(댓글ID), commentAuthorNickname(댓글 작성자 닉네임)
+     * @throws IllegalArgumentException 객체 필드와 select하는 컬럼명이 매핑이 안됐을 때
+     * @throws NullPointerException select하는 값이 비어있을 때
+     * @throws Exception 예기치 못한 시스템 에러
+     */
     public List<ResCommentDTO> getMemberCommentList(Long memberId){
-        List<ResCommentDTO> resCommentDTOS = commentRepository.findMemberCommentAll(memberId);
-        return resCommentDTOS;
-    }
+        try {
 
-    /*
-     * 댓글 수정
-     * @param : memberId(Long), commentId(Long)
-     * */
+            List<ResCommentDTO> resCommentDTOS = commentRepository.findMemberCommentAll(memberId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_LIST_NOT_FOUND));
+            return resCommentDTOS;
+
+        } catch (IllegalArgumentException illegalArgumentException){
+            throw new CustomException(ErrorCode.SYNTAX_INVALID_FIELD);
+        } catch (NullPointerException nullPointerException){
+            throw new CustomException(ErrorCode.EMPTY_VALUE);
+        } catch (Exception exception){
+            throw new CustomException(ErrorCode.SYSTEM_CONNECTION_ERROR);
+        }
+    }
 
     /**
      * 댓글 수정

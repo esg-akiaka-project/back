@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface CommentCustomRepository {
 
-    List<ResCommentDTO> findMemberCommentAll(Long memberId);
+    Optional<List<ResCommentDTO>> findMemberCommentAll(Long memberId);
 
     long commentDelete(Long commentId);
 
