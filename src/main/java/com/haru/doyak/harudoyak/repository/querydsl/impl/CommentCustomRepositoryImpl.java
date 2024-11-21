@@ -27,7 +27,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
      * 회원 댓글 목록 select
      * */
     @Override
-    public List<ResCommentDTO> findMemberCommentAll(Long memberId){
+    public Optional<List<ResCommentDTO>> findMemberCommentAll(Long memberId){
         List<ResCommentDTO> resCommentDTOS = jpaQueryFactory
                 .select(Projections.bean(
                         ResCommentDTO.class,
@@ -40,7 +40,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
                 .leftJoin(member).on(comment.member.memberId.eq(member.memberId))
                 .where(comment.member.memberId.eq(memberId))
                 .fetch();
-        return resCommentDTOS;
+        return Optional.ofNullable(resCommentDTOS);
     }
 
     /*
@@ -70,21 +70,21 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
      * 댓글 작성한 회원 select
      * */
     @Override
-    public Comment findCommentByMemberId(Long memberId, Long commentId){
+    public Optional<Comment> findCommentByMemberId(Long memberId, Long commentId){
 
-        return jpaQueryFactory
+        return Optional.ofNullable(jpaQueryFactory
                 .select(comment)
                 .from(comment)
                 .leftJoin(member).on(comment.member.memberId.eq(member.memberId))
                 .where(comment.member.memberId.eq(memberId), comment.commentId.eq(commentId))
-                .fetchOne();
+                .fetchOne());
     }
 
     /*
      * 서로도약 댓글 목록에 쓰일 data select
      * */
     @Override
-    public List<ResCommentDTO.ResCommentDetailDTO> findeCommentAll(Long shareDoyakId) {
+    public Optional<List<ResCommentDTO.ResCommentDetailDTO>> findeCommentAll(Long shareDoyakId) {
         List<ResCommentDTO.ResCommentDetailDTO> resCommentDTOS = jpaQueryFactory
                 .select(Projections.bean(
                         ResCommentDTO.ResCommentDetailDTO.class,
@@ -130,7 +130,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
                 ))
                 .collect(Collectors.toList());
 
-        return resCommentDTOS;
+        return Optional.ofNullable(resCommentDTOS);
 
     }
 

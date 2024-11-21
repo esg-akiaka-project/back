@@ -10,15 +10,15 @@ import java.util.Optional;
 
 public interface CommentCustomRepository {
 
-    List<ResCommentDTO> findMemberCommentAll(Long memberId);
+    Optional<List<ResCommentDTO>> findMemberCommentAll(Long memberId);
 
     long commentDelete(Long commentId);
 
     long commentContentUpdate(Long commentId, ReqCommentDTO reqCommentDTO);
 
-    Comment findCommentByMemberId(Long memberId, Long commentId);
+    Optional<Comment> findCommentByMemberId(Long memberId, Long commentId);
 
-    List<ResCommentDTO.ResCommentDetailDTO> findeCommentAll(Long shareDoyakId);
+    Optional<List<ResCommentDTO.ResCommentDetailDTO>> findeCommentAll(Long shareDoyakId);
 
     Optional<Comment> findCommentByCommentId (Long commentId);
 

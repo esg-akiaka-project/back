@@ -48,7 +48,6 @@ public class ResLogDTO {
     @Setter
     public static class ResWeeklyLogDTO {
 
-
         private List<EmotionDTO> emotions;
         private List<ResTagDTO.TagWeeklyDTO> tags;
         private List<ResLetterDTO.LetterWeeklyDTO> aiFeedbacks;
