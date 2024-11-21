@@ -1,7 +1,9 @@
 package com.haru.doyak.harudoyak.domain.sharedoyak;
 
 import com.haru.doyak.harudoyak.dto.comment.ResCommentDTO;
-import com.haru.doyak.harudoyak.dto.sharedoyak.*;
+import com.haru.doyak.harudoyak.dto.sharedoyak.ReqShareDoyakDTO;
+import com.haru.doyak.harudoyak.dto.sharedoyak.ResDoyakDTO;
+import com.haru.doyak.harudoyak.dto.sharedoyak.ResShareDoyakDTO;
 import com.haru.doyak.harudoyak.entity.*;
 import com.haru.doyak.harudoyak.exception.CustomException;
 import com.haru.doyak.harudoyak.exception.ErrorCode;
@@ -9,7 +11,7 @@ import com.haru.doyak.harudoyak.repository.FileRepository;
 import com.haru.doyak.harudoyak.repository.LevelRepository;
 import com.haru.doyak.harudoyak.repository.MemberRepository;
 import com.haru.doyak.harudoyak.repository.ShareDoyakRepository;
-import com.haru.doyak.harudoyak.repository.querydsl.CommentCustomRepository;
+import com.haru.doyak.harudoyak.repository.querydsl.CommentRepository;
 import com.haru.doyak.harudoyak.repository.querydsl.DoyakCustomRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -28,7 +30,7 @@ public class ShareDoyakService {
     private final MemberRepository memberRepository;
     private final DoyakCustomRepository doyakCustomRepository;
     private final FileRepository fileRepository;
-    private final CommentCustomRepository commentCustomRepository;
+    private final CommentRepository commentRepository;
     private final LevelRepository levelRepository;
 
     /*
@@ -56,11 +58,11 @@ public class ShareDoyakService {
         long shareDoyakDeleteResult = 0;
         if(shareDoyakAuthorId == memberId) {
             File file = fileRepository.findByFileId(selectShareDoyak.getFile().getFileId()).orElseThrow();
-            List<ResCommentDTO.ResCommentDetailDTO> comments = commentCustomRepository.findeCommentAll(selectShareDoyak.getShareDoyakId()).orElseThrow();
+            List<ResCommentDTO.ResCommentDetailDTO> comments = commentRepository.findeCommentAll(selectShareDoyak.getShareDoyakId()).orElseThrow();
             List<Doyak> doyaks = doyakCustomRepository.findDoyakAllByShareDoyakId(selectShareDoyak.getShareDoyakId()).orElseThrow();
             if(comments.size() != 0){
                 for(ResCommentDTO.ResCommentDetailDTO comment : comments){
-                    long commentDeleteResult = commentCustomRepository.commentDelete(comment.getCommentId());
+                    long commentDeleteResult = commentRepository.commentDelete(comment.getCommentId());
                 }
             }
             if(doyaks.size() != 0){
