@@ -56,7 +56,7 @@ public class LetterBatch {
             Long memberId = tuple.get(member.memberId);
             String sender = tuple.get(member.aiNickname);
             String content = tuple.get(letter.content)
-                    .substring(0, Math.min( tuple.get(letter.content).length(), 10)).concat("...");
+                    .substring(0, Math.min( tuple.get(letter.content).length(), 20)).concat("...");
 
             SseDataDTO sseDataDTO = SseDataDTO.builder()
                     .sender(sender)
@@ -66,7 +66,7 @@ public class LetterBatch {
             notificationService.customNotify(
                     memberId,
                     sseDataDTO,
-                    "7am, letter arrived",
+                    "도약이 편지 알림",
                     SseEventName.DAILY);
         }
     }
@@ -97,7 +97,7 @@ public class LetterBatch {
             notificationService.customNotify(
                     tuple.get(member.memberId),
                     sseDataDTO, 
-                    "7am, check last week logs",
+                    "지난주 성장기록 알림",
                     SseEventName.WEEK);
         }
     }
@@ -128,7 +128,7 @@ public class LetterBatch {
             notificationService.customNotify(
                     tuple.get(member.memberId),
                     sseDataDTO,
-                    "7am, check last week logs",
+                    "저번달 성장기록 알림",
                     SseEventName.MONTH);
         }
     }

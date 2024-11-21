@@ -1,5 +1,8 @@
 package com.haru.doyak.harudoyak.domain.comment;
 
+import com.haru.doyak.harudoyak.domain.notification.NotificationService;
+import com.haru.doyak.harudoyak.domain.notification.SseDataDTO;
+import com.haru.doyak.harudoyak.domain.notification.SseEventName;
 import com.haru.doyak.harudoyak.dto.comment.ReqCommentDTO;
 import com.haru.doyak.harudoyak.dto.comment.ResCommentDTO;
 import com.haru.doyak.harudoyak.entity.Comment;
@@ -11,6 +14,7 @@ import com.haru.doyak.harudoyak.repository.querydsl.CommentCustomRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +26,8 @@ public class CommentService {
     private final EntityManager entityManager;
     private final MemberRepository memberRepository;
     private final ShareDoyakRepository shareDoyakRepository;
+    private final NotificationService notificationService;
+    private final ConversionService conversionService;
 
     /*
      * 회원의 댓글 모아보기
@@ -134,6 +140,14 @@ public class CommentService {
                         .build();
                 entityManager.persist(reply);
 
+                // 대댓글일떄 parent에 댓글 알림 전송
+                Comment parent = commentCustomRepository.findCommentByCommentId(reply.getParentCommentId()).orElseThrow();
+                SseDataDTO sseDataDTO = SseDataDTO.builder()
+                        .sender(reply.getMember().getNickname())
+                        .content(reply.getContent().substring(0, Math.min(15, reply.getContent().length())).concat("..."))
+                        .postTitle(selectShareDoyak.getTitle())
+                .build();
+                notificationService.customNotify(parent.getMember().getMemberId(), sseDataDTO, "대댓글 알림", SseEventName.REPLY_COMMENT);
             }
 
             if(reqCommentDTO.getParentCommentId() == null){
@@ -146,6 +160,12 @@ public class CommentService {
                         .build();
                 entityManager.persist(comment);
 
+                // 게시글 작성자에게 댓글 알림 전송
+                SseDataDTO sseDataDTO = SseDataDTO.builder()
+                        .sender(selectShareDoyak.getMember().getNickname())
+                        .content(comment.getContent().substring(0, Math.min(15, comment.getContent().length())).concat("..."))
+                        .build();
+                notificationService.customNotify(selectShareDoyak.getMember().getMemberId(), sseDataDTO, "서로도약 댓글 알림", SseEventName.POST_COMMENT);
             }
 
         }

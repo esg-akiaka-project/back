@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.haru.doyak.harudoyak.entity.QComment.comment;
@@ -131,6 +132,15 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
 
         return resCommentDTOS;
 
+    }
+
+    @Override
+    public Optional<Comment> findCommentByCommentId (Long commentId){
+        return Optional.ofNullable(
+                jpaQueryFactory.selectFrom(comment)
+                        .where(comment.commentId.eq(commentId))
+                        .fetchOne()
+        );
     }
 
 }
