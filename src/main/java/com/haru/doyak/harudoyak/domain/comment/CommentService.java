@@ -37,7 +37,6 @@ public class CommentService {
      * @return resCommentDTOS commentShareDoyakId(댓글의 서로도약pk), commentId(댓글ID), commentAuthorNickname(댓글 작성자 닉네임)
      * @throws IllegalArgumentException 객체 필드와 select하는 컬럼명이 매핑이 안됐을 때
      * @throws NullPointerException select하는 값이 비어있을 때
-     * @throws Exception 예기치 못한 시스템 에러
      */
     public List<ResCommentDTO> getMemberCommentList(Long memberId){
         try {
@@ -50,8 +49,6 @@ public class CommentService {
             throw new CustomException(ErrorCode.SYNTAX_INVALID_FIELD);
         } catch (NullPointerException nullPointerException){
             throw new CustomException(ErrorCode.EMPTY_VALUE);
-        } catch (Exception exception){
-            throw new CustomException(ErrorCode.SYSTEM_CONNECTION_ERROR);
         }
     }
 
@@ -62,14 +59,13 @@ public class CommentService {
      * @param reqCommentDTO commentContent(댓글 내용)
      * @return commentUpdateResult 0(댓글 수정 실패), 1(댓글 수정 성공)
      * @throws EntityNotFoundException 해당 댓글이 존재하지 않을때
-     * @throws  Exception 예기치 못한 시스템 에러
      */
     @Transactional
     public long setCommentUpdate(Long memberId, Long commentId, ReqCommentDTO reqCommentDTO) {
 
         try{
             // 댓글의 작성자가 맞는지
-            Comment selectComment = commentRepository.findCommentByMemberId(memberId, commentId)
+            Comment selectComment = commentRepository.findCommentByMemberId(commentId)
                                     .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
             long commentAuthorId = selectComment.getMember().getMemberId();
             // 댓글의 작성자가 맞다면
@@ -81,8 +77,6 @@ public class CommentService {
             }
         } catch (EntityNotFoundException entityNotFoundException) {
             throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
-        } catch (Exception exception){
-            throw new CustomException(ErrorCode.SYSTEM_CONNECTION_ERROR);
         }
     }
 
@@ -92,16 +86,16 @@ public class CommentService {
      * @param commentId 댓글pk
      * @return commentDeleteResult 0(댓글 삭제 실패), 1(댓글 삭제 성공)
      * @throws EntityNotFoundException 해당 댓글이 존재하지 않을때
-     * @throws  Exception 예기치 못한 시스템 에러
      */
     @Transactional
     public long setCommentDelete(Long memberId, Long commentId){
         try{
-            // 댓글의 작성자가 맞는지
-            Comment selectComment = commentRepository.findCommentByMemberId(memberId, commentId)
+
+            // 댓글이 있는지
+            Comment selectComment = commentRepository.findCommentByMemberId(commentId)
                                     .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
             long commentAuthorId = selectComment.getMember().getMemberId();
-            // 댓글의 작성자가 맞다면
+            // 해당 댓글의 작성자가 맞다면
             if(commentAuthorId == memberId){
                 long commentDeleteResult = commentRepository.commentDelete(commentId);
                 return commentDeleteResult;
@@ -112,8 +106,6 @@ public class CommentService {
 
         } catch (EntityNotFoundException entityNotFoundException) {
             throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
-        } catch (Exception exception){
-            throw new CustomException(ErrorCode.SYSTEM_CONNECTION_ERROR);
         }
     }
 
@@ -124,12 +116,11 @@ public class CommentService {
      *                             replyCommentCount(댓글의 답글 총 수), replies(댓글의 답글 목록)
      * @throws IllegalArgumentException 객체 필드와 select하는 컬럼명이 매핑이 안됐을 때
      * @throws NullPointerException select하는 값이 비어있을 때
-     * @throws Exception 예기치 못한 시스템 에러
      */
     public List<ResCommentDTO.ResCommentDetailDTO> getCommentList(Long shareDoyakId){
         try {
 
-            List<ResCommentDTO.ResCommentDetailDTO> resReplyCommentDTOS = commentRepository.findeCommentAll(shareDoyakId)
+            List<ResCommentDTO.ResCommentDetailDTO> resReplyCommentDTOS = commentRepository.findCommentAll(shareDoyakId)
                                                                           .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_LIST_NOT_FOUND));
             return resReplyCommentDTOS;
 
@@ -137,8 +128,6 @@ public class CommentService {
             throw new CustomException(ErrorCode.SYNTAX_INVALID_FIELD);
         } catch (NullPointerException nullPointerException){
             throw new CustomException(ErrorCode.EMPTY_VALUE);
-        } catch (Exception exception){
-            throw new CustomException(ErrorCode.SYSTEM_CONNECTION_ERROR);
         }
     }
 
@@ -148,7 +137,6 @@ public class CommentService {
      * @param shareDoyakId 서로도약pk
      * @param reqCommentDTO parentCommentId(댓글의 답글(대댓글) 부모pk), commentContent(댓글 내용)
      * @throws DataIntegrityViolationException 잘못 입력된 데이터가 왔을때
-     * @throws Exception 예기치 못한 시스템 에러
      */
     @Transactional
     public void setCommentAdd(Long memberId, Long shareDoyakId, ReqCommentDTO reqCommentDTO){
@@ -164,7 +152,7 @@ public class CommentService {
 
             // 서로도약 select
             ShareDoyak selectShareDoyak = shareDoyakRepository.findShareDoyakByShareDoyakId(shareDoyakId)
-                                          .orElseThrow(() -> new CustomException(ErrorCode.SHARE_DOYAK_LIST_NOT_FOUND));
+                                          .orElseThrow(() -> new CustomException(ErrorCode.SHARE_DOYAK_NOT_FOUND));
 
             // 가입한 회원이고 게시글이 있다면
             if(selectMember.getMemberId() != null && selectShareDoyak.getShareDoyakId() != null){
@@ -216,9 +204,7 @@ public class CommentService {
             }
 
         } catch (DataIntegrityViolationException dataIntegrityViolationException){
-            throw new CustomException(ErrorCode.LETTER_INVALID_INPUT);
-        } catch (Exception exception){
-            throw new CustomException(ErrorCode.SYSTEM_CONNECTION_ERROR);
+            throw new CustomException(ErrorCode.INVALID_INPUT);
         }
 
     }

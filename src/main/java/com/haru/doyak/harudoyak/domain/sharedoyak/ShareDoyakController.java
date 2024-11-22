@@ -25,7 +25,7 @@ public class ShareDoyakController {
     @DeleteMapping("{memberId}/{shareDoyakId}")
     public ResponseEntity<String> setShareDoyakDelete(@PathVariable("memberId") Long memberId, @PathVariable("shareDoyakId") Long shareDoyakId) {
         long shareDoyakDeleteResult = shareDoyakService.setShareDoyakDelete(memberId, shareDoyakId);
-        if(shareDoyakDeleteResult == 1) {
+        if(shareDoyakDeleteResult >= 1) {
             return ResponseEntity.ok("서로도약 삭제가 완료되었습니다.");
         }
         return ResponseEntity.notFound().build();

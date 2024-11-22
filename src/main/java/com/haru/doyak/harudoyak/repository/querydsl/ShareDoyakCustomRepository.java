@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface ShareDoyakCustomRepository {
 
-    List<ResShareDoyakDTO.ResMemberShareDoyakDYO> findMemberShareDoyakAll(Long memberId);
+    Optional<List<ResShareDoyakDTO.ResMemberShareDoyakDYO>> findMemberShareDoyakAll(Long memberId);
 
     long shareDoyakDelete(Long memberId, Long shareDoyakId);
 

@@ -41,7 +41,6 @@ public class LogService {
      * @throws ParseException String -> Date 타입 변환이 실패 했을 때
      * @throws IllegalArgumentException 객체 필드와 select하는 컬럼명이 매핑이 안됐을 때
      * @throws NullPointerException select하는 값이 비어있을 때
-     * @throws Exception 예기치 못한 시스템 에러
      */
     public ResLogDTO.ResMonthlyLogDTO getMontlyLogDetail(Long memberId, String creationDate) {
 
@@ -73,8 +72,6 @@ public class LogService {
             throw new CustomException(ErrorCode.SYNTAX_INVALID_FIELD);
         } catch (NullPointerException nullPointerException){
             throw new CustomException(ErrorCode.EMPTY_VALUE);
-        } catch (Exception exception){
-            throw new CustomException(ErrorCode.SYSTEM_CONNECTION_ERROR);
         }
     }
 
@@ -87,7 +84,6 @@ public class LogService {
      * @throws ParseException String -> Date 타입 변환이 실패 했을 때
      * @throws IllegalArgumentException 객체 필드와 select하는 컬럼명이 매핑이 안됐을 때
      * @throws NullPointerException select하는 값이 비어있을 때
-     * @throws Exception 예기치 못한 시스템 에러
      */
     @Transactional
     public ResLogDTO.ResWeeklyLogDTO getWeeklyLogDetail(Long memberId, String creationDate) {
@@ -120,8 +116,6 @@ public class LogService {
             throw new CustomException(ErrorCode.SYNTAX_INVALID_FIELD);
         } catch (NullPointerException nullPointerException){
             throw new CustomException(ErrorCode.EMPTY_VALUE);
-        } catch (Exception exception){
-            throw new CustomException(ErrorCode.SYSTEM_CONNECTION_ERROR);
         }
 
     }
@@ -134,21 +128,18 @@ public class LogService {
      *                         tagNameList(태그들), letterContent(AI 피드백 내용), letterCreationDate(도약기록 작성일자)
      * @throws IllegalArgumentException 객체 필드와 select하는 컬럼명이 매핑이 안됐을 때
      * @throws NullPointerException select하는 값이 비어있을 때
-     * @throws Exception 예기치 못한 시스템 에러
      */
     public List<ResLogDTO.ResDailyLogDTO> getDailyLogDetail(Long memberId, Long logId) {
         try {
 
             List<ResLogDTO.ResDailyLogDTO> resDailyLogDTOS = logRepository.findLogByLogIdAndMemberId(memberId, logId)
-                                                             .orElseThrow(() -> new CustomException(ErrorCode.LOG_LIST_NOT_FOUND));
+                                                             .orElseThrow(() -> new CustomException(ErrorCode.LOG_NOT_FOUND));
             return resDailyLogDTOS;
 
         } catch (IllegalArgumentException illegalArgumentException){
             throw new CustomException(ErrorCode.SYNTAX_INVALID_FIELD);
         } catch (NullPointerException nullPointerException){
             throw new CustomException(ErrorCode.EMPTY_VALUE);
-        } catch (Exception exception){
-            throw new CustomException(ErrorCode.SYSTEM_CONNECTION_ERROR);
         }
     }
 
@@ -158,7 +149,6 @@ public class LogService {
      * @param LogId 도약기록pk
      * @param reqLetterDTO letterContent(AI 피드백 내용)
      * @throws DataIntegrityViolationException 잘못 입력된 데이터가 왔을때
-     * @throws Exception 예기치 못한 시스템 에러
      */
     @Transactional
     public void setLetterAdd(Long memberId, Long LogId, ReqLetterDTO reqLetterDTO) {
@@ -169,7 +159,7 @@ public class LogService {
             Member selectMember = memberRepository.findMemberByMemberId(memberId).orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
             // 도약 기록 존재 여부
-            Log selectLog = logRepository.findLogByLogId(LogId).orElseThrow();
+            Log selectLog = logRepository.findLogByLogId(LogId).orElseThrow(() -> new CustomException(ErrorCode.LOG_NOT_FOUND));
 
             // 회원과 도약기록이 존재한다면
             if(selectMember.getMemberId() != null && selectLog.getLogId() != null) {
@@ -185,9 +175,7 @@ public class LogService {
             }
 
         } catch (DataIntegrityViolationException dataIntegrityViolationException){
-            throw new CustomException(ErrorCode.LETTER_INVALID_INPUT);
-        } catch (Exception exception){
-            throw new CustomException(ErrorCode.SYSTEM_CONNECTION_ERROR);
+            throw new CustomException(ErrorCode.INVALID_INPUT);
         }
 
     }
@@ -197,21 +185,21 @@ public class LogService {
      * @param memberId 회원pk
      * @return resLogDTOS logId(도약기록pk), creationDate(도약기록 작성일자)을 반환
      * @throws IllegalArgumentException 객체 필드와 select하는 컬럼명이 매핑이 안됐을 때
-     * @throws NullPointerException select하는 값이 비어있을 때 
-     * @throws Exception 예기치 못한 시스템 에러
+     * @throws NullPointerException select하는 값이 비어있을 때
      */
     public List<ResLogDTO> getLogList(Long memberId){
         try {
 
-            List<ResLogDTO> resLogDTOS = logRepository.findLogAllByMemberId(memberId).orElseThrow(() -> new CustomException(ErrorCode.LOG_LIST_NOT_FOUND));
+            // 회원 존재 여부
+            Member selectMember = memberRepository.findMemberByMemberId(memberId).orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+            List<ResLogDTO> resLogDTOS = logRepository.findLogAllByMemberId(selectMember.getMemberId()).orElseThrow(() -> new CustomException(ErrorCode.LOG_LIST_NOT_FOUND));
             return resLogDTOS;
 
         } catch (IllegalArgumentException illegalArgumentException){
             throw new CustomException(ErrorCode.SYNTAX_INVALID_FIELD);
         } catch (NullPointerException nullPointerException){
             throw new CustomException(ErrorCode.EMPTY_VALUE);
-        } catch (Exception exception){
-            throw new CustomException(ErrorCode.SYSTEM_CONNECTION_ERROR);
         }
     }
 
@@ -221,7 +209,6 @@ public class LogService {
      * @param reqLogDTO logContent(도약기록 내용), tagNameList(도약기록 태그 목록), emotion(오늘의 감정), logImageUrl(이미지 파일url)
      * @return resLogAddDTO logId(도약기록pk), memberId(회원pk), logContent(작성 성공 메세지)를 반환
      * @throws DataIntegrityViolationException 잘못 입력된 데이터가 왔을때
-     * @throws Exception 예기치 못한 시스템 에러
      */
     @Transactional
     public ResLogDTO.ResLogAddDTO setLogAdd(Long memberId, ReqLogDTO reqLogDTO) {
@@ -312,9 +299,7 @@ public class LogService {
             }
 
         } catch (DataIntegrityViolationException dataIntegrityViolationException){
-            throw new CustomException(ErrorCode.LOG_INVALID_INPUT);
-        } catch (Exception exception){
-            throw new CustomException(ErrorCode.SYSTEM_CONNECTION_ERROR);
+            throw new CustomException(ErrorCode.INVALID_INPUT);
         }
     }
 
