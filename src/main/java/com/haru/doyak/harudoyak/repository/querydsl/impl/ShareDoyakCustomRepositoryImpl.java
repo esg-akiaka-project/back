@@ -93,7 +93,7 @@ public class ShareDoyakCustomRepositoryImpl implements ShareDoyakCustomRepositor
                                 shareDoyak.content.as("shareContent"),
                                 file.filePathName.as("shareImageUrl"),
                                 comment.commentId.countDistinct().as("commentCount"),
-                                doyak.shareDoyak.shareDoyakId.countDistinct().as("doyakCount")
+                                doyak.member.memberId.countDistinct().as("doyakCount")
                         )
                 )
                 .from(shareDoyak)
