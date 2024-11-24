@@ -185,7 +185,7 @@ public class CommentService {
                 Comment parent = commentRepository.findCommentByCommentId(reply.getParentCommentId()).orElseThrow();
                 SseDataDTO sseDataDTO = SseDataDTO.builder()
                         .sender(reply.getMember().getNickname())
-                        .content(reply.getContent().substring(0, Math.min(15, reply.getContent().length())).concat("..."))
+                        .content(reply.getContent().substring(0, Math.min(30, reply.getContent().length())).concat("..."))
                         .postTitle(selectShareDoyak.getTitle())
                         .shareDoyakId(parent.getShareDoyak().getShareDoyakId())
                 .build();
@@ -205,8 +205,9 @@ public class CommentService {
 
                     // 게시글 작성자에게 댓글 알림 전송
                     SseDataDTO sseDataDTO = SseDataDTO.builder()
+                            .postTitle(selectShareDoyak.getTitle())
                             .sender(selectShareDoyak.getMember().getNickname())
-                            .content(comment.getContent().substring(0, Math.min(15, comment.getContent().length())).concat("..."))
+                            .content(comment.getContent().substring(0, Math.min(30, comment.getContent().length())).concat("..."))
                             .shareDoyakId(comment.getShareDoyak().getShareDoyakId())
                             .build();
                     notificationService.customNotify(selectShareDoyak.getMember().getMemberId(), sseDataDTO, "서로도약 댓글 알림", SseEventName.POST_COMMENT);

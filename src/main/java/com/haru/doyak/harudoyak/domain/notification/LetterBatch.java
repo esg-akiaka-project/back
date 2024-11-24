@@ -57,7 +57,7 @@ public class LetterBatch {
             Long memberId = tuple.get(member.memberId);
             String sender = tuple.get(member.aiNickname);
             String content = tuple.get(letter.content)
-                    .substring(0, Math.min( tuple.get(letter.content).length(), 20)).concat("...");
+                    .substring(0, Math.min( tuple.get(letter.content).length(), 50)).concat("...");
             Long logId = tuple.get(log.logId);
 
             SseDataDTO sseDataDTO = SseDataDTO.builder()
