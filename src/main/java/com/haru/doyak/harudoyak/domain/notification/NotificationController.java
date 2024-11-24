@@ -1,8 +1,10 @@
 package com.haru.doyak.harudoyak.domain.notification;
 
+import com.haru.doyak.harudoyak.annotation.Authenticated;
 import com.haru.doyak.harudoyak.entity.Notification;
 import com.haru.doyak.harudoyak.exception.CustomException;
 import com.haru.doyak.harudoyak.exception.ErrorCode;
+import com.haru.doyak.harudoyak.security.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.data.repository.query.Param;
@@ -21,8 +23,9 @@ public class NotificationController {
     private final LetterBatch letterBatch;
 
     @GetMapping(value = "subscribe/{memberId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribe(@PathVariable(value = "memberId") Long memberId) {
-        return notificationService.subscribe(memberId);
+    public SseEmitter subscribe(@Authenticated AuthenticatedUser authenticatedUser,
+                                @PathVariable(value = "memberId") Long memberId) {
+        return notificationService.subscribe(authenticatedUser.getMemberId());
     }
 
     @PostMapping("add")
@@ -37,14 +40,15 @@ public class NotificationController {
      * @return 알림 리스트
      */
     @GetMapping("{memberId}/list")
-    public ResponseEntity getList(@PathVariable("memberId") Long memberId,
+    public ResponseEntity getList(@Authenticated AuthenticatedUser authenticatedUser,
+                                  @PathVariable("memberId") Long memberId,
                                   @RequestParam("category") String category)
     {
         if(category.equals("log")) {
-            return ResponseEntity.ok().body(notificationService.getLogNotifications(memberId, category));
+            return ResponseEntity.ok().body(notificationService.getLogNotifications(authenticatedUser.getMemberId(), category));
         }
         if(category.equals("post")){
-            return ResponseEntity.ok().body(notificationService.getLogNotifications(memberId, category));
+            return ResponseEntity.ok().body(notificationService.getLogNotifications(authenticatedUser.getMemberId(), category));
         }
         else throw new CustomException(ErrorCode.BAD_CATEGORY_NAME);
     }

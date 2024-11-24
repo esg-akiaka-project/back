@@ -1,7 +1,9 @@
 package com.haru.doyak.harudoyak.domain.comment;
 
+import com.haru.doyak.harudoyak.annotation.Authenticated;
 import com.haru.doyak.harudoyak.dto.comment.ReqCommentDTO;
 import com.haru.doyak.harudoyak.dto.comment.ResCommentDTO;
+import com.haru.doyak.harudoyak.security.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +23,8 @@ public class CommentController {
      * @return commentDeleteResult 0(댓글 삭제 실패), 1(댓글 삭제 성공)
      */
     @PutMapping("{memberId}/{commentId}")
-    public ResponseEntity<String> setCommentUpdate(@PathVariable("memberId") Long memberId, @PathVariable("commentId") Long commentId, @RequestBody ReqCommentDTO reqCommentDTO) {
-        long commentUpdateResult = commentService.setCommentUpdate(memberId, commentId, reqCommentDTO);
+    public ResponseEntity<String> setCommentUpdate(@Authenticated AuthenticatedUser authenticatedUser, @PathVariable("memberId") Long memberId, @PathVariable("commentId") Long commentId, @RequestBody ReqCommentDTO reqCommentDTO) {
+        long commentUpdateResult = commentService.setCommentUpdate(authenticatedUser.getMemberId(), commentId, reqCommentDTO);
         if(commentUpdateResult == 1) {
             return ResponseEntity.ok("댓글 수정이 완료되었습니다.");
         }
@@ -36,8 +38,8 @@ public class CommentController {
      * @return commentDeleteResult 0(댓글 삭제 실패), 1(댓글 삭제 성공)
      */
     @DeleteMapping("{memberId}/{commentId}")
-    public ResponseEntity<String> setCommentDelete(@PathVariable("memberId") Long memberId, @PathVariable("commentId") Long commentId){
-        long commentDeleteResult = commentService.setCommentDelete(memberId, commentId);
+    public ResponseEntity<String> setCommentDelete(@Authenticated AuthenticatedUser authenticatedUser, @PathVariable("memberId") Long memberId, @PathVariable("commentId") Long commentId){
+        long commentDeleteResult = commentService.setCommentDelete(authenticatedUser.getMemberId(), commentId);
         if(commentDeleteResult == 1){
             return ResponseEntity.ok("댓글 삭제가 완료되었습니다.");
         }
@@ -63,10 +65,10 @@ public class CommentController {
      * @param reqCommentDTO parentCommentId(댓글의 답글(대댓글) 부모pk), commentContent(댓글 내용)
      */
     @PostMapping("replys/{memberId}/{shareDoyakId}/{commentId}")
-    public ResponseEntity<String> setCommentChildAdd(@PathVariable("memberId") Long memberId, @PathVariable("shareDoyakId") Long shareDoyakId, @PathVariable("commentId") Long commentId, @RequestBody ReqCommentDTO reqCommentDTO) {
+    public ResponseEntity<String> setCommentChildAdd(@Authenticated AuthenticatedUser authenticatedUser, @PathVariable("memberId") Long memberId, @PathVariable("shareDoyakId") Long shareDoyakId, @PathVariable("commentId") Long commentId, @RequestBody ReqCommentDTO reqCommentDTO) {
         if(commentId != null){
             reqCommentDTO.setParentCommentId(commentId);
-            commentService.setCommentAdd(memberId,shareDoyakId, reqCommentDTO);
+            commentService.setCommentAdd(authenticatedUser.getMemberId(), shareDoyakId, reqCommentDTO);
             return ResponseEntity.ok("대댓글 작성을 완료했습니다.");
         }
         return ResponseEntity.notFound().build();
@@ -79,8 +81,8 @@ public class CommentController {
      * @param reqCommentDTO commentContent(댓글 내용)
      */
     @PostMapping("{memberId}/{shareDoyakId}")
-    public ResponseEntity<String> setCommentAdd(@PathVariable("memberId") Long memberId, @PathVariable("shareDoyakId") Long shareDoyakId, @RequestBody ReqCommentDTO reqCommentDTO) {
-        commentService.setCommentAdd(memberId, shareDoyakId, reqCommentDTO);
+    public ResponseEntity<String> setCommentAdd(@Authenticated AuthenticatedUser authenticatedUser, @PathVariable("memberId") Long memberId, @PathVariable("shareDoyakId") Long shareDoyakId, @RequestBody ReqCommentDTO reqCommentDTO) {
+        commentService.setCommentAdd(authenticatedUser.getMemberId(), shareDoyakId, reqCommentDTO);
         return ResponseEntity.ok("댓글 작성을 완료했습니다.");
     }
 
