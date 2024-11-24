@@ -5,6 +5,7 @@ import com.haru.doyak.harudoyak.domain.sharedoyak.ShareDoyakService;
 import com.haru.doyak.harudoyak.dto.member.ChangeMemberInfoReqDTO;
 import com.haru.doyak.harudoyak.dto.comment.ResCommentDTO;
 import com.haru.doyak.harudoyak.dto.member.MemberResDTO;
+import com.haru.doyak.harudoyak.dto.member.MypageResDTO;
 import com.haru.doyak.harudoyak.dto.sharedoyak.ResShareDoyakDTO;
 import com.haru.doyak.harudoyak.exception.CustomException;
 import com.haru.doyak.harudoyak.exception.ErrorCode;
@@ -108,6 +109,12 @@ public class MemberController {
         if(dto.getPhotoUrl()==null) throw new CustomException(ErrorCode.NULL_VALUE);
         MemberResDTO res = memberService.changeProfilePhoto(memberId, dto.getPhotoUrl());
         return ResponseEntity.ok().body(res);
+    }
+
+    @GetMapping("{memberId}/mypage")
+    public ResponseEntity getMypage(@PathVariable("memberId") Long memberId){
+        MypageResDTO dto = memberService.getMypageInfo(memberId);
+        return ResponseEntity.ok().body(dto);
     }
 
 }
