@@ -55,6 +55,6 @@ public class Level {
     public void updateWhenPostShareDoyak() {
         // share count+1, 포인트
         this.shareDoyakCount += 1;
-        this.point += 5;
+        this.point += 1;
     }
 }
