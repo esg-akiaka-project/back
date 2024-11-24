@@ -206,7 +206,7 @@ public class CommentService {
                     // 게시글 작성자에게 댓글 알림 전송
                     SseDataDTO sseDataDTO = SseDataDTO.builder()
                             .postTitle(selectShareDoyak.getTitle())
-                            .sender(selectShareDoyak.getMember().getNickname())
+                            .sender(comment.getMember().getNickname())
                             .content(comment.getContent().substring(0, Math.min(30, comment.getContent().length())).concat("..."))
                             .shareDoyakId(comment.getShareDoyak().getShareDoyakId())
                             .build();
