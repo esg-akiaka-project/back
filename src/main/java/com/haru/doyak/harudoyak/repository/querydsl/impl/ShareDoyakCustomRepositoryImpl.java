@@ -27,7 +27,7 @@ public class ShareDoyakCustomRepositoryImpl implements ShareDoyakCustomRepositor
     * 회원 서로도약 목록 select
     * */
     @Override
-    public List<ResShareDoyakDTO.ResMemberShareDoyakDYO> findMemberShareDoyakAll(Long memberId){
+    public Optional<List<ResShareDoyakDTO.ResMemberShareDoyakDYO>> findMemberShareDoyakAll(Long memberId){
         List<ResShareDoyakDTO.ResMemberShareDoyakDYO> resMemberShareDoyakDYOS = jpaQueryFactory
                 .select(Projections.bean(
                         ResShareDoyakDTO.ResMemberShareDoyakDYO.class,
@@ -38,7 +38,7 @@ public class ShareDoyakCustomRepositoryImpl implements ShareDoyakCustomRepositor
                 .leftJoin(member).on(shareDoyak.member.memberId.eq(member.memberId))
                 .where(shareDoyak.member.memberId.eq(memberId))
                 .fetch();
-        return resMemberShareDoyakDYOS;
+        return Optional.ofNullable(resMemberShareDoyakDYOS);
     }
 
     /*

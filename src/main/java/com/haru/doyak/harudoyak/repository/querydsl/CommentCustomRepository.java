@@ -16,9 +16,9 @@ public interface CommentCustomRepository {
 
     long commentContentUpdate(Long commentId, ReqCommentDTO reqCommentDTO);
 
-    Optional<Comment> findCommentByMemberId(Long memberId, Long commentId);
+    Optional<Comment> findCommentByMemberId(Long commentId);
 
-    Optional<List<ResCommentDTO.ResCommentDetailDTO>> findeCommentAll(Long shareDoyakId);
+    Optional<List<ResCommentDTO.ResCommentDetailDTO>> findCommentAll(Long shareDoyakId);
 
     Optional<Comment> findCommentByCommentId (Long commentId);
 
