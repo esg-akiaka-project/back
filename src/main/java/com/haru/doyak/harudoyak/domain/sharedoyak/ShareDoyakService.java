@@ -51,7 +51,7 @@ public class ShareDoyakService {
      */
     @Transactional
     public long setShareDoyakDelete(Long memberId, Long shareDoyakId) {
-        try {
+//        try {
 
             ShareDoyak selectShareDoyak = shareDoyakRepository.findShaereDoyakByMemeberId(memberId, shareDoyakId)
                     .orElseThrow(() -> new CustomException(ErrorCode.SHARE_DOYAK_NOT_FOUND));
@@ -80,9 +80,9 @@ public class ShareDoyakService {
                 // 서로도약 글의 작성자가 아니라면
                 throw new CustomException(ErrorCode.SHARE_DOYAK_NOT_AUTHOR);
             }
-        } catch (EntityNotFoundException entityNotFoundException) {
-            throw new CustomException(ErrorCode.SHARE_DOYAK_NOT_FOUND);
-        }
+//        } catch (EntityNotFoundException entityNotFoundException) {
+//            throw new CustomException(ErrorCode.SHARE_DOYAK_NOT_FOUND);
+//        }
     }
 
     /**
