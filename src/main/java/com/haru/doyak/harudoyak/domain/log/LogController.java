@@ -28,8 +28,6 @@ public class LogController {
      */
     @GetMapping("monthly/{memberId}/{creationDate}")
     public ResponseEntity<ResLogDTO.ResMonthlyLogDTO> getMontlyLogDetail(@Authenticated AuthenticatedUser authenticatedUser, @PathVariable("memberId") Long memberId, @PathVariable("creationDate") String creationDate) {
-        log.info("월간 도약기록 조회 memberId {}", memberId);
-        log.info("월간 도약기록 조회 date야 넘어왔니? {}", creationDate);
         ResLogDTO.ResMonthlyLogDTO resMonthlyLogDTO = logService.getMontlyLogDetail(authenticatedUser.getMemberId(), creationDate);
         return ResponseEntity.ok(resMonthlyLogDTO);
     }
