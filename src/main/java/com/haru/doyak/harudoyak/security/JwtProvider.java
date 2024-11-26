@@ -100,7 +100,7 @@ public class JwtProvider {
         } catch (JwtException jwtException){
             throw new CustomException(ErrorCode.INVALID_TOKEN);
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.UNKNOWN_ERROR);
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 
         return claims;
