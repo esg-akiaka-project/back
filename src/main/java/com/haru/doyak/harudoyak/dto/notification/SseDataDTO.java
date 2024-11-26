@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Data
 public class SseDataDTO {
     private String sender;// 도약이는 도약이 이름, 사용자 닉네임
-    private String postTitle;// 게시글 타이틀
+    private String postContent;// 게시글 내용
     private Long shareDoyakId;// 이동
     private String startDate;// 이동 주간 월간 시작일
     private Long logId;// 이동 로그 조회 id
