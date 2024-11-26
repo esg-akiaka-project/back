@@ -178,7 +178,7 @@ public class CommentService {
                         .shareDoyakId(parent.getShareDoyak().getShareDoyakId())
                 .build();
                 notificationService.customNotify(parent.getMember().getMemberId(), sseDataDTO, "대댓글 알림", SseEventName.REPLY_COMMENT);
-            }
+                }
 
                 // 파라미터로 parentCommentId가 없다면
                 if(reqCommentDTO.getParentCommentId() == null){
