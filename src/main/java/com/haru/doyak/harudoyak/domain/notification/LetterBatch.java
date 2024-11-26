@@ -27,20 +27,6 @@ import java.util.Map;
 public class LetterBatch {
     private final LogRepository logRepository;
     private final NotificationService notificationService;
-    // 임시 편지 리스트
-    private final Map<Long, List<String>> userLetters = new HashMap<>();
-
-    public void addLetterForUser(Long memberId, String letterContent, String message) {
-        userLetters.computeIfAbsent(memberId, k -> new ArrayList<>()).add(letterContent);
-        notificationService.customNotify(memberId, userLetters.get(memberId),message, null);
-        notificationService.saveNotification(
-                memberId,
-                SseDataDTO.builder()
-                        .content("content")
-                        .sender("sender")
-                        .build(),
-                SseEventName.POST_COMMENT);
-    }
 
     // 매일 7am 실행 -> 하루도약작성일 다음 날이면 알림
 //    @Scheduled(cron = "0 * * * * *")
