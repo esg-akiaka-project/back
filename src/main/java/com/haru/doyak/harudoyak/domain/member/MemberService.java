@@ -1,10 +1,13 @@
 package com.haru.doyak.harudoyak.domain.member;
 
 import com.haru.doyak.harudoyak.dto.member.MemberResDTO;
+import com.haru.doyak.harudoyak.dto.member.MypageResDTO;
 import com.haru.doyak.harudoyak.entity.File;
+import com.haru.doyak.harudoyak.entity.Level;
 import com.haru.doyak.harudoyak.entity.Member;
 import static com.haru.doyak.harudoyak.entity.QFile.file;
 import static com.haru.doyak.harudoyak.entity.QMember.member;
+import static com.haru.doyak.harudoyak.entity.QLevel.level;
 
 import com.haru.doyak.harudoyak.exception.CustomException;
 import com.haru.doyak.harudoyak.exception.ErrorCode;
@@ -110,5 +113,15 @@ public class MemberService {
         if(optionalMember.isEmpty()) throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
         return optionalMember.get();
     }
-    
+
+    public MypageResDTO getMypageInfo(Long memberId) {
+        Tuple tuple = memberRepository.findMemberFileByMemberId(memberId).orElseThrow();
+        File getFile = tuple.get(file);
+        Level getLevel = tuple.get(level);
+
+        return MypageResDTO.builder()
+                .level(getLevel)
+                .file(getFile)
+                .build();
+    }
 }

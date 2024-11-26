@@ -107,7 +107,7 @@ public class OAuthService {
             // 레벨 생성하기
             Level level = Level.builder()
                     .memberId(member.getMemberId())
-                    .point(10L)// 가입시 10포인트
+                    .point(5L)// 가입시 5포인트
                     .build();
             levelRepository.save(level);
         }else {
@@ -147,7 +147,7 @@ public class OAuthService {
             // 레벨 생성하기
             Level level = Level.builder()
                     .memberId(member.getMemberId())
-                    .point(10L)// 가입시 10포인트
+                    .point(5L)// 가입시 5포인트
                     .build();
             levelRepository.save(level);
         }else {

@@ -1,8 +1,10 @@
 package com.haru.doyak.harudoyak.domain.log;
 
+import com.haru.doyak.harudoyak.annotation.Authenticated;
 import com.haru.doyak.harudoyak.dto.letter.ReqLetterDTO;
 import com.haru.doyak.harudoyak.dto.log.ReqLogDTO;
 import com.haru.doyak.harudoyak.dto.log.ResLogDTO;
+import com.haru.doyak.harudoyak.security.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +27,10 @@ public class LogController {
      *                          aiFeedbacks(주간 AI 피드백 횟수)
      */
     @GetMapping("monthly/{memberId}/{creationDate}")
-    public ResponseEntity<ResLogDTO.ResMonthlyLogDTO> getMontlyLogDetail(@PathVariable("memberId") Long memberId, @PathVariable("creationDate") String creationDate) {
+    public ResponseEntity<ResLogDTO.ResMonthlyLogDTO> getMontlyLogDetail(@Authenticated AuthenticatedUser authenticatedUser, @PathVariable("memberId") Long memberId, @PathVariable("creationDate") String creationDate) {
         log.info("월간 도약기록 조회 memberId {}", memberId);
         log.info("월간 도약기록 조회 date야 넘어왔니? {}", creationDate);
-        ResLogDTO.ResMonthlyLogDTO resMonthlyLogDTO = logService.getMontlyLogDetail(memberId, creationDate);
+        ResLogDTO.ResMonthlyLogDTO resMonthlyLogDTO = logService.getMontlyLogDetail(authenticatedUser.getMemberId(), creationDate);
         return ResponseEntity.ok(resMonthlyLogDTO);
     }
 
@@ -40,8 +42,8 @@ public class LogController {
      *                         aiFeedbacks(주간 AI 피드백 내용 목록)
      */
     @GetMapping("weekly/{memberId}/{creationDate}")
-    public ResponseEntity<ResLogDTO.ResWeeklyLogDTO> getWeeklyLogDetail(@PathVariable("memberId") Long memberId, @PathVariable("creationDate") String creationDate) {
-        ResLogDTO.ResWeeklyLogDTO resWeeklyLogDTOS = logService.getWeeklyLogDetail(memberId, creationDate);
+    public ResponseEntity<ResLogDTO.ResWeeklyLogDTO> getWeeklyLogDetail(@Authenticated AuthenticatedUser authenticatedUser, @PathVariable("memberId") Long memberId, @PathVariable("creationDate") String creationDate) {
+        ResLogDTO.ResWeeklyLogDTO resWeeklyLogDTOS = logService.getWeeklyLogDetail(authenticatedUser.getMemberId(), creationDate);
         return ResponseEntity.ok(resWeeklyLogDTOS);
     }
 
@@ -53,8 +55,8 @@ public class LogController {
      *                         tagNameList(태그들), letterContent(AI 피드백 내용), letterCreationDate(도약기록 작성일자)
      */
     @GetMapping("daily/{memberId}/{logId}")
-    public ResponseEntity<List<ResLogDTO.ResDailyLogDTO>> getDailyLogDetail(@PathVariable("memberId") Long memberId, @PathVariable("logId") Long logId) {
-        List<ResLogDTO.ResDailyLogDTO> resDailyLogDTOS = logService.getDailyLogDetail(memberId, logId);
+    public ResponseEntity<List<ResLogDTO.ResDailyLogDTO>> getDailyLogDetail(@Authenticated AuthenticatedUser authenticatedUser, @PathVariable("memberId") Long memberId, @PathVariable("logId") Long logId) {
+        List<ResLogDTO.ResDailyLogDTO> resDailyLogDTOS = logService.getDailyLogDetail(authenticatedUser.getMemberId(), logId);
         return ResponseEntity.ok(resDailyLogDTOS);
     }
 
@@ -66,8 +68,8 @@ public class LogController {
      * @return body 작성 완료 메세지
      */
     @PostMapping("letters/{memberId}/{logId}")
-    public ResponseEntity<String> setLetterAdd(@PathVariable("memberId") Long memberId, @PathVariable("logId") Long LogId,@RequestBody ReqLetterDTO reqLetterDTO) {
-        logService.setLetterAdd(memberId, LogId, reqLetterDTO);
+    public ResponseEntity<String> setLetterAdd(@Authenticated AuthenticatedUser authenticatedUser, @PathVariable("memberId") Long memberId, @PathVariable("logId") Long LogId,@RequestBody ReqLetterDTO reqLetterDTO) {
+        logService.setLetterAdd(authenticatedUser.getMemberId(), LogId, reqLetterDTO);
         return ResponseEntity.ok("작성이 완료되었습니다.");
     }
 
@@ -77,8 +79,8 @@ public class LogController {
      * @return resLogDTOS logId(도약기록pk), creationDate(도약기록 작성일자)을 반환
      */
     @GetMapping("list/{memberId}")
-    public ResponseEntity<List<ResLogDTO>> getLogList(@PathVariable("memberId") Long memberId){
-        List<ResLogDTO> resLogDTOS = logService.getLogList(memberId);
+    public ResponseEntity<List<ResLogDTO>> getLogList(@Authenticated AuthenticatedUser authenticatedUser, @PathVariable("memberId") Long memberId){
+        List<ResLogDTO> resLogDTOS = logService.getLogList(authenticatedUser.getMemberId());
         return ResponseEntity.ok().body(resLogDTOS);
     }
 
@@ -89,8 +91,8 @@ public class LogController {
      * @return resLogAddDTO logId(도약기록pk), memberId(회원pk), logContent(작성 성공 메세지)를 반환
      */
     @PostMapping("{memberId}")
-    public ResponseEntity<ResLogDTO.ResLogAddDTO> setLogAdd(@PathVariable("memberId") Long memberId, @RequestBody ReqLogDTO reqLogDTO) {
-        ResLogDTO.ResLogAddDTO resLogAddDTO = logService.setLogAdd(memberId, reqLogDTO);
+    public ResponseEntity<ResLogDTO.ResLogAddDTO> setLogAdd(@Authenticated AuthenticatedUser authenticatedUser, @PathVariable("memberId") Long memberId, @RequestBody ReqLogDTO reqLogDTO) {
+        ResLogDTO.ResLogAddDTO resLogAddDTO = logService.setLogAdd(authenticatedUser.getMemberId(), reqLogDTO);
         return ResponseEntity.ok().body(resLogAddDTO);
     }
 

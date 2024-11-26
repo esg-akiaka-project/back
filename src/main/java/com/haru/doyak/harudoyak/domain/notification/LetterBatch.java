@@ -57,7 +57,7 @@ public class LetterBatch {
             Long memberId = tuple.get(member.memberId);
             String sender = tuple.get(member.aiNickname);
             String content = tuple.get(letter.content)
-                    .substring(0, Math.min( tuple.get(letter.content).length(), 20)).concat("...");
+                    .substring(0, Math.min( tuple.get(letter.content).length(), 50)).concat("...");
             Long logId = tuple.get(log.logId);
 
             SseDataDTO sseDataDTO = SseDataDTO.builder()
@@ -79,7 +79,7 @@ public class LetterBatch {
     @Scheduled(cron = "0 0 7 * * MON")
     public void sendWeekFeedback() {
         LocalDate today = LocalDate.now();
-        LocalDate startOfThisWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+        LocalDate startOfThisWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate startOfLastWeek = startOfThisWeek.minusWeeks(1);
         LocalDate endOfLastWeek = startOfThisWeek.minusDays(1);
 
@@ -87,7 +87,7 @@ public class LetterBatch {
         LocalDateTime endDateTime = setLastTime(endOfLastWeek);
 
         // 저번주 도약기록 작성한 유저만 뽑기
-        List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, setLastTime(today));
+        List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, endDateTime);
         for(Tuple tuple : tuples) {
             Long memberId = tuple.get(member.memberId);
             Long count = tuple.get(log.member.memberId.count());
@@ -119,7 +119,7 @@ public class LetterBatch {
         LocalDateTime endDateTime = setLastTime(endOfLastMonth);
 
         // 저번달 도약기록 작성한 유저 뽑기
-        List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, setLastTime(today));
+        List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, endDateTime);
         for(Tuple tuple : tuples) {
             Long memberId = tuple.get(member.memberId);
             Long count = tuple.get(log.member.memberId.count());

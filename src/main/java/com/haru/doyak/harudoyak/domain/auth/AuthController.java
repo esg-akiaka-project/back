@@ -92,11 +92,12 @@ public class AuthController {
     }
 
     @PostMapping("logout/{memberId}")
-    public ResponseEntity logout(@PathVariable("memberId") Long memberId,
+    public ResponseEntity logout(@Authenticated AuthenticatedUser authenticatedUser,
+                                 @PathVariable("memberId") Long memberId,
                                  @RequestBody JwtReqDTO jwtReqDTO)
     {
         if(jwtReqDTO.getRefreshToken()==null) throw new CustomException(ErrorCode.NULL_VALUE);
-        if(authService.logout(memberId, jwtReqDTO.getRefreshToken())) return ResponseEntity.ok().body("로그아웃이 완료되었습니다.");
+        if(authService.logout(authenticatedUser.getMemberId(), jwtReqDTO.getRefreshToken())) return ResponseEntity.ok().body("로그아웃이 완료되었습니다.");
         throw new CustomException(ErrorCode.INVALID_TOKEN);
     }
 }

@@ -1,6 +1,8 @@
 package com.haru.doyak.harudoyak.domain.sharedoyak;
 
+import com.haru.doyak.harudoyak.annotation.Authenticated;
 import com.haru.doyak.harudoyak.dto.sharedoyak.*;
+import com.haru.doyak.harudoyak.security.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +25,8 @@ public class ShareDoyakController {
     * @param : memberId(Long), shareDoyakId(Long)
     * */
     @DeleteMapping("{memberId}/{shareDoyakId}")
-    public ResponseEntity<String> setShareDoyakDelete(@PathVariable("memberId") Long memberId, @PathVariable("shareDoyakId") Long shareDoyakId) {
-        long shareDoyakDeleteResult = shareDoyakService.setShareDoyakDelete(memberId, shareDoyakId);
+    public ResponseEntity<String> setShareDoyakDelete(@Authenticated AuthenticatedUser authenticatedUser, @PathVariable("memberId") Long memberId, @PathVariable("shareDoyakId") Long shareDoyakId) {
+        long shareDoyakDeleteResult = shareDoyakService.setShareDoyakDelete(authenticatedUser.getMemberId(), shareDoyakId);
         if(shareDoyakDeleteResult >= 1) {
             return ResponseEntity.ok("서로도약 삭제가 완료되었습니다.");
         }
@@ -37,8 +39,8 @@ public class ShareDoyakController {
      * @return :
      * */
     @PutMapping("{memberId}/{shareDoyakId}")
-    public ResponseEntity<String> setShareDoyakUpdate(@PathVariable("memberId") Long memberId, @PathVariable("shareDoyakId") Long shareDoyakId,@RequestBody ReqShareDoyakDTO reqShareDoyakDTO){
-        long shareDoyakUpdateResult = shareDoyakService.setShareDoyakUpdate(memberId, shareDoyakId, reqShareDoyakDTO);
+    public ResponseEntity<String> setShareDoyakUpdate(@Authenticated AuthenticatedUser authenticatedUser, @PathVariable("memberId") Long memberId, @PathVariable("shareDoyakId") Long shareDoyakId,@RequestBody ReqShareDoyakDTO reqShareDoyakDTO){
+        long shareDoyakUpdateResult = shareDoyakService.setShareDoyakUpdate(authenticatedUser.getMemberId(), shareDoyakId, reqShareDoyakDTO);
         if(shareDoyakUpdateResult == 1){
             return ResponseEntity.ok("서로도약 게시글 수정이 완료되었습니다.");
         }
@@ -62,8 +64,8 @@ public class ShareDoyakController {
     * res : doyakCount(Long)
      * */
     @PostMapping("doyak/{memberId}/{shareDoyakId}")
-    public ResponseEntity<ResDoyakDTO> setDoyakAdd(@PathVariable("memberId") Long memberId, @PathVariable("shareDoyakId") Long shareDoyakId) {
-        ResDoyakDTO resDoyakDTO = shareDoyakService.setDoyakAdd(memberId, shareDoyakId);
+    public ResponseEntity<ResDoyakDTO> setDoyakAdd(@Authenticated AuthenticatedUser authenticatedUser, @PathVariable("memberId") Long memberId, @PathVariable("shareDoyakId") Long shareDoyakId) {
+        ResDoyakDTO resDoyakDTO = shareDoyakService.setDoyakAdd(authenticatedUser.getMemberId(), shareDoyakId);
         return ResponseEntity.ok().body(resDoyakDTO);
     }
 
@@ -73,8 +75,8 @@ public class ShareDoyakController {
     * @return :
     * */
     @PostMapping("{memberId}")
-    public ResponseEntity<String> setShareDoyakAdd(@PathVariable("memberId") Long memberId, @RequestBody ReqShareDoyakDTO reqShareDoyakDTO) {
-        shareDoyakService.setShareDoyakAdd(memberId, reqShareDoyakDTO);
+    public ResponseEntity<String> setShareDoyakAdd(@Authenticated AuthenticatedUser authenticatedUser, @PathVariable("memberId") Long memberId, @RequestBody ReqShareDoyakDTO reqShareDoyakDTO) {
+        shareDoyakService.setShareDoyakAdd(authenticatedUser.getMemberId(), reqShareDoyakDTO);
         return ResponseEntity.ok("서로도약 게시글 작성을 완료했습니다.");
     }
 
