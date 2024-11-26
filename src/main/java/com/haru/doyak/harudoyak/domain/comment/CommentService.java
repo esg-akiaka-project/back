@@ -173,8 +173,8 @@ public class CommentService {
                 Comment parent = commentRepository.findCommentByCommentId(reply.getParentCommentId()).orElseThrow();
                 SseDataDTO sseDataDTO = SseDataDTO.builder()
                         .sender(reply.getMember().getNickname())
-                        .content(reply.getContent().substring(0, Math.min(30, reply.getContent().length())).concat("..."))
-                        .postTitle(selectShareDoyak.getTitle())
+                        .content(reply.getContent().substring(0, Math.min(30, reply.getContent().length())).concat(".."))
+                        .postContent(selectShareDoyak.getContent().substring(0, Math.min(20, selectShareDoyak.getContent().length())).concat(".."))
                         .shareDoyakId(parent.getShareDoyak().getShareDoyakId())
                 .build();
                 notificationService.customNotify(parent.getMember().getMemberId(), sseDataDTO, "대댓글 알림", SseEventName.REPLY_COMMENT);
@@ -193,9 +193,9 @@ public class CommentService {
 
                     // 게시글 작성자에게 댓글 알림 전송
                     SseDataDTO sseDataDTO = SseDataDTO.builder()
-                            .postTitle(selectShareDoyak.getTitle())
+                            .postContent(selectShareDoyak.getContent().substring(0, Math.min(20, selectShareDoyak.getContent().length())).concat(".."))
                             .sender(comment.getMember().getNickname())
-                            .content(comment.getContent().substring(0, Math.min(30, comment.getContent().length())).concat("..."))
+                            .content(comment.getContent().substring(0, Math.min(30, comment.getContent().length())).concat(".."))
                             .shareDoyakId(comment.getShareDoyak().getShareDoyakId())
                             .build();
                     notificationService.customNotify(selectShareDoyak.getMember().getMemberId(), sseDataDTO, "서로도약 댓글 알림", SseEventName.POST_COMMENT);
