@@ -1,6 +1,7 @@
 package com.haru.doyak.harudoyak.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.haru.doyak.harudoyak.dto.file.FileDTO;
 import com.haru.doyak.harudoyak.dto.member.LevelDTO;
 import com.haru.doyak.harudoyak.dto.member.MemberDTO;

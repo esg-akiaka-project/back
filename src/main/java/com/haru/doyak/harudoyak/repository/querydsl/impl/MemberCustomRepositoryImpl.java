@@ -4,6 +4,7 @@ import com.haru.doyak.harudoyak.dto.auth.LoginResDTO;
 import com.haru.doyak.harudoyak.dto.file.FileDTO;
 import com.haru.doyak.harudoyak.dto.member.LevelDTO;
 import com.haru.doyak.harudoyak.dto.member.MemberDTO;
+import com.haru.doyak.harudoyak.entity.File;
 import com.haru.doyak.harudoyak.entity.Member;
 
 import static com.haru.doyak.harudoyak.entity.QMember.member;
@@ -13,6 +14,7 @@ import static com.haru.doyak.harudoyak.entity.QFile.file;
 import com.haru.doyak.harudoyak.repository.querydsl.MemberCustomRepository;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Null;
@@ -79,7 +81,8 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                                         member.aiNickname,
                                         member.goalName,
                                         member.isVerified,
-                                        member.refreshToken),
+                                        member.refreshToken
+                                ),
                                 Projections.constructor(
                                         LevelDTO.class,
                                         level.recentContinuity,
@@ -100,19 +103,24 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 )
                 .from(member)
                 .leftJoin(level).on(member.memberId.eq(level.memberId))
-                .leftJoin(file).on(member.fileId.eq(file.fileId))
+                .leftJoin(member.file, file)
                 .where(member.memberId.eq(memberId))
                 .fetchOne();
         return Optional.ofNullable(loginResDTO);
     }
 
+    /**
+     * oneToOne은 lazy로 member에 file을 넣느라 select를 한번 더 하는데, fetchJion을 하면 한번에 됨
+     * @param memberId
+     * @return
+     */
     @Override
-    public Optional<Tuple> findMemberFileByMemberId(Long memberId) {
-        Tuple tuple = jpaQueryFactory.select(member, file)
+    public Optional<Member> findFileByMemberId(Long memberId) {
+        Member getMember = jpaQueryFactory.select(member)
                 .from(member)
-                .leftJoin(file).on(member.fileId.eq(file.fileId))
+                .leftJoin(member.file, file).fetchJoin()
                 .where(member.memberId.eq(memberId))
                 .fetchOne();
-        return Optional.ofNullable(tuple);
+        return Optional.ofNullable(getMember);
     }
 }

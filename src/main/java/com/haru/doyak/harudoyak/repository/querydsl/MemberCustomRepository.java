@@ -13,5 +13,5 @@ public interface MemberCustomRepository {
     Optional<Member> findMemberByRefreshToken(String refreshToken);
     Optional<Member> findMemberByProviderId(String providerId);
     Optional<LoginResDTO> findLevelAndFileByMemberId(Long memberId);
-    Optional<Tuple> findMemberFileByMemberId(Long memberId);
+    Optional<Member> findFileByMemberId(Long memberId);
 }
