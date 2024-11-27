@@ -31,17 +31,28 @@ public class Member {
 
     @Column(unique = true)
     private String email;      // 이메일 주소
+
     private String password;        // 비밀번호
+
     @NotNull
+    @Column(unique = true)
     private String nickname;   // 닉네임
+
     @NotNull
     private String aiNickname; // 도약이별명
+
     private String goalName;   // 도약목표명
+
     @NotNull
     private Boolean isVerified;   // 이메일인증 상태
+
+    @Column(unique = true)
     private String refreshToken;
+
     @NotNull
     private String provider;// 소셜로그인제공자 local, kakao, google
+
+    @Column(unique = true)
     private String providerId;// provider_소셜이부여한id
 
     /**

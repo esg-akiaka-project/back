@@ -28,12 +28,6 @@ public class NotificationController {
         return notificationService.subscribe(authenticatedUser.getMemberId());
     }
 
-    @PostMapping("add")
-    public ResponseEntity add(@RequestParam("memberId")Long memberId, @RequestParam("content")String content){
-        letterBatch.addLetterForUser(memberId, content, "도약이 편지가 도착했어요");
-        return ResponseEntity.status(HttpStatus.OK).body("메세지 추가");
-    }
-
     /**
      * @param memberId
      * @param category 알림 카테고리 [도약기록, 서로도약] = [log, post]

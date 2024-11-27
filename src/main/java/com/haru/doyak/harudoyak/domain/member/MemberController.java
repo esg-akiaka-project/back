@@ -94,8 +94,8 @@ public class MemberController {
     public ResponseEntity changePassword(@Authenticated AuthenticatedUser authenticatedUser,
                                          @PathVariable("memberId") Long memberId,
                                          @RequestBody ChangeMemberInfoReqDTO dto){
-        if(dto.getPassword()==null) throw new CustomException(ErrorCode.NULL_VALUE);
-        memberService.changePassword(authenticatedUser.getMemberId(), dto.getPassword());
+        if(dto.getOldpassword() == null && dto.getNewpassword()==null) throw new CustomException(ErrorCode.NULL_VALUE);
+        memberService.changePassword(authenticatedUser.getMemberId(), dto.getOldpassword(), dto.getNewpassword());
         return ResponseEntity.ok().body("비밀번호가 변경되었습니다.");
     }
 

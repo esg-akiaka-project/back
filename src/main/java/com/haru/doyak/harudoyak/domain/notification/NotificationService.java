@@ -31,9 +31,8 @@ public class NotificationService {
      * @param data 클라이언트에 전달되는 데이터 내용
      * @param comment 클라이언트에선 주석처리됨 안보임
      * @param sseEventName 이벤트 이름
-     * @param <T>
      */
-    public <T> void customNotify(Long memberId, T data, String comment, SseEventName sseEventName) {
+    public void customNotify(Long memberId, SseDataDTO data, String comment, SseEventName sseEventName) {
         sendToClient(memberId, data, comment, sseEventName);
     }
     public void notify(Long memberId, Object data, String comment) {
@@ -56,7 +55,7 @@ public class NotificationService {
         }
     }
 
-    private <T> void sendToClient(Long memberId, T data, String comment, SseEventName sseEventName) {
+    private void sendToClient(Long memberId, SseDataDTO data, String comment, SseEventName sseEventName) {
         SseEmitter emitter = emitterRepository.get(memberId);
         if (emitter != null) {
             try {

@@ -15,11 +15,13 @@ import com.haru.doyak.harudoyak.repository.LevelRepository;
 import com.haru.doyak.harudoyak.repository.MemberRepository;
 import com.haru.doyak.harudoyak.security.JwtProvider;
 import com.querydsl.core.Tuple;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -35,6 +37,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final LevelRepository levelRepository;
     private final FileRepository fileRepository;
+    private final EmailService emailService;
     @Value("${spring.oauth2.local.client-name}")
     private String local_client_name;
 
@@ -116,12 +119,45 @@ public class AuthService {
                 .build();
     }
 
-    public boolean logout(Long memberId, String refreshToken) {
+    public void logout(Long memberId, String refreshToken) {
         Member member = memberRepository.findMemberByRefreshToken(refreshToken)
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
         if(!Objects.equals(member.getMemberId(), memberId)) throw new CustomException(ErrorCode.DIFFERENT_MEMBER_TOKEN);
         member.updateRefreshToken(null);
         memberRepository.save(member);
-        return true;
+    }
+
+    public void handleTempPasswordRequest(String email) {
+        String tempPassword = generateTempPassword(8);
+        saveTempPassword(email, tempPassword);
+        emailService.sendTempPasswordEmail(email, tempPassword);
+    }
+
+    /**
+     * 
+     * @param passwordLength 원하는 임시 비밀번호의 길이
+     * @return 랜덤으로 만들어진 임시 비밀번호
+     */
+    public String generateTempPassword(int passwordLength) {
+        SecureRandom secureRandom = new SecureRandom();
+        String PASSWORD_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        StringBuilder sb = new StringBuilder(passwordLength);
+        for(int i=0; i<passwordLength; i++){
+            int index = secureRandom.nextInt(PASSWORD_CHARACTERS.length());
+            sb.append(PASSWORD_CHARACTERS.charAt(index));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * @param email
+     * @param tempPassword 인코딩 되지 않은 비밀번호
+     */
+    public void saveTempPassword(String email, String tempPassword){
+        Member member = memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        member.updatePassword(passwordEncoder.encode(tempPassword));
+        memberRepository.save(member);
     }
 }
