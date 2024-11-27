@@ -70,10 +70,12 @@ public class MemberService {
                 .build();
     }
 
-    public void changePassword(Long memberId, String newPassword) {
-        String encoded = passwordEncoder.encode(newPassword);
+    public void changePassword(Long memberId, String oldPassword, String newPassword) {
         Member member = getMemberById(memberId);
-        member.updatePassword(encoded);
+        if(passwordEncoder.matches(oldPassword, member.getPassword())) {
+            // 기존 비밀번호가 맞을 경우 패스워드 암호화 해서 저장
+            member.updatePassword(passwordEncoder.encode(newPassword));
+        }else throw new CustomException(ErrorCode.INVALID_PASSWORD);
         memberRepository.save(member);
     }
 

@@ -9,4 +9,6 @@ public class ChangeMemberInfoReqDTO {
     private String goalName;
     private String password;
     private String photoUrl;
+    private String oldpassword;
+    private String newpassword;
 }
