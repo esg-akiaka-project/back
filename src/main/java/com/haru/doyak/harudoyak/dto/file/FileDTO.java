@@ -1,7 +1,11 @@
 package com.haru.doyak.harudoyak.dto.file;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class FileDTO {
     // 파일의 정보를 담는 DTO

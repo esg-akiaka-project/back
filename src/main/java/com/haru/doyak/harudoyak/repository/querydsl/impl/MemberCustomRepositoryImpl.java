@@ -1,5 +1,9 @@
 package com.haru.doyak.harudoyak.repository.querydsl.impl;
 
+import com.haru.doyak.harudoyak.dto.auth.LoginResDTO;
+import com.haru.doyak.harudoyak.dto.file.FileDTO;
+import com.haru.doyak.harudoyak.dto.member.LevelDTO;
+import com.haru.doyak.harudoyak.dto.member.MemberDTO;
 import com.haru.doyak.harudoyak.entity.Member;
 
 import static com.haru.doyak.harudoyak.entity.QMember.member;
@@ -8,6 +12,7 @@ import static com.haru.doyak.harudoyak.entity.QFile.file;
 
 import com.haru.doyak.harudoyak.repository.querydsl.MemberCustomRepository;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Null;
@@ -62,14 +67,43 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     }
 
     @Override
-    public Optional<Tuple> findLevelAndFileByMemberId(Long memberId) {
-        Tuple tuple = jpaQueryFactory.select(member, level, file)
+    public Optional<LoginResDTO> findLevelAndFileByMemberId(Long memberId) {
+        LoginResDTO loginResDTO = jpaQueryFactory
+                .select(Projections.constructor(
+                        LoginResDTO.class,
+                                Projections.constructor(
+                                        MemberDTO.class,
+                                        member.memberId,
+                                        member.email,
+                                        member.nickname,
+                                        member.aiNickname,
+                                        member.goalName,
+                                        member.isVerified,
+                                        member.refreshToken),
+                                Projections.constructor(
+                                        LevelDTO.class,
+                                        level.recentContinuity,
+                                        level.maxContinuity,
+                                        level.point,
+                                        level.logCount,
+                                        level.shareDoyakCount,
+                                        level.firstDate,
+                                        level.logLastDate
+                                ),
+                                Projections.constructor(
+                                        FileDTO.class,
+                                        file.fileId,
+                                        file.filePathName,
+                                        file.originalName
+                                )
+                        )
+                )
                 .from(member)
                 .leftJoin(level).on(member.memberId.eq(level.memberId))
                 .leftJoin(file).on(member.fileId.eq(file.fileId))
                 .where(member.memberId.eq(memberId))
                 .fetchOne();
-        return Optional.ofNullable(tuple);
+        return Optional.ofNullable(loginResDTO);
     }
 
     @Override
