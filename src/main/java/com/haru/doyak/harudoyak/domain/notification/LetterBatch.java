@@ -5,6 +5,7 @@ import static com.haru.doyak.harudoyak.entity.QLog.log;
 import static com.haru.doyak.harudoyak.entity.QLetter.letter;
 
 import com.haru.doyak.harudoyak.dto.notification.SseDataDTO;
+import com.haru.doyak.harudoyak.dto.notification.WeekMonthNotificationDTO;
 import com.haru.doyak.harudoyak.repository.LogRepository;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
@@ -72,10 +73,10 @@ public class LetterBatch {
         LocalDateTime endDateTime = setLastTime(endOfLastWeek);
 
         // 저번주 도약기록 작성한 유저만 뽑기
-        List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, endDateTime);
-        for(Tuple tuple : tuples) {
-            Long memberId = tuple.get(member.memberId);
-            Long count = tuple.get(log.member.memberId.count());
+        List<WeekMonthNotificationDTO> list = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, endDateTime);
+        for(WeekMonthNotificationDTO dto : list) {
+            Long memberId = dto.getMemberId();
+            Long count = dto.getCount();
 
             SseDataDTO sseDataDTO = SseDataDTO.builder()
                     .count(count)
@@ -104,10 +105,10 @@ public class LetterBatch {
         LocalDateTime endDateTime = setLastTime(endOfLastMonth);
 
         // 저번달 도약기록 작성한 유저 뽑기
-        List<Tuple> tuples = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, endDateTime);
-        for(Tuple tuple : tuples) {
-            Long memberId = tuple.get(member.memberId);
-            Long count = tuple.get(log.member.memberId.count());
+        List<WeekMonthNotificationDTO> list = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, endDateTime);
+        for(WeekMonthNotificationDTO dto : list) {
+            Long memberId = dto.getMemberId();
+            Long count = dto.getCount();
 
             SseDataDTO sseDataDTO = SseDataDTO.builder()
                     .count(count)
