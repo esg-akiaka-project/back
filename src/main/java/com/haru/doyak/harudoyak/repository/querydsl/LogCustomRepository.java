@@ -4,6 +4,7 @@ import com.haru.doyak.harudoyak.dto.log.EmotionDTO;
 import com.haru.doyak.harudoyak.dto.log.ResLetterDTO;
 import com.haru.doyak.harudoyak.dto.log.ResLogDTO;
 import com.haru.doyak.harudoyak.dto.log.ResTagDTO;
+import com.haru.doyak.harudoyak.dto.notification.DailyNotificationDTO;
 import com.haru.doyak.harudoyak.dto.notification.WeekMonthNotificationDTO;
 import com.querydsl.core.Tuple;
 
@@ -37,7 +38,7 @@ public interface LogCustomRepository {
      * */
     Optional<List<ResLogDTO>> findLogAllByMemberId(Long memberId);
 
-    List<Tuple> findLetterMemberWhereBetweenLogCreationDateTime(LocalDateTime startDate, LocalDateTime endDate);
+    List<DailyNotificationDTO> findLetterMemberWhereBetweenLogCreationDateTime(LocalDateTime startDate, LocalDateTime endDate);
 
     List<WeekMonthNotificationDTO> findLogMemberWhereBetweenLogCreationDatetime(LocalDateTime startDate, LocalDateTime endDate);
 }

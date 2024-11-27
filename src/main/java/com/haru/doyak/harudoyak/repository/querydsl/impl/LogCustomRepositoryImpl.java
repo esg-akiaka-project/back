@@ -4,6 +4,7 @@ import com.haru.doyak.harudoyak.dto.log.EmotionDTO;
 import com.haru.doyak.harudoyak.dto.log.ResLetterDTO;
 import com.haru.doyak.harudoyak.dto.log.ResLogDTO;
 import com.haru.doyak.harudoyak.dto.log.ResTagDTO;
+import com.haru.doyak.harudoyak.dto.notification.DailyNotificationDTO;
 import com.haru.doyak.harudoyak.dto.notification.WeekMonthNotificationDTO;
 import com.haru.doyak.harudoyak.repository.querydsl.LogCustomRepository;
 import com.querydsl.core.Tuple;
@@ -242,9 +243,17 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
      * @return <List> 기간 내에 작성한 로그의 member, letter
      */
     @Override
-    public List<Tuple> findLetterMemberWhereBetweenLogCreationDateTime(LocalDateTime startDate, LocalDateTime endDate) {
-         return jpaQueryFactory.select(letter.content, member.memberId, member.aiNickname, log.logId)
-                .from(log)
+    public List<DailyNotificationDTO> findLetterMemberWhereBetweenLogCreationDateTime(LocalDateTime startDate, LocalDateTime endDate) {
+         return jpaQueryFactory.select(
+                         Projections.constructor(
+                                 DailyNotificationDTO.class,
+                                 letter.content,
+                                 member.memberId,
+                                 member.aiNickname,
+                                 log.logId
+                         )
+                 )
+                 .from(log)
                 .leftJoin(member)
                 .on(member.memberId.eq(log.member.memberId))
                 .rightJoin(letter)
