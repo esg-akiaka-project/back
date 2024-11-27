@@ -127,8 +127,7 @@ public class AuthService {
 
     public void handleTempPasswordRequest(String email) {
         String tempPassword = generateTempPassword(8);
-        String encodedPassword = passwordEncoder.encode(tempPassword);
-        saveTempPassword(email, encodedPassword);
+        saveTempPassword(email, tempPassword);
         emailService.sendTempPasswordEmail(email, tempPassword);
     }
 
@@ -149,10 +148,14 @@ public class AuthService {
         return sb.toString();
     }
 
+    /**
+     * @param email
+     * @param tempPassword 인코딩 되지 않은 비밀번호
+     */
     public void saveTempPassword(String email, String tempPassword){
         Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-        member.updatePassword(passwordEncoder.encode(member.getPassword()));
+        member.updatePassword(passwordEncoder.encode(tempPassword));
         memberRepository.save(member);
     }
 }
