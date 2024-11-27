@@ -63,14 +63,12 @@ public class AuthController {
     public ResponseEntity<String> emailVerify(@RequestHeader(value = "Referer", required = false) String referer,
                                               @RequestBody EmailVerifyReqDTO dto)
     {
-        if(memberService.isEmailAvailable(dto.getEmail())){
-            try {
-                emailService.sendAuthLinkEmail(referer, dto.getEmail());
-                return ResponseEntity.ok().body("인증 메일이 발송되었습니다.");
-            } catch (MessagingException e) {
-                throw new CustomException(ErrorCode.EMAIL_SEND_FAIL);
-            }
-        }else throw new CustomException(ErrorCode.DUPLICATE_MEMBER);
+        if(!memberService.isEmailAvailable(dto.getEmail())) {
+            throw new CustomException(ErrorCode.DUPLICATE_MEMBER);
+        }
+        emailService.sendAuthLinkEmail(referer, dto.getEmail());
+        return ResponseEntity.ok().body("인증 메일이 발송되었습니다.");
+
     }
 
     @PostMapping("validate")
@@ -97,7 +95,17 @@ public class AuthController {
                                  @RequestBody JwtReqDTO jwtReqDTO)
     {
         if(jwtReqDTO.getRefreshToken()==null) throw new CustomException(ErrorCode.NULL_VALUE);
-        if(authService.logout(authenticatedUser.getMemberId(), jwtReqDTO.getRefreshToken())) return ResponseEntity.ok().body("로그아웃이 완료되었습니다.");
-        throw new CustomException(ErrorCode.INVALID_TOKEN);
+
+        authService.logout(authenticatedUser.getMemberId(), jwtReqDTO.getRefreshToken());
+        return ResponseEntity.ok().body("로그아웃이 완료되었습니다.");
+    }
+
+    @PostMapping("temp-password")
+    public ResponseEntity sendTempPassword(@Authenticated AuthenticatedUser authenticatedUser,
+                                           @RequestBody JoinReqDTO joinReqDTO){
+        if(joinReqDTO.getEmail() == null) throw new CustomException(ErrorCode.NULL_VALUE);
+        
+        authService.handleTempPasswordRequest(joinReqDTO.getEmail());
+        return ResponseEntity.ok().body("임시 비밀번호가 전송됨");
     }
 }
