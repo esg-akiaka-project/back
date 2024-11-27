@@ -117,7 +117,7 @@ public class MemberService {
     }
 
     public MypageResDTO getMypageInfo(Long memberId) {
-        Tuple tuple = memberRepository.findMemberFileByMemberId(memberId).orElseThrow();
+        Tuple tuple = memberRepository.findLevelAndFileByMemberId(memberId).orElseThrow();
         File getFile = tuple.get(file);
         Level getLevel = tuple.get(level);
 
