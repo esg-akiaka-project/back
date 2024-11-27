@@ -35,9 +35,6 @@ public class NotificationService {
     public void customNotify(Long memberId, SseDataDTO data, String comment, SseEventName sseEventName) {
         sendToClient(memberId, data, comment, sseEventName);
     }
-    public void notify(Long memberId, Object data, String comment) {
-        sendToClient(memberId, data, comment);
-    }
 
     private void sendToClient(Long memberId, Object data, String comment) {
         SseEmitter emitter = emitterRepository.get(memberId);
@@ -88,9 +85,9 @@ public class NotificationService {
         return notificationRepository.findAllByMemberIdAndCategory(memberId, category);
     }
 
-    public <T> void saveNotification(Long memberId, T sseDataDTO, SseEventName sseEventName) {
+    public void saveNotification(Long memberId, SseDataDTO sseDataDTO, SseEventName sseEventName) {
         Notification notification = Notification.builder()
-                .data((SseDataDTO) sseDataDTO)
+                .data(sseDataDTO)
                 .sseEventName(sseEventName)
                 .memberId(memberId)
                 .build();
