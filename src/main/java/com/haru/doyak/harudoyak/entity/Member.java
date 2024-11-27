@@ -50,7 +50,6 @@ public class Member {
     @Column(unique = true)
     private String refreshToken;
 
-    @NotNull
     private String provider;// 소셜로그인제공자 local, kakao, google
 
     @Column(unique = true)
