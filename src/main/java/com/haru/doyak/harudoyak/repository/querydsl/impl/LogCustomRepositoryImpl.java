@@ -87,7 +87,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 ))
                 .from(log)
                 .leftJoin(letter).on(log.logId.eq(letter.log.logId))
-                .where(log.member.memberId.eq(memberId), letter.arrivedDate.between(startMonthDayDate, endMonthDayDate))
+                .where(log.member.memberId.eq(memberId), log.creationDate.between(startMonthDayDate, endMonthDayDate))
                 .fetch();
 
 
@@ -111,7 +111,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                 .from(log)
                 .join(member).on(log.member.memberId.eq(member.memberId))
                 .join(letter).on(log.logId.eq(letter.log.logId))
-                .where(log.member.memberId.eq(memberId), letter.arrivedDate.between(mondayDate, sundayDate))
+                .where(log.member.memberId.eq(memberId), log.creationDate.between(mondayDate, sundayDate))
                 .orderBy(log.creationDate.asc())
                 .fetch();
 

@@ -10,6 +10,4 @@ public interface LogRepository extends JpaRepository<Log, Long> , LogCustomRepos
 
     Optional<Log> findLogByLogId(Long logId);
 
-    boolean existsByLogId(Long logId);
-
 }
