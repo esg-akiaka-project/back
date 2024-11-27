@@ -52,7 +52,6 @@ public class Member {
     @NotNull
     private String provider;// 소셜로그인제공자 local, kakao, google
 
-    @NotNull
     @Column(unique = true)
     private String providerId;// provider_소셜이부여한id
 
