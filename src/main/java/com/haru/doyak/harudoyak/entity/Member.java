@@ -26,8 +26,9 @@ public class Member {
     @OneToMany(mappedBy = "member")
     private List<Doyak> doyaks;    // 복합키 도약 엔티티
 
-    @JoinColumn
-    private Long fileId;// 프로필 사진
+    @JoinColumn(name = "file_id")
+    @OneToOne
+    private File file;// 프로필 사진
 
     @Column(unique = true)
     private String email;      // 이메일 주소
@@ -49,7 +50,6 @@ public class Member {
     @Column(unique = true)
     private String refreshToken;
 
-    @NotNull
     private String provider;// 소셜로그인제공자 local, kakao, google
 
     @Column(unique = true)
@@ -95,8 +95,8 @@ public class Member {
     public void updateLocalProviderId(){
         this.providerId = this.provider+"_"+this.memberId;
     }
-    public void updateFileId(Long fileId){
-        this.fileId = fileId;
+    public void updateFile(File file){
+        this.file = file;
     }
 
 }

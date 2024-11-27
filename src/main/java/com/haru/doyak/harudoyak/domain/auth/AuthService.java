@@ -109,13 +109,8 @@ public class AuthService {
     }
 
     public LoginResDTO makeLoginResDTO(Long memberId) {
-        Tuple tuple = memberRepository.findLevelAndFileByMemberId(memberId)
+        return memberRepository.findLevelAndFileByMemberId(memberId)
                 .orElseThrow(()-> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-        return LoginResDTO.builder()
-                .member(tuple.get(member))
-                .level(tuple.get(level))
-                .file(tuple.get(file))
-                .build();
     }
 
     public void logout(Long memberId, String refreshToken) {

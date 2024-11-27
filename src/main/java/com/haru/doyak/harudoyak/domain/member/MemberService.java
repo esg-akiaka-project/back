@@ -1,5 +1,6 @@
 package com.haru.doyak.harudoyak.domain.member;
 
+import com.haru.doyak.harudoyak.dto.auth.LoginResDTO;
 import com.haru.doyak.harudoyak.dto.member.MemberResDTO;
 import com.haru.doyak.harudoyak.dto.member.MypageResDTO;
 import com.haru.doyak.harudoyak.entity.File;
@@ -80,23 +81,20 @@ public class MemberService {
     }
 
     public MemberResDTO changeProfilePhoto(Long memberId, String newPhotoUrl) {
-        Tuple tuple = memberRepository.findMemberFileByMemberId(memberId).orElseThrow();
-        File getFile = tuple.get(file);
-        if(getFile==null){
-            // 기존 프로필이 없다면 생성 후 member와 연결
-            getFile = File.builder()
-                    .filePathName(newPhotoUrl)
-                    .build();
-            fileRepository.save(getFile);
-
-            Member getMember = tuple.get(member);
-            getMember.updateFileId(getFile.getFileId());
-            memberRepository.save(getMember);
+        Member member = memberRepository.findFileByMemberId(memberId).orElseThrow();
+        File file = member.getFile();
+        if(file==null){
+            // 기존 프로필이 없다면 생성 저장
+            file = fileRepository.save(File.builder()
+                            .filePathName(newPhotoUrl)
+                    .build());
+        }else {
+            file.updateFilePathName(newPhotoUrl);
         }
-        getFile.updateFilePathName(newPhotoUrl);
-        fileRepository.save(getFile);
+        member.updateFile(file);
+        memberRepository.save(member);
         return MemberResDTO.builder()
-                .profileUrl(getFile.getFilePathName())
+                .profileUrl(file.getFilePathName())
                 .build();
     }
 
@@ -117,13 +115,12 @@ public class MemberService {
     }
 
     public MypageResDTO getMypageInfo(Long memberId) {
-        Tuple tuple = memberRepository.findLevelAndFileByMemberId(memberId).orElseThrow();
-        File getFile = tuple.get(file);
-        Level getLevel = tuple.get(level);
+        LoginResDTO loginResDTO = memberRepository.findLevelAndFileByMemberId(memberId)
+                .orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         return MypageResDTO.builder()
-                .level(getLevel)
-                .file(getFile)
+                .level(loginResDTO.getLevel())
+                .file(loginResDTO.getFile())
                 .build();
     }
 }

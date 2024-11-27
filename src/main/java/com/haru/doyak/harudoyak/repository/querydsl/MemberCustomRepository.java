@@ -1,5 +1,6 @@
 package com.haru.doyak.harudoyak.repository.querydsl;
 
+import com.haru.doyak.harudoyak.dto.auth.LoginResDTO;
 import com.haru.doyak.harudoyak.entity.Member;
 import com.querydsl.core.Tuple;
 
@@ -11,6 +12,6 @@ public interface MemberCustomRepository {
     Optional<Member> findMemberById(Long id);
     Optional<Member> findMemberByRefreshToken(String refreshToken);
     Optional<Member> findMemberByProviderId(String providerId);
-    Optional<Tuple> findLevelAndFileByMemberId(Long memberId);
-    Optional<Tuple> findMemberFileByMemberId(Long memberId);
+    Optional<LoginResDTO> findLevelAndFileByMemberId(Long memberId);
+    Optional<Member> findFileByMemberId(Long memberId);
 }
