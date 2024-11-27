@@ -48,9 +48,10 @@ public class LogService {
 
             // String 문자열 LocalDateTime으로 변환
             LocalDateTime resultLocalDateTime = dateUtil.stringToLocalDateTime(creationDate);
-            // 해당 월의 시작일과 종료일 계산
+            // 해당 월의 시작일 계산 00:00:00
             LocalDateTime startMonthDayDate = resultLocalDateTime.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate().atStartOfDay();
-            LocalDateTime endMonthDayDate = resultLocalDateTime.with(TemporalAdjusters.lastDayOfMonth()).toLocalDate().atStartOfDay();
+            // 해당 월의 종료일 계산 23:59:59
+            LocalDateTime endMonthDayDate = resultLocalDateTime.with(TemporalAdjusters.lastDayOfMonth()).toLocalDate().atTime(23, 59, 59);
 
             List<ResLetterDTO.LetterMonthlyDTO> letterMonthlyDTOS = logRepository.findMontlyLetterAll(memberId, startMonthDayDate, endMonthDayDate)
                                                                     .orElseThrow(() -> new CustomException(ErrorCode.LETTER_LIST_NOT_FOUND));
@@ -88,20 +89,27 @@ public class LogService {
     @Transactional
     public ResLogDTO.ResWeeklyLogDTO getWeeklyLogDetail(Long memberId, String creationDate) {
 
+        log.info("memberId 잘 오니? {} ", memberId);
+
         try {
 
             // String 문자열 LocalDateTime으로 변환
             LocalDateTime resultLocalDateTime = dateUtil.stringToLocalDateTime(creationDate);
-            // 월요일 날짜 계산
+            // 월요일 00:00:00 계산
             LocalDateTime mondayDate = resultLocalDateTime.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-            // 일요일 날짜 계산
-            LocalDateTime sundayDate = resultLocalDateTime.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+            log.info("mondayDate {} ", mondayDate);
+            // 일요일 23:59:59 계산
+            LocalDateTime sundayDate = resultLocalDateTime.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)).withHour(23).withMinute(59).withSecond(59);
+            log.info("sundayDate {} ", sundayDate);
 
             ResLogDTO.ResWeeklyLogDTO resWeeklyLogDTO = new ResLogDTO.ResWeeklyLogDTO();
             List<ResLetterDTO.LetterWeeklyDTO> letterWeeklyDTOS = logRepository.findLetterByDate(memberId, mondayDate, sundayDate)
                                                                   .orElseThrow(() -> new CustomException(ErrorCode.LETTER_LIST_NOT_FOUND));
             List<EmotionDTO> emotionDTOS = logRepository.findEmotionByDate(memberId, mondayDate, sundayDate)
                                            .orElseThrow(() -> new CustomException(ErrorCode.EMOTION_LIST_NOT_FOUND));
+            for(EmotionDTO emotionDTO : emotionDTOS){
+
+            }
             List<ResTagDTO.TagWeeklyDTO> tagWeeklyDTOS = logRepository.findTagsByName(memberId, mondayDate, sundayDate)
                                                          .orElseThrow(() -> new CustomException(ErrorCode.TAG_LIST_NOT_FOUND));
 
