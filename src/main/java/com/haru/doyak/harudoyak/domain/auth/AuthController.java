@@ -101,8 +101,7 @@ public class AuthController {
     }
 
     @PostMapping("temp-password")
-    public ResponseEntity sendTempPassword(@Authenticated AuthenticatedUser authenticatedUser,
-                                           @RequestBody JoinReqDTO joinReqDTO){
+    public ResponseEntity sendTempPassword(@RequestBody JoinReqDTO joinReqDTO){
         if(joinReqDTO.getEmail() == null) throw new CustomException(ErrorCode.NULL_VALUE);
         
         authService.handleTempPasswordRequest(joinReqDTO.getEmail());

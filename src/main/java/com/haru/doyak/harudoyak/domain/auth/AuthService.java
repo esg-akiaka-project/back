@@ -126,9 +126,10 @@ public class AuthService {
     }
 
     public void handleTempPasswordRequest(String email) {
-        String encodedPassword = passwordEncoder.encode(generateTempPassword(8));
+        String tempPassword = generateTempPassword(8);
+        String encodedPassword = passwordEncoder.encode(tempPassword);
         saveTempPassword(email, encodedPassword);
-        emailService.sendTempPasswordEmail(email, encodedPassword);
+        emailService.sendTempPasswordEmail(email, tempPassword);
     }
 
     /**
