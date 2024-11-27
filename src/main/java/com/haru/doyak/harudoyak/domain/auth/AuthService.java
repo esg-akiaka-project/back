@@ -1,10 +1,8 @@
 package com.haru.doyak.harudoyak.domain.auth;
 
-import static com.haru.doyak.harudoyak.entity.QMember.member;
-import static com.haru.doyak.harudoyak.entity.QLevel.level;
-import static com.haru.doyak.harudoyak.entity.QFile.file;
-
-import com.haru.doyak.harudoyak.dto.auth.*;
+import com.haru.doyak.harudoyak.dto.auth.JoinReqDTO;
+import com.haru.doyak.harudoyak.dto.auth.LoginReqDTO;
+import com.haru.doyak.harudoyak.dto.auth.LoginResDTO;
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtMemberDTO;
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtRecord;
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtReqDTO;
@@ -24,6 +22,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 import java.util.Optional;
+
+import static com.haru.doyak.harudoyak.entity.QFile.file;
+import static com.haru.doyak.harudoyak.entity.QLevel.level;
+import static com.haru.doyak.harudoyak.entity.QMember.member;
 
 @RequiredArgsConstructor
 @Service
