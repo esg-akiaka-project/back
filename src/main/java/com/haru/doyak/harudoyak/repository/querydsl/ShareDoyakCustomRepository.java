@@ -15,7 +15,7 @@ public interface ShareDoyakCustomRepository {
 
     Optional<ShareDoyak> findShaereDoyakByMemeberId(Long memeberId, Long shareDoyakId);
 
-    Optional<List<ResShareDoyakDTO>> findeAll();
+    Optional<List<ResShareDoyakDTO.ResShareDoyakDTOS>> findeAll();
 
     long shareContentUpdate(Long shareDoyakId, ReqShareDoyakDTO reqShareDoyakDTO);
 

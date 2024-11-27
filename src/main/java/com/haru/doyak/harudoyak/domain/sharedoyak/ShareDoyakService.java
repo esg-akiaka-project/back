@@ -85,6 +85,29 @@ public class ShareDoyakService {
         }
     }
 
+    // 서로도약 상세 조회
+
+    /**
+     *
+     * @param memberId
+     * @param shareDoyakId
+     * @return ResShareDoyakDTO shareDoyakId(서로도약pk), shareContent(서로도약 내용), shareImageUrl(서로도약 이미지파일 url)
+     * @throws CustomException 상황에 맞는 ErrorCode 반환
+     */
+    public ResShareDoyakDTO setShareDoyakDetail(Long memberId, Long shareDoyakId) {
+        Member selectMember = memberRepository.findMemberByMemberId(memberId).orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        ShareDoyak selectShareDoyak = shareDoyakRepository.findShareDoyakByShareDoyakId(shareDoyakId).orElseThrow(() -> new CustomException(ErrorCode.SHARE_DOYAK_NOT_FOUND));
+        if(selectShareDoyak.getMember().getMemberId() != selectMember.getMemberId()){
+            throw new CustomException(ErrorCode.SHARE_DOYAK_NOT_AUTHOR);
+        }
+
+        return ResShareDoyakDTO.builder()
+                .shareDoyakId(selectShareDoyak.getShareDoyakId())
+                .shareContent(selectShareDoyak.getContent())
+                .shareImageUrl(selectShareDoyak.getFile().getFilePathName())
+                .build();
+    }
+
     /**
      * 서로도약 수정
      * @param memberId 회원pk
@@ -122,9 +145,8 @@ public class ShareDoyakService {
      *                      doyakCount(도약 총 수)
      */
     @Transactional
-    public List<ResShareDoyakDTO> getShareDoyakList(){
+    public List<ResShareDoyakDTO.ResShareDoyakDTOS> getShareDoyakList(){
         try {
-
             return shareDoyakRepository.findeAll().orElseThrow(() -> new CustomException(ErrorCode.SHARE_DOYAK_LIST_NOT_FOUND));
 
         } catch (IllegalArgumentException illegalArgumentException){

@@ -33,6 +33,18 @@ public class ShareDoyakController {
         return ResponseEntity.notFound().build();
     }
 
+    /**
+     * 서로도약 상세 조회
+     * @param authenticatedUser
+     * @param shareDoyakId
+     * @return
+     */
+    @GetMapping("{shareDoyakId}")
+    public ResponseEntity<ResShareDoyakDTO> setShareDoyakDetail(@Authenticated AuthenticatedUser authenticatedUser, @PathVariable("shareDoyakId") Long shareDoyakId) {
+        ResShareDoyakDTO resShareDoyakDTO = shareDoyakService.setShareDoyakDetail(authenticatedUser.getMemberId(), shareDoyakId);
+        return ResponseEntity.ok(resShareDoyakDTO);
+    }
+
     /*
      * 서로도약 수정
      * @param : memberId(Long), shareDoyakId(Long), shareContent(String)
@@ -53,8 +65,8 @@ public class ShareDoyakController {
      * @return : List<ResShareDoyakDTO>
      * */
     @GetMapping("/list")
-    public ResponseEntity<List<ResShareDoyakDTO>> getShareDoyakList(){
-        List<ResShareDoyakDTO> resShareDoyakDTOS = shareDoyakService.getShareDoyakList();
+    public ResponseEntity<List<ResShareDoyakDTO.ResShareDoyakDTOS>> getShareDoyakList(){
+        List<ResShareDoyakDTO.ResShareDoyakDTOS> resShareDoyakDTOS = shareDoyakService.getShareDoyakList();
         return ResponseEntity.ok(resShareDoyakDTOS);
     }
 
