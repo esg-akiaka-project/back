@@ -41,29 +41,25 @@ public class AuthService {
     private String local_client_name;
 
     public void joinMember(JoinReqDTO joinReqDTO){
-        Optional<Member> optionalMember = memberRepository.findMemberByEmail(joinReqDTO.getEmail());
-        if(optionalMember.isPresent()){
-            Member savedMember = optionalMember.get();
-            // 자체가입 한 경우 예외처리
-            if(savedMember.getProviderId()==null) throw new CustomException(ErrorCode.DUPLICATE_MEMBER);
-            // 소셜로 가입했던 경우 연동
-            savedMember.updatePassword(passwordEncoder.encode(joinReqDTO.getPassword()));
-            memberRepository.save(savedMember);
-        }else {
-            // 최초가입
-            Member member = Member.builder()
-                    .email(joinReqDTO.getEmail())
-                    .password(passwordEncoder.encode(joinReqDTO.getPassword()))
-                    .nickname(joinReqDTO.getNickname())
-                    .build();
-            memberRepository.save(member);
-            // 레벨 생성하기
-            Level level = Level.builder()
-                    .memberId(member.getMemberId())
-                    .point(5L)// 가입시 5포인트
-                    .build();
-            levelRepository.save(level);
+        if(memberRepository.findMemberByEmail(joinReqDTO.getEmail()).isPresent()){
+            throw new CustomException(ErrorCode.DUPLICATE_MEMBER);
         }
+        Member member = Member.builder()
+                .email(joinReqDTO.getEmail())
+                .provider(local_client_name)
+                .password(passwordEncoder.encode(joinReqDTO.getPassword()))
+                .nickname(joinReqDTO.getNickname())
+                .build();
+
+        memberRepository.save(member);
+        member.updateLocalProviderId();
+        memberRepository.save(member);
+        // 레벨 생성하기
+        Level level = Level.builder()
+                .memberId(member.getMemberId())
+                .point(5L)// 가입시 5포인트
+                .build();
+        levelRepository.save(level);
     }
 
     /**
