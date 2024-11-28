@@ -94,6 +94,7 @@ public class ShareDoyakCustomRepositoryImpl implements ShareDoyakCustomRepositor
                                 shareDoyak.shareDoyakId,
                                 shareDoyak.content.as("shareContent"),
                                 file.filePathName.as("shareImageUrl"),
+                                // 스칼라 서브 쿼리
                                 ExpressionUtils.as(
                                         JPAExpressions.select(comment.countDistinct())
                                                 .from(comment)
