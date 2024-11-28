@@ -106,7 +106,7 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
         List<ResLetterDTO.LetterWeeklyDTO> letterWeeklyDTOS = jpaQueryFactory
                 .select(Projections.bean(
                         ResLetterDTO.LetterWeeklyDTO.class,
-                        letter.arrivedDate.as("feedBackDate"),
+                        letter.creationDate.as("feedBackDate"),
                         letter.content.as("feedback")
                 ))
                 .from(log)
