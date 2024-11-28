@@ -4,6 +4,7 @@ import com.haru.doyak.harudoyak.dto.notification.SseDataDTO;
 import com.haru.doyak.harudoyak.entity.Notification;
 import com.haru.doyak.harudoyak.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationService {
     private final EmitterRepository emitterRepository;
     private final NotificationRepository notificationRepository;
@@ -53,7 +55,9 @@ public class NotificationService {
     }
 
     private void sendToClient(Long memberId, SseDataDTO data, String comment, SseEventName sseEventName) {
+        log.info("알림 전송 시작");
         SseEmitter emitter = emitterRepository.get(memberId);
+        log.info(memberId+"에게");
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
@@ -66,8 +70,10 @@ public class NotificationService {
                 emitter.completeWithError(e);
             }
         }
+        log.info(memberId+"가 접속해있지 않음");
 
         saveNotification(memberId, data, sseEventName);
+        log.info("알림 저장 완료");
     }
 
 
