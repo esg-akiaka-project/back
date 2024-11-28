@@ -55,9 +55,12 @@ public class NotificationService {
     }
 
     private void sendToClient(Long memberId, SseDataDTO data, String comment, SseEventName sseEventName) {
+        log.info("알림 저장");
+        saveNotification(memberId, data, sseEventName);
+
         log.info("알림 전송 시작");
         SseEmitter emitter = emitterRepository.get(memberId);
-        log.info(memberId+"에게");
+        log.info(memberId+"에게 sse 전송 시도중");
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
@@ -71,9 +74,6 @@ public class NotificationService {
             }
         }
         log.info(memberId+"가 접속해있지 않음");
-
-        saveNotification(memberId, data, sseEventName);
-        log.info("알림 저장 완료");
     }
 
 
