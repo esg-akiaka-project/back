@@ -27,7 +27,7 @@ public class LetterBatch {
     // 매일 7am 실행 -> 하루도약작성일 다음 날이면 알림
 //    @Scheduled(cron = "0 * * * * *")
 //    @Scheduled(cron = "0 0 7 * * *")
-    @Scheduled(cron = "0 25 11 * * *")
+    @Scheduled(cron = "0 33 11 * * *")
     public void sendDailyFeedback(){
         LocalDate today = LocalDate.now();
         LocalDateTime startDateTime = today.minusDays(1).atStartOfDay();// 어제 00:00
