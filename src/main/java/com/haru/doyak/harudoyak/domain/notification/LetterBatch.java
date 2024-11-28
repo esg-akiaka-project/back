@@ -1,15 +1,11 @@
 package com.haru.doyak.harudoyak.domain.notification;
 
-import static com.haru.doyak.harudoyak.entity.QMember.member;
-import static com.haru.doyak.harudoyak.entity.QLog.log;
-import static com.haru.doyak.harudoyak.entity.QLetter.letter;
-
 import com.haru.doyak.harudoyak.dto.notification.DailyNotificationDTO;
 import com.haru.doyak.harudoyak.dto.notification.SseDataDTO;
 import com.haru.doyak.harudoyak.dto.notification.WeekMonthNotificationDTO;
 import com.haru.doyak.harudoyak.repository.LogRepository;
-import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -19,28 +15,28 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class LetterBatch {
     private final LogRepository logRepository;
     private final NotificationService notificationService;
 
     // 매일 7am 실행 -> 하루도약작성일 다음 날이면 알림
 //    @Scheduled(cron = "0 * * * * *")
-    @Scheduled(cron = "0 0 7 * * *")
+//    @Scheduled(cron = "0 0 7 * * *")
+    @Scheduled(cron = "0 25 11 * * *")
     public void sendDailyFeedback(){
         LocalDate today = LocalDate.now();
         LocalDateTime startDateTime = today.minusDays(1).atStartOfDay();// 어제 00:00
         LocalDateTime endDateTime = startDateTime.plusDays(1).minusNanos(1);// 어제 23:59
-
+        log.info("DAILY"+startDateTime.toString()+"~"+ endDateTime.toString());
         // 도약기록 작성일로 검색해서 편지 가져오기
         List<DailyNotificationDTO> list = logRepository.findLetterMemberWhereBetweenLogCreationDateTime(startDateTime, endDateTime);
         for(DailyNotificationDTO dto : list){
+            log.info(dto.toString());
             Long memberId = dto.getMemberId();
             String sender = dto.getAiNickName();
             String content = dto.getContent()
