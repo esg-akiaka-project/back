@@ -23,7 +23,6 @@ public class DateUtil {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         // 문자열 -> Date
         LocalDateTime date = LocalDateTime.parse(dateStr, formatter);
-        System.out.println(date); // 2021-06-19T21:05:07
 
         return date;
     }
