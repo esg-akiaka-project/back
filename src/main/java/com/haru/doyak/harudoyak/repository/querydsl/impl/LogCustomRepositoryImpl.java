@@ -7,7 +7,6 @@ import com.haru.doyak.harudoyak.dto.log.ResTagDTO;
 import com.haru.doyak.harudoyak.dto.notification.DailyNotificationDTO;
 import com.haru.doyak.harudoyak.dto.notification.WeekMonthNotificationDTO;
 import com.haru.doyak.harudoyak.repository.querydsl.LogCustomRepository;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
@@ -187,9 +186,9 @@ public class LogCustomRepositoryImpl implements LogCustomRepository {
                                 .otherwise(letter.content)
                                 .as("letterContent"),
                         new CaseBuilder()
-                                .when(letter.arrivedDate.isNotNull())
-                                .then(letter.arrivedDate)
-                                .otherwise(letter.arrivedDate)
+                                .when(letter.creationDate.isNotNull())
+                                .then(letter.creationDate)
+                                .otherwise(letter.creationDate)
                                 .as("letterCreationDate")
                 ))
                 .from(log)
