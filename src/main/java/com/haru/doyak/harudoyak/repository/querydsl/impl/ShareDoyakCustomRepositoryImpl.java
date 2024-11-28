@@ -4,7 +4,9 @@ import com.haru.doyak.harudoyak.dto.sharedoyak.ReqShareDoyakDTO;
 import com.haru.doyak.harudoyak.dto.sharedoyak.ResShareDoyakDTO;
 import com.haru.doyak.harudoyak.entity.ShareDoyak;
 import com.haru.doyak.harudoyak.repository.querydsl.ShareDoyakCustomRepository;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -92,7 +94,12 @@ public class ShareDoyakCustomRepositoryImpl implements ShareDoyakCustomRepositor
                                 shareDoyak.shareDoyakId,
                                 shareDoyak.content.as("shareContent"),
                                 file.filePathName.as("shareImageUrl"),
-                                comment.commentId.countDistinct().as("commentCount"),
+                                ExpressionUtils.as(
+                                        JPAExpressions.select(comment.countDistinct())
+                                                .from(comment)
+                                                .where(comment.shareDoyak.shareDoyakId.eq(shareDoyak.shareDoyakId))
+                                        , "commentCount"
+                                ),
                                 doyak.member.memberId.countDistinct().as("doyakCount")
                         )
                 )
