@@ -91,10 +91,16 @@ public class OAuthService {
         GoogleUserResponse userInfo = requestGoogleUserInfo(requestGoogleAccessToken(authorizationCode));
         // provider_id로 가입 했었는지 확인
         String providerId = google_client_name+"_"+userInfo.getId();
-        Optional<Member> optionalMember = memberRepository.findMemberByProviderId(providerId);
+
+        Optional<Member> optionalMember = memberRepository.findMemberByEmail(userInfo.getEmail());
         Member savedMember;
-        if(optionalMember.isEmpty()){
-            // 가입 안되어있으면 가입시키기
+        if(optionalMember.isPresent()){
+            // 기존 계정과 연동
+            savedMember = optionalMember.get();
+            savedMember.updateProviderId(google_client_name, userInfo.getId());
+            savedMember = memberRepository.save(savedMember);
+        }else{
+            // 최초 가입 가입시키기
             Member member = Member.builder()
                     .email(userInfo.email)
                     .isVerified(true)
@@ -102,17 +108,15 @@ public class OAuthService {
                     .providerId(providerId)
                     .nickname(userInfo.name)
                     .build();
-            memberRepository.save(member);
-            savedMember = member;
+            savedMember = memberRepository.save(member);
             // 레벨 생성하기
             Level level = Level.builder()
-                    .memberId(member.getMemberId())
+                    .memberId(savedMember.getMemberId())
                     .point(5L)// 가입시 5포인트
                     .build();
             levelRepository.save(level);
-        }else {
-            savedMember = optionalMember.get();
         }
+
         // 토큰 발행
         JwtRecord jwtRecord = jwtProvider.getJwtRecord(savedMember);
         savedMember.updateRefreshToken(jwtRecord.refreshToken());
