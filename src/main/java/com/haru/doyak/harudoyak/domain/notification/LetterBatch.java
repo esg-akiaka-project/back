@@ -27,12 +27,14 @@ public class LetterBatch {
     // 매일 7am 실행 -> 하루도약작성일 다음 날이면 알림
 //    @Scheduled(cron = "0 * * * * *")
 //    @Scheduled(cron = "0 0 7 * * *")
-    @Scheduled(cron = "0 33 11 * * *")
+    @Scheduled(cron = "0 15 13 * * *")
     public void sendDailyFeedback(){
         LocalDate today = LocalDate.now();
         LocalDateTime startDateTime = today.minusDays(1).atStartOfDay();// 어제 00:00
         LocalDateTime endDateTime = startDateTime.plusDays(1).minusNanos(1);// 어제 23:59
-        log.info("DAILY"+startDateTime.toString()+"~"+ endDateTime.toString());
+
+        log.info("DAILY "+startDateTime+" ~ "+ endDateTime);
+
         // 도약기록 작성일로 검색해서 편지 가져오기
         List<DailyNotificationDTO> list = logRepository.findLetterMemberWhereBetweenLogCreationDateTime(startDateTime, endDateTime);
         for(DailyNotificationDTO dto : list){
@@ -48,12 +50,17 @@ public class LetterBatch {
                     .content(content)
                     .logId(logId)
                     .build();
-            // 알림 전송
-            notificationService.customNotify(
-                    memberId,
-                    sseDataDTO,
-                    "도약이 편지 알림",
-                    SseEventName.DAILY);
+
+            try{// 알림 전송
+                notificationService.customNotify(
+                        memberId,
+                        sseDataDTO,
+                        "도약이 편지 알림",
+                        SseEventName.DAILY);
+            } catch (Exception e){
+                log.error("DAILY 알림중 error : "+e);
+            }
+
         }
     }
 
@@ -69,6 +76,8 @@ public class LetterBatch {
         LocalDateTime startDateTime = startOfLastWeek.atStartOfDay();
         LocalDateTime endDateTime = setLastTime(endOfLastWeek);
 
+        log.info("WEEK "+startDateTime+" ~ "+ endDateTime);
+
         // 저번주 도약기록 작성한 유저만 뽑기
         List<WeekMonthNotificationDTO> list = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, endDateTime);
         for(WeekMonthNotificationDTO dto : list) {
@@ -80,12 +89,16 @@ public class LetterBatch {
                     .startDate(startOfLastWeek.toString())
                     .build();
 
-            // 알림 전송
-            notificationService.customNotify(
-                    memberId,
-                    sseDataDTO,
-                    "지난주 성장기록 알림",
-                    SseEventName.WEEK);
+            try{// 알림 전송
+                notificationService.customNotify(
+                        memberId,
+                        sseDataDTO,
+                        "지난주 성장기록 알림",
+                        SseEventName.WEEK);
+            } catch (Exception e){
+                log.error("DAILY 알림중 error : "+e);
+            }
+
         }
     }
 
@@ -101,6 +114,8 @@ public class LetterBatch {
         LocalDateTime startDateTime = startOfLastMonth.atStartOfDay();
         LocalDateTime endDateTime = setLastTime(endOfLastMonth);
 
+        log.info("MONTH "+startDateTime+" ~ "+ endDateTime);
+
         // 저번달 도약기록 작성한 유저 뽑기
         List<WeekMonthNotificationDTO> list = logRepository.findLogMemberWhereBetweenLogCreationDatetime(startDateTime, endDateTime);
         for(WeekMonthNotificationDTO dto : list) {
@@ -111,13 +126,15 @@ public class LetterBatch {
                     .count(count)
                     .startDate(startOfLastMonth.toString())
                     .build();
-
-            // 알림 전송
-            notificationService.customNotify(
-                    memberId,
-                    sseDataDTO,
-                    "저번달 성장기록 알림",
-                    SseEventName.MONTH);
+            try{// 알림 전송
+                notificationService.customNotify(
+                     memberId,
+                     sseDataDTO,
+                     "저번달 성장기록 알림",
+                     SseEventName.MONTH);
+            } catch (Exception e){
+                log.error("DAILY 알림중 error : "+e);
+            }
         }
     }
 
