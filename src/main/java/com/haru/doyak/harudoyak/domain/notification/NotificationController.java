@@ -49,7 +49,7 @@ public class NotificationController {
 
     @PutMapping("{notificationId}")
     public ResponseEntity putNotificationIsRead(@Authenticated AuthenticatedUser authenticatedUser,
-                                                @PathVariable("notificaionId") Long notificationId){
+                                                @PathVariable("notificationId") Long notificationId){
         return ResponseEntity.ok().body(
                 notificationService.readNotification(authenticatedUser.getMemberId(), notificationId)
         );
