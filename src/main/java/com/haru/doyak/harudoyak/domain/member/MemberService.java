@@ -39,8 +39,19 @@ public class MemberService {
     }
 
     public boolean isEmailAvailable(String email) {
+        // 존재하지 않으면 true
+        // 존재할때 providernull이 아니면 가능
         Optional<Member> optionalMember = memberRepository.findMemberByEmail(email);
-        return optionalMember.isEmpty();
+
+        if(optionalMember.isEmpty()){
+            return true;
+        }
+
+        String provider = optionalMember.get().getProvider();
+        if(provider != null) {// 구글 가입 한 적 있으면 자체가입 가능
+            return true;
+        }
+        return false;
     }
 
     public MemberResDTO changeNickname(Long memberId, String newNickname) {
