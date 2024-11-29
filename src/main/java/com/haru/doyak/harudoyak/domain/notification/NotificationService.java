@@ -2,6 +2,8 @@ package com.haru.doyak.harudoyak.domain.notification;
 
 import com.haru.doyak.harudoyak.dto.notification.SseDataDTO;
 import com.haru.doyak.harudoyak.entity.Notification;
+import com.haru.doyak.harudoyak.exception.CustomException;
+import com.haru.doyak.harudoyak.exception.ErrorCode;
 import com.haru.doyak.harudoyak.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -98,5 +100,17 @@ public class NotificationService {
                 .memberId(memberId)
                 .build();
         notificationRepository.save(notification);
+    }
+
+    public Notification readNotification(Long memberId, Long notificationId) {
+        Notification notification = notificationRepository
+                .findById(notificationId).orElseThrow(()-> new CustomException(ErrorCode.NOTIFICATION_NOT_FOND));
+
+        if(notification.getMemberId()!=memberId){
+            throw new CustomException(ErrorCode.DIFFERENT_MEMBER_TOKEN);
+        }
+
+        if(!notification.getIsRead()) notification.read();
+        return notificationRepository.save(notification);
     }
 }
