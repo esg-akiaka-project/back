@@ -39,6 +39,7 @@ public enum ErrorCode {
     LETTER_LIST_NOT_FOUND(HttpStatus.NOT_FOUND, "도약이 편지(피드백) 목록이 없습니다."),
     EMOTION_LIST_NOT_FOUND(HttpStatus.NOT_FOUND, "감정 목록이 없습니다."),
     TAG_LIST_NOT_FOUND(HttpStatus.NOT_FOUND, "태그 목록이 없습니다."),
+    NOTIFICATION_NOT_FOND(HttpStatus.NOT_FOUND, "알림이 없습니다."),
 
     // 405 Method Not Allowed
 

@@ -4,6 +4,7 @@ import com.haru.doyak.harudoyak.dto.auth.jwt.JwtMemberDTO;
 import com.haru.doyak.harudoyak.dto.auth.jwt.JwtRecord;
 import com.haru.doyak.harudoyak.entity.Level;
 import com.haru.doyak.harudoyak.entity.Member;
+import com.haru.doyak.harudoyak.exception.CustomException;
 import com.haru.doyak.harudoyak.repository.FileRepository;
 import com.haru.doyak.harudoyak.repository.LevelRepository;
 import com.haru.doyak.harudoyak.repository.MemberRepository;
@@ -83,36 +84,42 @@ public class OAuthService {
     }
 
     /**
-     *
      * @param authorizationCode 구글 로그인 성공 후 redirect uri로 받은 인가코드
      * @return db에 없으면 레벨도 함꼐 생성해 저장 후, jwt를 생성해 member와 jwt를 반환
      */
     public JwtMemberDTO googleLogin(String authorizationCode){
         GoogleUserResponse userInfo = requestGoogleUserInfo(requestGoogleAccessToken(authorizationCode));
-        // provider_id로 가입 했었는지 확인
-        String providerId = google_client_name+"_"+userInfo.getId();
-        Optional<Member> optionalMember = memberRepository.findMemberByProviderId(providerId);
+
+        String providerId = google_client_name + "_" +userInfo.getId();
+
+        // email로 가입 했었는지 확인
+        Optional<Member> optionalMember = memberRepository.findMemberByEmail(userInfo.getEmail());
         Member savedMember;
-        if(optionalMember.isEmpty()){
-            // 가입 안되어있으면 가입시키기
+        if(optionalMember.isPresent()){
+            savedMember = optionalMember.get();
+            if(savedMember.getProviderId()==null){
+                // 자체가입 했던 경우 연동
+                savedMember.updateProviderId(google_client_name, userInfo.getId());
+                savedMember = memberRepository.save(savedMember);
+            }
+        }else{
+            // 최초 가입 가입시키기
             Member member = Member.builder()
-                    .email(userInfo.email)
+                    .email(userInfo.getEmail())
                     .isVerified(true)
                     .provider(google_client_name)
                     .providerId(providerId)
-                    .nickname(userInfo.name)
+                    .nickname(userInfo.getName())
                     .build();
-            memberRepository.save(member);
-            savedMember = member;
+            savedMember = memberRepository.save(member);
             // 레벨 생성하기
             Level level = Level.builder()
-                    .memberId(member.getMemberId())
+                    .memberId(savedMember.getMemberId())
                     .point(5L)// 가입시 5포인트
                     .build();
             levelRepository.save(level);
-        }else {
-            savedMember = optionalMember.get();
         }
+
         // 토큰 발행
         JwtRecord jwtRecord = jwtProvider.getJwtRecord(savedMember);
         savedMember.updateRefreshToken(jwtRecord.refreshToken());
