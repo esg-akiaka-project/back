@@ -29,6 +29,8 @@ public enum ErrorCode {
     SHARE_DOYAK_LIST_NOT_FOUND(HttpStatus.NOT_FOUND, "서로도약 글 목록이 없습니다."),
     SHARE_DOYAK_NOT_FOUND(HttpStatus.NOT_FOUND, "이미 삭제된 서로도약 글이거나 없는 서로도약 글 입니다."),
     SHARE_DOYAK_NOT_AUTHOR(HttpStatus.NOT_FOUND, "서로도약 글의 작성자가 아닙니다."),
+    DOYAK_LIST_NOT_FOUND(HttpStatus.NOT_FOUND, "도약하기 목록이 없습니다."),
+    DOYAK_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 서로도약에 도약하기를 누르지 않았습니다."),
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "이미 삭제된 파일이거나 없는 파일 입니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "이미 삭제된 댓글이거나 없는 댓글 입니다."),
     COMMENT_NOT_AUTHOR(HttpStatus.NOT_FOUND, "댓글의 작성자가 아닙니다."),
