@@ -36,22 +36,6 @@ public class Comment {
     @CreationTimestamp
     private LocalDateTime creationDate;         // 댓글 등록일
 
-    @NotNull
-    private Boolean isRemoved;  // 댓글 삭제여부
-
-    private Boolean isRead; // 알림읽기 여부
-
-    /**
-     * insert 되기전 (persist 되기전) 실행된다.
-     * */
-    @PrePersist
-    public void prePersist() {
-        if (this.isRemoved == null && this.isRead == null) {
-            this.isRemoved = false;
-            this.isRead = false;
-        }
-    }
-
     @Builder
     public Comment(ShareDoyak shareDoyak, Member member, Long parentCommentId, String content) {
         this.shareDoyak = shareDoyak;

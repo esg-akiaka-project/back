@@ -33,13 +33,10 @@ public class Log {
     private String emotion;             // 오늘의 감정
     
     private LocalDateTime creationDate; // 도약기록 작성일
-    
-    private Boolean isRead;             // 도약기록 알림 읽기 여부
 
     @PrePersist
     private void prePersist() {
         this.creationDate = LocalDateTime.now();
-        this.isRead = false;
     }
 
     @Builder
@@ -48,7 +45,6 @@ public class Log {
         this.content = content;
         this.emotion = emotion;
         this.creationDate = creationDate;
-        this.isRead = isRead;
         this.file = file;
     }
 
