@@ -47,4 +47,12 @@ public class NotificationController {
         else throw new CustomException(ErrorCode.BAD_CATEGORY_NAME);
     }
 
+    @PutMapping("{notificationId}")
+    public ResponseEntity putNotificationIsRead(@Authenticated AuthenticatedUser authenticatedUser,
+                                                @PathVariable("notificationId") Long notificationId){
+        return ResponseEntity.ok().body(
+                notificationService.readNotification(authenticatedUser.getMemberId(), notificationId)
+        );
+    }
+
 }

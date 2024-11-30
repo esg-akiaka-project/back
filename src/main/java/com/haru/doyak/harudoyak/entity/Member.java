@@ -92,8 +92,9 @@ public class Member {
     public void updateGoalName(String goalName){
         this.goalName = goalName;
     }
-    public void updateLocalProviderId(){
-        this.providerId = this.provider+"_"+this.memberId;
+    public void updateProviderId(String provider, String id) {
+        this.provider = provider;
+        this.providerId = this.provider + "_" + id;
     }
     public void updateFile(File file){
         this.file = file;
