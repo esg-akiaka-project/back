@@ -169,12 +169,6 @@ public class ShareDoyakService {
         }
     }
 
-    /*
-     * 도약하기 추가
-     * req : memberId(Long), shareDoyakId(Long)
-     * res : doyakCount(Long)
-     * */
-
     /**
      * 도약하기 추가 & 도약하기 취소
      * @param memberId 회원pk
