@@ -89,18 +89,14 @@ public class LogService {
     @Transactional
     public ResLogDTO.ResWeeklyLogDTO getWeeklyLogDetail(Long memberId, String creationDate) {
 
-        log.info("memberId 잘 오니? {} ", memberId);
-
         try {
 
             // String 문자열 LocalDateTime으로 변환
             LocalDateTime resultLocalDateTime = dateUtil.stringToLocalDateTime(creationDate);
             // 월요일 00:00:00 계산
             LocalDateTime mondayDate = resultLocalDateTime.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-            log.info("mondayDate {} ", mondayDate);
             // 일요일 23:59:59 계산
             LocalDateTime sundayDate = resultLocalDateTime.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)).withHour(23).withMinute(59).withSecond(59);
-            log.info("sundayDate {} ", sundayDate);
 
             ResLogDTO.ResWeeklyLogDTO resWeeklyLogDTO = new ResLogDTO.ResWeeklyLogDTO();
             List<ResLetterDTO.LetterWeeklyDTO> letterWeeklyDTOS = logRepository.findLetterByDate(memberId, mondayDate, sundayDate)
