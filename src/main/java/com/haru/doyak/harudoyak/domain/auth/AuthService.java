@@ -55,6 +55,7 @@ public class AuthService {
                     .email(joinReqDTO.getEmail())
                     .password(passwordEncoder.encode(joinReqDTO.getPassword()))
                     .nickname(joinReqDTO.getNickname())
+                    .isVerified(true)
                     .build();
             memberRepository.save(member);
             // 레벨 생성하기
