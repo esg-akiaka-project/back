@@ -140,10 +140,6 @@ public class CommentService {
      */
     @Transactional
     public void setCommentAdd(Long memberId, Long shareDoyakId, ReqCommentDTO reqCommentDTO){
-        // 회원아이디와 서로도약아이디 null체크
-        if(memberId == 0 && shareDoyakId == 0){
-
-        }
 
         try {
 

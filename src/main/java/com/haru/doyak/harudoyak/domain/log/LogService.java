@@ -89,27 +89,20 @@ public class LogService {
     @Transactional
     public ResLogDTO.ResWeeklyLogDTO getWeeklyLogDetail(Long memberId, String creationDate) {
 
-        log.info("memberId 잘 오니? {} ", memberId);
-
         try {
 
             // String 문자열 LocalDateTime으로 변환
             LocalDateTime resultLocalDateTime = dateUtil.stringToLocalDateTime(creationDate);
             // 월요일 00:00:00 계산
             LocalDateTime mondayDate = resultLocalDateTime.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-            log.info("mondayDate {} ", mondayDate);
             // 일요일 23:59:59 계산
             LocalDateTime sundayDate = resultLocalDateTime.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)).withHour(23).withMinute(59).withSecond(59);
-            log.info("sundayDate {} ", sundayDate);
 
             ResLogDTO.ResWeeklyLogDTO resWeeklyLogDTO = new ResLogDTO.ResWeeklyLogDTO();
             List<ResLetterDTO.LetterWeeklyDTO> letterWeeklyDTOS = logRepository.findLetterByDate(memberId, mondayDate, sundayDate)
                                                                   .orElseThrow(() -> new CustomException(ErrorCode.LETTER_LIST_NOT_FOUND));
             List<EmotionDTO> emotionDTOS = logRepository.findEmotionByDate(memberId, mondayDate, sundayDate)
                                            .orElseThrow(() -> new CustomException(ErrorCode.EMOTION_LIST_NOT_FOUND));
-            for(EmotionDTO emotionDTO : emotionDTOS){
-
-            }
             List<ResTagDTO.TagWeeklyDTO> tagWeeklyDTOS = logRepository.findTagsByName(memberId, mondayDate, sundayDate)
                                                          .orElseThrow(() -> new CustomException(ErrorCode.TAG_LIST_NOT_FOUND));
 
@@ -170,7 +163,7 @@ public class LogService {
             Log selectLog = logRepository.findLogByLogId(LogId).orElseThrow(() -> new CustomException(ErrorCode.LOG_NOT_FOUND));
 
             // 회원과 도약기록이 존재한다면
-            if(selectMember.getMemberId() != null && selectLog.getLogId() != null) {
+            if(selectMember.getMemberId() > 0 && selectLog.getLogId() > 0) {
 
                 Letter letter = Letter.builder()
                         .log(selectLog)
@@ -227,7 +220,7 @@ public class LogService {
 
             ResLogDTO.ResLogAddDTO resLogAddDTO = new ResLogDTO.ResLogAddDTO();
             // 회원이 존재한다면
-            if (selectMember.getMemberId() != null){
+            if (selectMember.getMemberId() > 0){
 
                 // 이미지 url이 있다면
                 if(reqLogDTO.getLogImageUrl() != null){
