@@ -107,9 +107,6 @@ public class LogService {
                                                                   .orElseThrow(() -> new CustomException(ErrorCode.LETTER_LIST_NOT_FOUND));
             List<EmotionDTO> emotionDTOS = logRepository.findEmotionByDate(memberId, mondayDate, sundayDate)
                                            .orElseThrow(() -> new CustomException(ErrorCode.EMOTION_LIST_NOT_FOUND));
-            for(EmotionDTO emotionDTO : emotionDTOS){
-
-            }
             List<ResTagDTO.TagWeeklyDTO> tagWeeklyDTOS = logRepository.findTagsByName(memberId, mondayDate, sundayDate)
                                                          .orElseThrow(() -> new CustomException(ErrorCode.TAG_LIST_NOT_FOUND));
 
@@ -170,7 +167,7 @@ public class LogService {
             Log selectLog = logRepository.findLogByLogId(LogId).orElseThrow(() -> new CustomException(ErrorCode.LOG_NOT_FOUND));
 
             // 회원과 도약기록이 존재한다면
-            if(selectMember.getMemberId() != null && selectLog.getLogId() != null) {
+            if(selectMember.getMemberId() > 0 && selectLog.getLogId() > 0) {
 
                 Letter letter = Letter.builder()
                         .log(selectLog)
@@ -227,7 +224,7 @@ public class LogService {
 
             ResLogDTO.ResLogAddDTO resLogAddDTO = new ResLogDTO.ResLogAddDTO();
             // 회원이 존재한다면
-            if (selectMember.getMemberId() != null){
+            if (selectMember.getMemberId() > 0){
 
                 // 이미지 url이 있다면
                 if(reqLogDTO.getLogImageUrl() != null){
