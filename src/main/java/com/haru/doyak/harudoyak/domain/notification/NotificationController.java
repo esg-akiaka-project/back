@@ -55,4 +55,13 @@ public class NotificationController {
         );
     }
 
+    @PostMapping("push/{memberId}/{year}/{month}/{day}")
+    public ResponseEntity pushNotification(@PathVariable("memberId") Long memberId,
+                                           @PathVariable("year") int year,
+                                           @PathVariable("month") int month,
+                                           @PathVariable("day") int day){
+        letterBatch.sendTodayFeedbackToMemberId(memberId, year, month, day);
+        return ResponseEntity.ok().body(memberId+"에게 알림 전송");
+    }
+
 }

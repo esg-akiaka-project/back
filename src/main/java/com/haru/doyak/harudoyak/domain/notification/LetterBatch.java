@@ -141,4 +141,34 @@ public class LetterBatch {
     public LocalDateTime setLastTime(LocalDate localDate){
         return localDate.atTime(23, 59, 59,999999999);
     }
+
+    public void sendTodayFeedbackToMemberId(Long memberId, int year, int month, int day) {
+        LocalDate today = LocalDate.of(year, month, day);
+        log.info(today+"날짜의 도악기록에 대한 편지 알림 요청");
+        LocalDateTime startDateTime = today.atStartOfDay();
+        LocalDateTime lastDateTime = setLastTime(today);
+        List<DailyNotificationDTO> list = logRepository.findLetterMemberWhereBetweenLogCreationDateTime(startDateTime, lastDateTime);
+
+        for(DailyNotificationDTO dto : list){
+            if(dto.getMemberId().equals(memberId)){
+                SseDataDTO sseDataDTO = SseDataDTO.builder()
+                        .sender(dto.getAiNickName())
+                        .content(dto.getContent())
+                        .logId(dto.getLogId())
+                        .build();
+                log.info("알림 찾고 전송");
+                try{// 알림 전송
+                    notificationService.customNotify(
+                            memberId,
+                            sseDataDTO,
+                            "도약이 편지 알림",
+                            SseEventName.DAILY);
+                } catch (Exception e){
+                    log.error("DAILY 알림중 error : "+e);
+                }
+                log.info("전송완료");
+                break;
+            }
+        }
+    }
 }
