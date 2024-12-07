@@ -24,7 +24,7 @@ public class NotificationCustomRepositoryImpl implements NotificationCustomRepos
                         notification.memberId.eq(memberId)
                                 .and(notification.category.eq(category))
                 )
-                .orderBy(notification.notificationId.desc())
+                .orderBy(notification.creationDate.desc())
                 .fetch();
     }
 }
