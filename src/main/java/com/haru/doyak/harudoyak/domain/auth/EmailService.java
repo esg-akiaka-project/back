@@ -22,6 +22,8 @@ public class EmailService {
     private String mailVerifyUriLocal;
     @Value("${spring.mail.verify-uri-site}")
     private String mailVerifyUriSite;
+    @Value("${domain}")
+    private String domain;
 
     public void sendAuthLinkEmail(String referrer, String recipient) {
         try {
@@ -49,8 +51,8 @@ public class EmailService {
 
     public String getMailVerifyUri(String referrer){
         if(referrer!= null &&
-                referrer.startsWith("https://www.harudoyak.site") ||
-                referrer.startsWith("https://harudoyak.site")) return mailVerifyUriSite;
+                referrer.startsWith("https://www."+domain) ||
+                referrer.startsWith("https://"+domain)) return mailVerifyUriSite;
         else return mailVerifyUriLocal;
     }
 
