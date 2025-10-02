@@ -16,6 +16,8 @@
 https://www.notion.so/ruiiary/ESG-SW-PROJECT-1190df5de2c380de90a8d42b237a62ea?pvs=4
 <br>
  (프로젝트 notion)
+ 
+도메인 주소 : https://harudoyak.store
 
 ### 기획 배경
 
